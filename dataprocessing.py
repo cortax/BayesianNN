@@ -19,6 +19,23 @@ def load_dfs(path_name, columns=range(2,12)):
     return dfs
 
 
+def dataset_df_to_tensor(df, K):
+    K = 100
+    N = D.shape[0]-K
+
+    lst_x = []
+    lst_y = []
+    for i in range(K,N):
+        xi = D[(i-K):i,inputs_idx].flatten()
+        lst_x.append(torch.Tensor(xi))
+        yi = D[i,outputs_idx]
+        lst_y.append(torch.Tensor(yi))
+
+    X = torch.stack(lst_x)
+    Y = torch.stack(lst_y)
+    return(X,Y)
+
+
 
 
 
