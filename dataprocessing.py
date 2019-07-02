@@ -5,7 +5,7 @@ import torch
 import numpy as np
 
 
-def load_dfs(path_name):
+def load_dfs(path_name, columns=range(2,12)):
 
     assert(isinstance(path_name, str))
 
@@ -17,7 +17,7 @@ def load_dfs(path_name):
     dfs = []
     for file_name in file_names:
         if file_name.endswith('.csv'):
-            dfs += [read_csv(path_name + '/' + file_name, skiprows=2)]
+            dfs.append(read_csv(path_name + '/' + file_name, usecols=columns, skiprows=2))
 
     return dfs
 
