@@ -1,9 +1,14 @@
 from pandas import read_csv
 from os import listdir
-import pandas as pd
-import torch
-import numpy as np
+from torch.utils.data import TensorDataset
+from torch.utils.data import DataLoader
 
+import torch
+
+from torch.utils.data import DataLoader
+
+def data_loader(X,y):
+    return DataLoader(TensorDataset(X,y), batch_size=32)
 
 def load_dfs(path_name, columns=range(2,12)):
 
