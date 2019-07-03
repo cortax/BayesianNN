@@ -45,6 +45,21 @@ def dataset_df_to_tensor(df, K):
     Y = torch.stack(lst_y)
     return(X,Y)
 
+def load_tensor_from_csv(path_name, K):
+    L = load_dfs(path_name)
+
+    lst_x = []
+    lst_y = []
+
+    for j in range(0,len(L)):
+        (Xj,Yj) = dataset_df_to_tensor(L[j],K)
+        lst_x.append(Xj)
+        lst_y.append(Yj)
+
+    X = torch.cat(lst_x, 0)
+    Y = torch.cat(lst_y, 0)
+    return (X,Y)
+
 
 
 
