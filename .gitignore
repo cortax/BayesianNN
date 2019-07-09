@@ -1,9 +1,5 @@
+notebooks/\.ipynb_checkpoints/
+DataBombardier/*
 
 \.vscode/settings\.json
-
-\.ipynb_checkpoints/
-
 *.pyc
-Untitled\.ipynb
-
-test\.ipynb
