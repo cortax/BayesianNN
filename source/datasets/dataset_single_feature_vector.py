@@ -5,10 +5,7 @@ import torch.utils.data as data
 from source.utils.preprocessing import *
 
 class SingleFeatureVectorDataset(data.Dataset):
-    def __init__(self, target_type_string, target_choice,
-                    split_train_test_ratio=0.8, split_train_valid_ratio=0.8, 
-                    normalize=False,
-                    random_seed=42):
+    def __init__(self, target_type_string, target_choice):
         #target_choice is a parameter that yield what forecasting problem we are on.
             #1 is for bay 1, 2 is for bay 2, 0 is for both bays.
 
