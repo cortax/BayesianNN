@@ -65,7 +65,7 @@ def train(model, X,y, n_epoch=2, learning_rate=0.01):
 if __name__ == "__main__":
 
     dfs = load_dfs("../DataBombardier/")
-    K = 1000
+    K = 10
     Xs = []; ys = []
 
     df_test = dfs[0]
