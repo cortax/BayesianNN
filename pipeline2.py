@@ -17,16 +17,16 @@ class NNModel(nn.Module):
     def __init__(self, input_dim, H):
         super(NNModel, self).__init__()
 
-        self.linear1 = nn.Linear(input_dim, H)
-        self.linear2 = nn.Linear(H, H)
+        #self.linear1 = nn.Linear(input_dim, H)
+        #self.linear2 = nn.Linear(H, H)
         #self.linear3 = nn.Linear(H, H)
-        self.fc = nn.Linear(H, 1)
+        self.fc = nn.Linear(H, 1, bias=False)
 
     def forward(self, x):
-        h_relu1 = F.relu(self.linear1(x))
-        h_relu2 = F.relu(self.linear2(h_relu1))
+        #h_relu1 = F.relu(self.linear1(x))
+        #h_relu2 = F.relu(self.linear2(h_relu1))
         #h_relu3 = F.relu(self.linear3(h_relu2))
-        y = self.fc(h_relu2)
+        y = self.fc(x)
         return y
 
 
@@ -65,16 +65,17 @@ def train(model, X,y, n_epoch=2, learning_rate=0.01):
 if __name__ == "__main__":
 
     dfs = load_dfs("../DataBombardier/")
-    K = 1000
+    K = 1
     Xs = []; ys = []
+    with_y = True
 
     df_test = dfs[0]
     dfs_train = dfs[1:]
 
-    X_test,y_test = dataset_df_to_tensor(df_test, K)
+    X_test,y_test = dataset_df_to_tensor(df_test, K, with_y=with_y)
 
     for df in dfs_train:
-        X,y = dataset_df_to_tensor(df, K)
+        X,y = dataset_df_to_tensor(df, K, with_y=with_y)
 
         Xs.append(X)
         ys.append(y)
@@ -85,8 +86,8 @@ if __name__ == "__main__":
     print(X_train.shape)
     print(X_test.shape)
 
-    model = NNModel(X_train.shape[1], 1000)
-    train(model, X_train, y_train, n_epoch=50)
+    model = NNModel(X_train.shape[1], 1)
+    train(model, X_train, y_train, n_epoch=20)
 
     criterion = nn.L1Loss()
 

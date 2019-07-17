@@ -7,9 +7,6 @@ import torch
 
 from torch.utils.data import DataLoader
 
-def data_loader(X,y):
-    return DataLoader(TensorDataset(X,y), batch_size=32)
-
 def load_dfs(path_name, columns=range(2,12)):
 
     assert(isinstance(path_name, str))
@@ -26,18 +23,24 @@ def load_dfs(path_name, columns=range(2,12)):
 
     return dfs
 
-def dataset_df_to_tensor(df, K):
-    inputs_idx = [1,2,3,4,5]
+def dataset_df_to_tensor(df, K, with_y=False):
+    inputs_idx = []
     outputs_idx = [7]
+
+    if with_y:
+        inputs_idx.append(7)
 
     D = df.to_numpy()
     N = D.shape[0]-K
 
     lst_x = []
     lst_y = []
+
     for i in range(K,N):
+
         xi = D[(i-K):i,inputs_idx].flatten()
         lst_x.append(torch.Tensor(xi))
+
         yi = D[i,outputs_idx]
         lst_y.append(torch.Tensor(yi))
 
@@ -58,6 +61,7 @@ def load_tensor_from_csv(path_name, K):
 
     X = torch.cat(lst_x, 0)
     Y = torch.cat(lst_y, 0)
+
     return (X,Y)
 
 
