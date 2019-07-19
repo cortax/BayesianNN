@@ -1,21 +1,96 @@
 import glob
 import os
 import math
+import torch
+import random
 import pandas as pd
 import numpy as np
 
 
+#list of dataframes into non overlapping sliding windows
+def list_df_to_contiguous_sliding_windows_arrays(list_df, window_size, rem_beg=True):
+    all_windows = []
+    for dfs in list_df:
+        windows = df_to_contiguous_sliding_windows_arrays(dfs, window_size, rem_beg=True)
+        all_windows.extend(windows)
+    return all_windows
+
+#single dataframe into non overlapping sliding windows
+def df_to_contiguous_sliding_windows_arrays(df, window_size, rem_beg=True):
+    amount_to_remove = len(df)%window_size
+    if rem_beg:
+        df_rem = remove_df_starting_rows(df, amount_to_remove)
+    elif not rem_beg:
+        df_rem = remove_df_ending_rows(df, amount_to_remove)
+    
+    rows = []
+    windows = []
+    for index, row in df_rem.iterrows():
+        rows.append(row.values.tolist())
+        if len(rows)==window_size:
+            windows.append(rows)
+            rows = []
+    return windows
+
+#list of dataframes into overlapping sliding windows
+def list_df_to_overlapping_sliding_windows_arrays(list_df, window_size):
+    all_windows = []
+    for dfs in list_df:
+        windows = df_to_overlapping_sliding_windows_arrays(dfs, window_size)
+        all_windows.extend(windows)
+    return all_windows
+
+#single dataframe into overlapping sliding windows
+def df_to_overlapping_sliding_windows_arrays(dataframe, window_size):
+    values_array = dataframe.values                 
+    s0, s1 = values_array.strides
+    row, col = values_array.shape
+    windows = np.lib.stride_tricks.as_strided(values_array, shape=(row-window_size+1, window_size, col), strides=(s0, s0, s1))
+    return windows
+
+#function to remove N starting rows from a dataframe
+def remove_df_starting_rows(dataframe, amount_to_remove):
+    if amount_to_remove > 0:
+        df = dataframe.iloc[amount_to_remove:]                 
+        return df
+    else:
+        return dataframe
+
+#function to remove N trailing rows from a dataframe
+def remove_df_ending_rows(dataframe, amount_to_remove):
+    if amount_to_remove > 0:
+        df = dataframe.iloc[:-amount_to_remove]                 
+        return df
+    else:
+        return dataframe
+
+#function for ordering files. Very basic (hardcoded positions)
 def sortKeyFunc(s):
     return int(os.path.basename(s)[12:-4])
 
-def split_dataframe_on_ratio(dataframe, ratio):
-    rows, cols = dataframe.shape
-    index_where_to_split = math.floor(rows * ratio)
-    dataframe_part_A = dataframe.iloc[:index_where_to_split]
-    dataframe_part_B = dataframe.iloc[index_where_to_split:]
-    
-    return dataframe_part_A, dataframe_part_B
+#dataframe rows into a vector
+def df_rows_to_vectors(df):
+    vectors = []
+    for rows in range(len(df)):
+        row = df.iloc[rows]
+        vectors.append(row.values.tolist())
+    return vectors
 
+#splitting a pythong list or ndarray into 2 parts according to specificied ratio
+def split_list_on_ratio(liste, ratio, shuffle=False, random_seed=42):
+    len_list = len(liste)
+    if shuffle:
+        random.seed(random_seed)
+        random.shuffle(liste)
+    
+    index_where_to_split = math.floor(len_list * ratio)
+
+    list_part_a = liste[:index_where_to_split]
+    list_part_b = liste[index_where_to_split:]
+    
+    return list_part_a, list_part_b
+
+#loading multiple csv into multiple dataframes, where each csv is a dataframe. Partly hardcoded for a bombardier flight test CSV files.
 def bomb_csv_to_df(csv_stringLoader):
     list_df = []
     list_data_units = []
