@@ -5,7 +5,11 @@ import torch.utils.data as data
 from source.utils.preprocessing import *
 
 
-def get_vectors_datasets(csv_files_path, forecasting, feature_endo, feature_exo, target_choice, shift_delta, train_test_ratio, train_valid_ratio, shuffle=False, random_seed=42):
+def get_vectors_datasets(csv_files_path,
+                            forecasting, feature_endo, feature_exo, target_choice, 
+                            shift_delta, 
+                            train_test_ratio, train_valid_ratio, 
+                            shuffle=False, random_seed=42):
     #loading CSV
     list_df, list_data_units, list_data_label_type = bomb_csv_to_df(csv_files_path)
     
@@ -70,3 +74,9 @@ class VectorsDataset(data.Dataset):
             return len(self.targets)
         else:
             raise('The dataset does not have one target per feature and vice versa')
+
+    def input_size(self, index=0):
+        return len(self.features[index])
+
+    def output_size(self, index=0):
+        return len(self.targets[index])

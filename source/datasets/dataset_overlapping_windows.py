@@ -70,3 +70,9 @@ class OverlappingWindowsDataset(data.Dataset):
             return len(self.targets)
         else:
             raise('The dataset does not have one target per feature and vice versa')
+        
+    def input_size(self, index=0):
+        return len(self.features[index].tolist())
+
+    def output_size(self, index=0):
+        return len(self.targets[index][-1].tolist())

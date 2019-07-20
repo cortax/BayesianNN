@@ -9,20 +9,16 @@ from source.utils.plot import plot_confusion_matrix
 from source.utils.plot import histograms_lineGraphs_moments_pandas
 
 
-class IndexGRUModel(nn.Module):
-    def __init__(self, amount_features, 
-                        number_classes, 
-                        window_size, 
-                        hidden_size, 
-                        num_layers, 
-                        bias=True, 
-                        batch_first=True, 
-                        dropout_hidden=0, 
-                        bidirectional=False, 
-                        dropout_layer=0):
+class GatedRecurrentUnitNetworkModel(nn.Module):
+    def __init__(self, input_size, output_size, window_size, 
+                        hidden_size, num_layers, 
+                        target_type_string='Regression',
+                        bias=True, batch_first=True, 
+                        bidirectional=False,
+                        dropout_hidden=0, dropout_layer=0):
 
         super().__init__()
-        self.gru = nn.GRU(input_size=amount_features,
+        self.gru = nn.GRU(input_size=input_size,
                             hidden_size=hidden_size,
                             num_layers=num_layers,
                             bias=bias,
@@ -30,14 +26,12 @@ class IndexGRUModel(nn.Module):
                             dropout=dropout_hidden, 
                             bidirectional=bidirectional)
         self.dropout_layer = nn.Dropout(dropout_layer)
-        self.predict_layer = nn.Linear(hidden_size * num_layers * (bidirectional + 1), number_classes) #(hidden*layers*1, 1)
+        self.predict_layer = nn.Linear(hidden_size * num_layers * (bidirectional + 1), output_size) #(hidden*layers*1, 1)
         
-        if number_classes == 1:
+        if target_type_string=='Regression':
             self.loss_function = nn.MSELoss()
-            self.target_type_string = 'Regression'
-        else:
+        elif target_type_string=='Classification':
             self.loss_function = nn.CrossEntropyLoss()
-            self.target_type_string = 'Classification'
              
     def forward(self, input):
         #print('batch:', input)
