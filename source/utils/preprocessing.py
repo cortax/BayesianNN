@@ -6,17 +6,16 @@ import random
 import pandas as pd
 import numpy as np
 
-
 #list of dataframes into non overlapping sliding windows
-def list_df_to_contiguous_sliding_windows_arrays(list_df, window_size, rem_beg=True):
+def list_df_to_contiguous_sliding_windows(list_df, window_size, rem_beg=True):
     all_windows = []
     for dfs in list_df:
-        windows = df_to_contiguous_sliding_windows_arrays(dfs, window_size, rem_beg=True)
+        windows = df_to_contiguous_sliding_windows(dfs, window_size, rem_beg=True)
         all_windows.extend(windows)
     return all_windows
 
 #single dataframe into non overlapping sliding windows
-def df_to_contiguous_sliding_windows_arrays(df, window_size, rem_beg=True):
+def df_to_contiguous_sliding_windows(df, window_size, rem_beg=True):
     amount_to_remove = len(df)%window_size
     if rem_beg:
         df_rem = remove_df_starting_rows(df, amount_to_remove)
@@ -33,16 +32,16 @@ def df_to_contiguous_sliding_windows_arrays(df, window_size, rem_beg=True):
     return windows
 
 #list of dataframes into overlapping sliding windows
-def list_df_to_overlapping_sliding_windows_arrays(list_df, window_size):
+def list_df_to_overlapping_sliding_windows(list_df, window_size):
     all_windows = []
     for dfs in list_df:
-        windows = df_to_overlapping_sliding_windows_arrays(dfs, window_size)
+        windows = df_to_overlapping_sliding_windows(dfs, window_size)
         all_windows.extend(windows)
     return all_windows
 
 #single dataframe into overlapping sliding windows
-def df_to_overlapping_sliding_windows_arrays(dataframe, window_size):
-    values_array = dataframe.values                 
+def df_to_overlapping_sliding_windows(dataframe, window_size):
+    values_array = dataframe.values
     s0, s1 = values_array.strides
     row, col = values_array.shape
     windows = np.lib.stride_tricks.as_strided(values_array, shape=(row-window_size+1, window_size, col), strides=(s0, s0, s1))
@@ -67,6 +66,14 @@ def remove_df_ending_rows(dataframe, amount_to_remove):
 #function for ordering files. Very basic (hardcoded positions)
 def sortKeyFunc(s):
     return int(os.path.basename(s)[12:-4])
+
+#list of dataframe rows into vectors
+def list_df_rows_to_vectors(list_df):
+    all_vectors = []
+    for dfs in list_df:
+        vectors = df_rows_to_vectors(dfs)
+        all_vectors.extend(vectors)
+    return all_vectors
 
 #dataframe rows into a vector
 def df_rows_to_vectors(df):
