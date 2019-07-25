@@ -1,5 +1,6 @@
 notebooks/\.ipynb_checkpoints/
 DataBombardier/*
+Data_MNIST
 
 \.vscode/settings\.json
 *.pyc
