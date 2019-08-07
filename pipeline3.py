@@ -1,91 +1,120 @@
 import torch
+import math
+
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import numpy as np
 
-from torch.utils.data import TensorDataset
+from torch.optim.lr_scheduler import MultiStepLR
 from torch.utils.data import DataLoader
-
 from collections import OrderedDict
-
 from dataprocessing import load_dfs
 from dataprocessing import DatasetBasic
+from matplotlib import pyplot as plt
 
 class NNModelBasic(nn.Module):
 
-    def __init__(self, dim_exo, dim_endo, past_steps, future_steps, layer_width):
+    def __init__(self, dim_exo, dim_endo, past_steps, layer_width):
 
         super(NNModelBasic, self).__init__()
+        withbias = True
 
         H = layer_width
 
         self.past_steps = past_steps
-        self.future_steps = future_steps
 
-        self.ExoLayers = nn.ModuleList([nn.Linear(dim_exo,H, bias=False) for n in range(past_steps + 1)])
-        self.EndoLayers = nn.ModuleList([nn.Linear(dim_endo,H, bias=(n==0)) for n in range(past_steps)])
+        self.dim_exo = dim_exo
+        self.dim_endo = dim_endo
+
+        dims = dim_exo * (past_steps + 1) + dim_endo * past_steps
+
+        self.ExoLayer = nn.Linear(dim_exo*(past_steps+1), H, bias=False)
+        nn.init.constant_(self.ExoLayer.weight,0)
+
+        self.EndoLayer = nn.Linear(dim_endo*past_steps, H, bias=withbias)
+        nn.init.constant_(self.EndoLayer.weight, 0)
 
         self.PostFullyConnected = nn.Sequential(OrderedDict([
-            ('PostRelu0', nn.ReLU()),
-            ('PostLayer1', nn.Linear(H, H)), ('PostRelu1', nn.ReLU()),
-            ('PostLayer2', nn.Linear(H, H)), ('PostRelu2', nn.ReLU()),
-            ('PostLayer3', nn.Linear(H, H)), ('PostRelu3', nn.ReLU()),
-            ('PostLayer4', nn.Linear(H, H)), ('PostRelu4', nn.ReLU()),
-            ('PostLayer5', nn.Linear(H, H)), ('PostRelu5', nn.ReLU()),
-            ('PostLayer6', nn.Linear(H, H)), ('PostRelu6', nn.ReLU()),
-            ('PostLayer7', nn.Linear(H, H)), ('PostRelu7', nn.ReLU()),
-            ('PostLayerLast', nn.Linear(H, 1))
+            ('PostRelu0', nn.Tanh()),
+            ('PostLayer1', nn.Linear(H, H, bias=withbias)), ('PostAct1', nn.Tanh()),
+            ('PostLayer2', nn.Linear(H, H, bias=withbias)), ('PostAct2', nn.Tanh()),
+            ('PostLayer3', nn.Linear(H, H, bias=withbias)), ('PostAct3', nn.Tanh()),
+            ('PostLayer4', nn.Linear(H, H, bias=withbias)), ('PostAct4', nn.Tanh()),
+            ('PostLayer5', nn.Linear(H, H, bias=withbias)), ('PostAct5', nn.Tanh()),
+            ('PostLayer6', nn.Linear(H, H, bias=withbias)), ('PostAct6', nn.Tanh()),
+            ('PostLayer7', nn.Linear(H, H, bias=withbias)), ('PostAct7', nn.Tanh()),
+            ('PostLayerLast', nn.Linear(H, 1, bias=withbias))
         ]))
+
+        for module in self.PostFullyConnected.modules():
+            if type(module) == nn.Linear:
+                nn.init.normal_(module.weight,mean=0.0,std=0.001/H)
+
+
 
     def forward(self, inputs):
 
-        xs_all = list(inputs[0])
-        ys_all = list(inputs[1])
+        xs,ys = inputs
 
-        outputs = []
+        future_steps = xs.shape[1] - ys.shape[1]
 
-        for t in range(self.future_steps):
-            xs = xs_all[t:(self.past_steps+t+1)]
-            ys = ys_all[t:(self.past_steps+t)]
+        for t in range(future_steps):
 
-            h_exo = sum([self.ExoLayers[n](xs[n]) for n in range(self.past_steps + 1)])
-            h_endo = sum([self.EndoLayers[n](ys[n]) for n in range(self.past_steps)])
+            h_exo = self.ExoLayer(xs.narrow(1,t,self.past_steps+1).view((xs.shape[0], (self.past_steps+1)*self.dim_exo)))
+            h_endo = self.EndoLayer(ys.narrow(1,t,self.past_steps).view((ys.shape[0], self.past_steps*self.dim_endo)))
 
             h = h_exo + h_endo
-            ys_all.append(self.PostFullyConnected(h))
+            pred = ys[:,(self.past_steps-1+t,)] + self.PostFullyConnected(h).view((len(ys), 1))
+            ys = torch.cat((ys,pred),dim=1)
 
-        return ys_all[-future_steps:]
+        return ys[:,-future_steps:]
 
 
 
-def train(model, data,criterion, n_epoch, learning_rate, batch_size):
+def train(model, data_train, data_val, criterion, n_epoch, learning_rate, batch_size):
 
     use_gpu = True
     device = 1
 
-    inputs_all, targets_all = data[range(0, len(data))]
-    trainloader = DataLoader(data, batch_size=batch_size,shuffle=True)
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    train_loader = DataLoader(data_train, batch_size=batch_size,shuffle=True)
+    val_loader = DataLoader(data_val, batch_size=batch_size,shuffle=True)
 
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate,weight_decay=0.1)
+    scheduler = MultiStepLR(optimizer, milestones=[10,50,100,200,300,400,500,600,700,800,900],gamma=0.5)
 
-    disp_loss = lambda t: print('Train (epoch ' + str(t) + '): ' + str(torch.sqrt(criterion(model(inputs_all), targets_all)).item()))
+    train_losses = []
+    val_losses = []
+
+    disp_train_loss = lambda t, loss: print('Train (epoch ' + str(t) + '): ' + str(loss))
+    disp_val_loss = lambda t, loss: print('Val (epoch ' + str(t) + '): ' + str(loss) + '\n')
 
     for t in range(n_epoch):
+        model.eval()
         model.cpu()
-        disp_loss(t)
 
+        train_losses.append(train_loss(model, train_loader))
+        val_losses.append(train_loss(model, val_loader))
+
+        disp_train_loss(t, train_losses[-1])
+        disp_val_loss(t, val_losses[-1])
+
+        scheduler.step(t)
+
+        model.train()
         if use_gpu:
             model.cuda(device)
 
-        for batch in trainloader:
+        #(scheduler.get_lr())
+        for batch in train_loader:
 
             inputs , targets = batch
             if use_gpu:
                 xs,ys = inputs
-                xs = tuple(x.cuda(device) for x in xs)
-                ys = tuple(y.cuda(device) for y in ys)
+                xs = xs.cuda(device)
+                ys = ys.cuda(device)
                 inputs = (xs,ys)
-                targets = [target.cuda(device) for target in targets]
+                targets = targets.cuda(device)
 
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -95,61 +124,101 @@ def train(model, data,criterion, n_epoch, learning_rate, batch_size):
             loss.backward()
             optimizer.step()
 
+    model.eval()
     model.cpu()
-    disp_loss(t)
-    return
+
+    train_losses.append(train_loss(model, train_loader))
+    val_losses.append(train_loss(model, val_loader))
+
+    disp_train_loss(t+1, train_losses[-1])
+    disp_val_loss(t+1, val_losses[-1])
+
+    return train_losses, val_losses
+
+
+def train_loss(model, train_loader):
+
+    criterion = nn.MSELoss(reduction='sum')
+
+    model.eval()
+    model.cpu()
+    val_loss = []
+
+    for batch in train_loader:
+        inputs, targets = batch
+        output = model(inputs)
+        val_loss.append(criterion(output,targets).item())
+
+    return math.sqrt(np.sum(val_loss)/(len(train_loader.dataset)*train_loader.dataset.future_steps))
+
 
 
 if __name__ == "__main__":
 
     #torch.manual_seed(42)
 
-    n_epoch = 5
-
-    past_steps = 10
-    future_steps = 10
-    with_y = True
+    past_steps = 16     # 32 by default
+    future_steps = 100  # 80 by default
+    stride = 30
+    skip_ts = 30
 
     datafolder = '../DataBombardier/'
 
-    stride = 10
-    skip_ts = 10
-    n_epoch = 500
-    batch_size = 1000
-
-    inputs_idx = (1,2,3,4,5)
+    layer_width = 30
+    n_epoch = 1000
+    batch_size = 2056
+    learning_rate = 0.001
 
     dfs = load_dfs(datafolder)
     df_test = dfs[0]
-    dfs_train = dfs[1:]
+    df_val = dfs[1]
+    dfs_train = dfs[2:]
 
     data_train = DatasetBasic(dfs_train, past_steps, future_steps, stride, skip_ts)
     data_test = DatasetBasic([df_test], past_steps, future_steps, stride, skip_ts)
+    data_val = DatasetBasic([df_val], past_steps, future_steps, stride, skip_ts)
 
-    model = NNModelBasic(dim_endo=1, dim_exo=5, past_steps=past_steps,future_steps=future_steps, layer_width=6)
+    datas_whole = [DatasetBasic([df], past_steps, 1000000, stride, skip_ts) for df in dfs]
+
+    model = NNModelBasic(dim_endo=1, dim_exo=5, past_steps=past_steps,layer_width=layer_width)
 
     n_params = sum(parameters.numel() for parameters in model.parameters())
     print('# of parameters : ' + str(n_params))
 
-    n_train = len(data_train)
-    n_test = len(data_test)
-
-    print('Size (train) : ' + str(n_train))
+    print('Size (train) : ' + str(len(data_train)))
     print('Size (test) : ' + str(len(data_test)))
+    print('Size (val) : ' + str(len(data_val)))
 
     criterion = nn.MSELoss()
-    criterion_all = lambda outputs_all, targets_all: \
-        sum([criterion(outputs,targets) for (outputs,targets) in zip(outputs_all,targets_all)])
+    #criterion_all = lambda outputs_all, targets_all: \
+    #    criterion(outputs,targets)
 
-    train(model, data_train,criterion_all, n_epoch=n_epoch, batch_size=batch_size, learning_rate=0.01)
+    train_losses, val_losses = train(model, data_train, data_val, criterion, n_epoch=n_epoch, batch_size=batch_size, learning_rate=learning_rate)
+    model.cpu()
 
-    inputs_train, outputs_train = data_train[0:n_train]
-    inputs_test, outputs_test = data_test[0:n_test]
+    plt.plot(train_losses)
+    plt.plot(val_losses)
+    plt.savefig('../DataBombardier/loss.png')
+    plt.cla()
 
-    print('Train RMSE: ' + str(torch.sqrt(criterion_all(model(inputs_train),outputs_train)).item()))
-    print('Test RMSE:  ' + str(torch.sqrt(criterion_all(model(inputs_test), outputs_test)).item()))
+    inputs_train, targets_train = data_train[0:len(data_train)]
+    inputs_test, targets_test = data_test[0:len(data_test)]
 
-    y0 = data_test.ys[0]
+    for n,data_whole in enumerate(datas_whole):
 
-    print('Test Baseline : ' + str(float(torch.sqrt(criterion(y0[:-1], y0[1:])))))
+        inputs_test_whole, targets_test_whole = data_whole[0:len(data_whole)]
+
+        outputs_whole = model(inputs_test_whole)
+        temperatures_pred = outputs_whole.detach().numpy().flatten()
+        temperatures_ground = targets_test_whole.detach().numpy().flatten()
+
+        plt.plot(temperatures_ground, color='blue')
+        plt.plot(temperatures_pred, color='red')
+        plt.savefig('../DataBombardier/flight' + str(n) + '.png')
+        plt.cla()
+
+        print('Test Whole flight (#' + str(n) + ') :' + str(torch.sqrt(criterion(outputs_whole, targets_test_whole)).item()))
+
+    print('Train RMSE: ' + str(torch.sqrt(criterion(model(inputs_train),targets_train)).item()))
+    print('Test RMSE : ' + str(torch.sqrt(criterion(model(inputs_test), targets_test)).item()))
     torch.save(model.state_dict(), "../DataBombardier/model1")
