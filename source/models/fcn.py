@@ -26,6 +26,7 @@ class FullyConnectedNetworkModel(nn.Module):
             self.loss_function = nn.CrossEntropyLoss()
             
     def forward(self, input):
+        #relu?
         drop_in = self.input_dropout(input)
 
         hid_out1 = self.hidden_1(drop_in)

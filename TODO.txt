@@ -9,3 +9,7 @@ Models: Input changes (LogNorm, Embeddings, autoencoding),
         Output Changes(Better Classif/Regression Head, use RNN outputs instead of H_n),
         Attention, 
         Ensemble
+
+FCL Relu, N layers nn.seq
+
+Data en delta y
