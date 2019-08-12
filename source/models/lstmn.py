@@ -3,7 +3,7 @@ import torch.nn as nn
 #from torch.nn.utils.rnn import pack_padded_sequence
 
 
-class LongShortTermMemoryNetworkModel(nn.Module):
+class LongShortTermMemoryHNNet(nn.Module):
     def __init__(self, input_size, output_size,
                         hidden_size, num_layers,
                         target_type_string='Regression',

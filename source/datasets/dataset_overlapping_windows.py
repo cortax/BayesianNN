@@ -62,8 +62,8 @@ class OverlappingWindowsDataset(data.Dataset):
         features_item = self.features[index].tolist()
         targets_item = self.targets[index][-1].tolist()
         
-        #TODO: Verify if returns as "Lists" are problematics for the dataloaders (might want Tensors and basetypes such as floats)
-        return features_item, targets_item
+        #TODO: Verify if returns typage is "ok"
+        return torch.Tensor(features_item), torch.Tensor(targets_item)
 
     def __len__(self):
         if len(self.features)==len(self.targets):
