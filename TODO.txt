@@ -1,9 +1,7 @@
 Make/Tests Models objects (Make: CNN, Dilated CNN, NeuralODEN, MaxoutN)
-Remake Experiments files (pipelines)
-Remake Main (Redux)
-Update pipelines for "test recalling" of models
+Update pipelines for "test recalling" of models (recall models to retrain midway is complete)
 
-Eval metrics for significative events inside windows
+Eval metrics for significant events inside windows
 Think about splitting along features instead of flights
 
 Models: Input changes(LogNorm, Embeddings, autoencoding), 
@@ -12,4 +10,5 @@ Models: Input changes(LogNorm, Embeddings, autoencoding),
         Ensemble,
         RNN outputs Nets (Instead of H_n)
 
-Data en delta y
+RNN Gradient clipping (with norm ideally)
+Data delta y instead of y

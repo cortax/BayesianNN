@@ -57,7 +57,7 @@ def train(model,
             early_stop_counter = 0
             torch_extension = '.torch'
             model_file_string = file_string + '_epoch{}_validloss{:.4f}_'.format(i, valid_loss)
-            folder_path = make_dir(os.path.join('.', 'models', path_string))
+            folder_path = make_dir(os.path.join('.', 'saved_models', path_string))
             best_model_save_string = os.path.join(folder_path, model_file_string + torch_extension)
             #print(best_model_save_string)
             torch.save(model.state_dict(), best_model_save_string)

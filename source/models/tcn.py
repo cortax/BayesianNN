@@ -57,5 +57,11 @@ class TemporalConvNet(nn.Module):
 
         self.network = nn.Sequential(*layers)
 
+        self.target_type_string = target_type_string
+        if target_type_string=='Regression':
+            self.loss_function = nn.MSELoss()
+        elif target_type_string=='Classification':
+            self.loss_function = nn.CrossEntropyLoss()
+        
     def forward(self, x):
         return self.network(x)

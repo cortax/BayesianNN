@@ -117,6 +117,7 @@ def bomb_csv_to_df(csv_stringLoader):
         data_label_type.name = 'Type'
 
         df = df.iloc[3:].reset_index()
+        df = df.apply(pd.to_numeric)
         
         list_df.append(df)
         list_data_units.append(data_units)

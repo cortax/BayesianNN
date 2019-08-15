@@ -1,0 +1,41 @@
+
+----------ARGUMENTS----------
+
+Namespace(BATCH_SIZE=32, COOLDOWN=0, DAMPENING=0.0, DROPOUT_HIDDEN=0.0, DROPOUT_HN=0.0, EARLY_STOP=50, EPOCHS=500, EXPERIMENT_NUMBER=0, FACTOR=0.5, FEATURE_ENDO=True, FEATURE_EXO=True, FORECASTING=True, GPU_DEVICE_ID=0, HIDDEN_SIZE=128, LEARNING_RATE=0.01, MODEL='hn_gru_net', MODULE='model', MODULE_MODE='train', MOMENTUM=0.9, NUM_LAYERS=1, NUM_WORKERS=4, OPTIM_TYPE='adam', PATIENCE=10, RANDOM_SEED=42, RESTART=False, RESTART_MODEL_WEIGHTS_STRING=None, SAMPLER_TYPE=None, SHIFT_DELTA=1, TARGET_CHOICE=1, THRESHOLD=1e-06, TRAIN_TEST_RATIO=0.8, TRAIN_VALID_RATIO=0.8, USE_GPU=True, VERBOSE=True, WEIGHT_DECAY=0.0, WINDOWS_SIZE=8) 
+
+
+----------MODULE START----------
+
+model
+Start of Main
+Making Dataset
+Loading:.\DataBombardier\2sec\flight_test_1.csv
+Loading:.\DataBombardier\2sec\flight_test_3.csv
+Loading:.\DataBombardier\2sec\flight_test_4.csv
+Loading:.\DataBombardier\2sec\flight_test_5.csv
+Loading:.\DataBombardier\2sec\flight_test_6.csv
+Loading:.\DataBombardier\2sec\flight_test_7.csv
+Loading:.\DataBombardier\2sec\flight_test_8.csv
+Loading:.\DataBombardier\2sec\flight_test_9.csv
+Loading:.\DataBombardier\2sec\flight_test_10.csv
+Loading:.\DataBombardier\2sec\flight_test_11.csv
+Not using any Special Sampler
+Making Loaders
+Making all 3 Loaders with Training Shuffle at: True
+Making Model
+Managing Cuda devices
+Running on GPU 0
+Making Optimizer, Scheduler and Getting Criterion
+Start of Training
+Epoch 0 - Training time: 28.23s - Train loss: 53.6904 - Valid loss: 58.0206 - Train R2: -3.8127 - Valid R2: -23.6814 - Train MSE: 258.1602 - Valid MSE: 452.2608 - Train MAE: 14.3010 - Valid MAE: 20.8311
+New Model Saved (New Best:58.0206)
+
+Epoch 1 - Training time: 29.70s - Train loss: 53.8244 - Valid loss: 66.5859 - Train R2: -3.8127 - Valid R2: -23.6814 - Train MSE: 258.1602 - Valid MSE: 452.2608 - Train MAE: 14.3010 - Valid MAE: 20.8311
+No improvement, in the last 1 epoch(s), on the valid loss (Best:58.0206, Current:66.5859)
+
+Epoch 2 - Training time: 30.99s - Train loss: 53.6439 - Valid loss: 60.2861 - Train R2: -3.8127 - Valid R2: -23.6814 - Train MSE: 258.1602 - Valid MSE: 452.2608 - Train MAE: 14.3010 - Valid MAE: 20.8311
+No improvement, in the last 2 epoch(s), on the valid loss (Best:58.0206, Current:60.2861)
+
+Epoch 3 - Training time: 30.12s - Train loss: 54.5810 - Valid loss: 49.1422 - Train R2: -3.8127 - Valid R2: -23.6814 - Train MSE: 258.1602 - Valid MSE: 452.2608 - Train MAE: 14.3010 - Valid MAE: 20.8311
+New Model Saved (New Best:49.1422)
+

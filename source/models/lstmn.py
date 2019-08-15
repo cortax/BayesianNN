@@ -3,7 +3,7 @@ import torch.nn as nn
 #from torch.nn.utils.rnn import pack_padded_sequence
 
 
-class LongShortTermMemoryHNNet(nn.Module):
+class LongShortTermMemoryHnNet(nn.Module):
     def __init__(self, input_size, output_size,
                         hidden_size, num_layers,
                         target_type_string='Regression',
@@ -22,6 +22,7 @@ class LongShortTermMemoryHNNet(nn.Module):
         self.dropout_layer = nn.Dropout(dropout_layer)
         self.predict_layer = nn.Linear(hidden_size * num_layers * (bidirectional + 1), output_size)
 
+        self.target_type_string = target_type_string
         if target_type_string=='Regression':
             self.loss_function = nn.MSELoss()
         elif target_type_string=='Classification':

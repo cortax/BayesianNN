@@ -75,8 +75,8 @@ class VectorsDataset(data.Dataset):
         else:
             raise('The dataset does not have one target per feature and vice versa')
 
-    def input_size(self, index=0):
+    def features_size(self, index=0):
         return len(self.features[index])
 
-    def output_size(self, index=0):
+    def labels_size(self, index=0):
         return len(self.targets[index])

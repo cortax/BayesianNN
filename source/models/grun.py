@@ -3,13 +3,13 @@ import torch.nn as nn
 #from torch.nn.utils.rnn import pack_padded_sequence
 
 
-class HNGatedRecurrentUnitHNNet(nn.Module):
-    def __init__(self, input_size, output_size, window_size, 
-                        hidden_size, num_layers, 
+class GatedRecurrentUnitHnNet(nn.Module):
+    def __init__(self, input_size, output_size, 
+                        window_size, hidden_size, num_layers, 
                         target_type_string='Regression',
                         bias=True, batch_first=True, 
                         bidirectional=False,
-                        dropout_hidden=0, dropout_layer=0):
+                        dropout_hidden=0, dropout_Hn=0):
 
         super().__init__()
         self.gru = nn.GRU(input_size=input_size,
@@ -19,9 +19,10 @@ class HNGatedRecurrentUnitHNNet(nn.Module):
                             batch_first=batch_first,
                             dropout=dropout_hidden, 
                             bidirectional=bidirectional)
-        self.dropout_layer = nn.Dropout(dropout_layer)
+        self.hn_dropout_layer = nn.Dropout(dropout_Hn)
         self.predict_layer = nn.Linear(hidden_size * num_layers * (bidirectional + 1), output_size) #(hidden*layers*1, 1)
         
+        self.target_type_string = target_type_string
         if target_type_string=='Regression':
             self.loss_function = nn.MSELoss()
         elif target_type_string=='Classification':
@@ -46,7 +47,7 @@ class HNGatedRecurrentUnitHNNet(nn.Module):
         #print('hn concat:', h_n_concat)
         #print('hn concat size:', h_n_concat.size(0), h_n_concat.size(1))
         
-        h_n_with_dropout = self.dropout_layer(h_n_concat)
+        h_n_with_dropout = self.hn_dropout_layer(h_n_concat)
         predict = self.predict_layer(h_n_with_dropout) #predict est vertical
         #print('predict:', predict)
         return predict
