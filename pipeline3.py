@@ -30,26 +30,26 @@ class NNModelBasic(nn.Module):
         dims = dim_exo * (past_steps + 1) + dim_endo * past_steps
 
         self.ExoLayer = nn.Linear(dim_exo*(past_steps+1), H, bias=False)
-        nn.init.constant_(self.ExoLayer.weight,0)
+        nn.init.normal_(self.ExoLayer.weight, mean=0.0, std=0.1/dims)
 
         self.EndoLayer = nn.Linear(dim_endo*past_steps, H, bias=withbias)
-        nn.init.constant_(self.EndoLayer.weight, 0)
+        nn.init.normal_(self.EndoLayer.weight, mean=0.0, std=0.1/dims)
 
         self.PostFullyConnected = nn.Sequential(OrderedDict([
             ('PostRelu0', nn.Tanh()),
             ('PostLayer1', nn.Linear(H, H, bias=withbias)), ('PostAct1', nn.Tanh()),
             ('PostLayer2', nn.Linear(H, H, bias=withbias)), ('PostAct2', nn.Tanh()),
-            ('PostLayer3', nn.Linear(H, H, bias=withbias)), ('PostAct3', nn.Tanh()),
-            ('PostLayer4', nn.Linear(H, H, bias=withbias)), ('PostAct4', nn.Tanh()),
-            ('PostLayer5', nn.Linear(H, H, bias=withbias)), ('PostAct5', nn.Tanh()),
-            ('PostLayer6', nn.Linear(H, H, bias=withbias)), ('PostAct6', nn.Tanh()),
-            ('PostLayer7', nn.Linear(H, H, bias=withbias)), ('PostAct7', nn.Tanh()),
+            #('PostLayer3', nn.Linear(H, H, bias=withbias)), ('PostAct3', nn.Tanh()),
+            #('PostLayer4', nn.Linear(H, H, bias=withbias)), ('PostAct4', nn.Tanh()),
+            #('PostLayer5', nn.Linear(H, H, bias=withbias)), ('PostAct5', nn.Tanh()),
+            #('PostLayer6', nn.Linear(H, H, bias=withbias)), ('PostAct6', nn.Tanh()),
+            #('PostLayer7', nn.Linear(H, H, bias=withbias)), ('PostAct7', nn.Tanh()),
             ('PostLayerLast', nn.Linear(H, 1, bias=withbias))
         ]))
 
-        for module in self.PostFullyConnected.modules():
-            if type(module) == nn.Linear:
-                nn.init.normal_(module.weight,mean=0.0,std=0.001/H)
+        #for module in self.PostFullyConnected.modules():
+            #if type(module) == nn.Linear:
+                #nn.init.normal_(module.weight,mean=0.0,std=0.001/H)
 
 
 
@@ -77,10 +77,10 @@ def train(model, data_train, data_val, criterion, n_epoch, learning_rate, batch_
     use_gpu = True
     device = 1
 
-    train_loader = DataLoader(data_train, batch_size=batch_size,shuffle=True)
-    val_loader = DataLoader(data_val, batch_size=batch_size,shuffle=True)
+    train_loader = DataLoader(data_train, batch_size=batch_size,shuffle=True, num_workers=10)
+    val_loader = DataLoader(data_val, batch_size=batch_size,shuffle=True, num_workers=10)
 
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate,weight_decay=0.1)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = MultiStepLR(optimizer, milestones=[10,50,100,200,300,400,500,600,700,800,900],gamma=0.5)
 
     train_losses = []
@@ -99,7 +99,7 @@ def train(model, data_train, data_val, criterion, n_epoch, learning_rate, batch_
         disp_train_loss(t, train_losses[-1])
         disp_val_loss(t, val_losses[-1])
 
-        scheduler.step(t)
+        #scheduler.step(t)
 
         model.train()
         if use_gpu:
@@ -158,46 +158,47 @@ if __name__ == "__main__":
     #torch.manual_seed(42)
 
     past_steps = 16     # 32 by default
-    future_steps = 100  # 80 by default
-    stride = 30
-    skip_ts = 30
+    future_steps = 200  # 80 by default
+    stride = 50
+    skip_ts = 2
+
+    print('Past steps : %d\nFuture steps : %d\nStride : %d\nskip ts : %d\n' %(past_steps, future_steps, stride, skip_ts))
 
     datafolder = '../DataBombardier/'
 
     layer_width = 30
-    n_epoch = 1000
-    batch_size = 2056
-    learning_rate = 0.001
+    n_epoch = 30
+    batch_size = 256
+    learning_rate = 0.000001
+
+    print('LayerWidth: %d\nn_epoch: %d\nBatchSize : %d\nLearningRate : %d\n' %(layer_width, n_epoch, batch_size, learning_rate))
 
     dfs = load_dfs(datafolder)
     df_test = dfs[0]
-    df_val = dfs[1]
-    dfs_train = dfs[2:]
+    dfs_train = dfs[1:]
 
-    data_train = DatasetBasic(dfs_train, past_steps, future_steps, stride, skip_ts)
-    data_test = DatasetBasic([df_test], past_steps, future_steps, stride, skip_ts)
-    data_val = DatasetBasic([df_val], past_steps, future_steps, stride, skip_ts)
+    data_train = DatasetBasic(dfs_train, past_steps, future_steps, stride, skip_ts,True)
+    data_test = DatasetBasic([df_test], past_steps, future_steps, stride, skip_ts, True)
 
-    datas_whole = [DatasetBasic([df], past_steps, 1000000, stride, skip_ts) for df in dfs]
+    datas_whole = [DatasetBasic([df], past_steps, 1000000, stride, skip_ts, False) for df in dfs]
 
-    model = NNModelBasic(dim_endo=1, dim_exo=5, past_steps=past_steps,layer_width=layer_width)
+    model = NNModelBasic(dim_endo=1, dim_exo=6, past_steps=past_steps,layer_width=layer_width)
 
     n_params = sum(parameters.numel() for parameters in model.parameters())
     print('# of parameters : ' + str(n_params))
 
     print('Size (train) : ' + str(len(data_train)))
     print('Size (test) : ' + str(len(data_test)))
-    print('Size (val) : ' + str(len(data_val)))
 
     criterion = nn.MSELoss()
     #criterion_all = lambda outputs_all, targets_all: \
     #    criterion(outputs,targets)
 
-    train_losses, val_losses = train(model, data_train, data_val, criterion, n_epoch=n_epoch, batch_size=batch_size, learning_rate=learning_rate)
+    train_losses, test_losses = train(model, data_train, data_test, criterion, n_epoch=n_epoch, batch_size=batch_size, learning_rate=learning_rate)
     model.cpu()
 
     plt.plot(train_losses)
-    plt.plot(val_losses)
+    plt.plot(test_losses)
     plt.savefig('../DataBombardier/loss.png')
     plt.cla()
 
