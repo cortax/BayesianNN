@@ -113,7 +113,7 @@ class History:
         save_string = os.path.join(folder_path, file_string + base_name + img_extension)
         fig.savefig(save_string)
 
-    def history_display(self, path_string, file_string, type_display):
+    def history_display(self, path_string, file_string, type_display='base'):
         if type_display is None or type_display == 'base':
             self._base_display(path_string, file_string)
         else:

@@ -1,6 +1,8 @@
 Make/Tests Models objects (Make: CNN, Dilated CNN, NeuralODEN, MaxoutN)
 Update pipelines for "test recalling" of models (recall models to retrain midway is complete)
+Add Helps to redux args ex: help='size of word embeddings'
 
+Save history as JSON or something (required for a better restart training)
 Eval metrics for significant events inside windows
 Think about splitting along features instead of flights
 

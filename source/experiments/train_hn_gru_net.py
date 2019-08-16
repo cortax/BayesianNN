@@ -89,11 +89,13 @@ def hn_gru_net_main(experiment_number,
                                 verbose=verbose, threshold=threshold, threshold_mode='rel', 
                                 cooldown=cooldown, min_lr=0, eps=1e-08)
 
+    best_model_save_string = None
     if restart and restart_file_string is not None:
         restart_model_weights_string = os.path.join('.', 'saved_models', folder_string, restart_file_string)
         if os.path.exists(restart_model_weights_string):
             print('Restarting from Specified Model Weights')
             model = load_model(model, restart_model_weights_string)
+            best_model_save_string = restart_model_weights_string
         else:
             print('Cannot Restart from Specified Model Weights')
     
@@ -105,7 +107,7 @@ def hn_gru_net_main(experiment_number,
                                     folder_string, file_name_string, use_gpu=use_gpu)
     
     print('Saving Training History')
-    history.save_display(folder_string, file_name_string)
+    history.history_display(folder_string, file_name_string)
 
     print('Start of Testing')
     model = load_model(model, best_model_save_string)

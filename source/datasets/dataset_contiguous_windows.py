@@ -72,7 +72,7 @@ class ContiguousWindowsDataset(data.Dataset):
             raise('The dataset does not have one target per feature and vice versa')
 
     def features_size(self, index=0):
-        return len(self.features[index])
+        return len(self.features[index][-1])
 
     def labels_size(self, index=0):
         return len(self.targets[index][-1])

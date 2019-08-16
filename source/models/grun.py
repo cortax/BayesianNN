@@ -12,11 +12,11 @@ class GatedRecurrentUnitHnNet(nn.Module):
                         dropout_hidden=0, dropout_Hn=0):
 
         super().__init__()
-        self.gru = nn.GRU(input_size=input_size,
-                            hidden_size=hidden_size,
-                            num_layers=num_layers,
-                            bias=bias,
-                            batch_first=batch_first,
+        self.gru = nn.GRU(input_size=input_size, 
+                            hidden_size=hidden_size, 
+                            num_layers=num_layers, 
+                            bias=bias, 
+                            batch_first=batch_first, 
                             dropout=dropout_hidden, 
                             bidirectional=bidirectional)
         self.hn_dropout_layer = nn.Dropout(dropout_Hn)

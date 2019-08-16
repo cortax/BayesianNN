@@ -27,7 +27,7 @@ def train(model,
 
     early_stop_counter = 0
     last_valid_loss = math.inf
-    best_model_save_string = ''
+    best_model_save_string = None
     lr_a = _get_LR(optimizer)
     lr_b = _get_LR(optimizer)
 
@@ -88,6 +88,8 @@ def do_epoch(model, train_loader, criterion, optimizer, use_gpu):
     model.train()
     for j, batch in enumerate(train_loader):
         inputs, targets = batch
+        #print('inputs', inputs)
+        #print('targets', targets)
 
         if use_gpu:
             inputs = inputs.cuda()
@@ -99,7 +101,7 @@ def do_epoch(model, train_loader, criterion, optimizer, use_gpu):
         loss.backward()
         optimizer.step()
 
-def validate(model, valid_loader, criterion, use_gpu=False):
+def validate(model, loader, criterion, use_gpu=False):
     true = []
     pred = []
     valid_loss = []
@@ -107,15 +109,24 @@ def validate(model, valid_loader, criterion, use_gpu=False):
     model.eval()
 
     with torch.no_grad():
-        for j, batch in enumerate(valid_loader):
+        for j, batch in enumerate(loader):
             inputs, targets = batch
+            #print('inputs', inputs)
             if use_gpu:
                 inputs = inputs.cuda()
                 targets = targets.cuda()
+            #print('targets', targets)
 
             output = model(inputs)
+            #print('outputs', output)
 
-            predictions = output.max(dim=1)[1]
+            if model.target_type_string == 'Classification':
+                #Return the index of the highest value for each output
+                predictions = output.max(dim=1)[1]
+            elif model.target_type_string == 'Regression':
+                #Return the outputs as they are.
+                predictions = output
+            #print('preds', predictions)
 
             valid_loss.append(criterion(output, targets).item())
             true.extend(targets.data.cpu().numpy().tolist())
