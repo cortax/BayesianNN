@@ -13,26 +13,17 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
 
-
 def log_norm(x, mu, std):
-    """
-    Compute the log pdf of x under a normal distribution with mean mu and standard deviation std.
-    """
     return -0.5 * torch.log(2*np.pi*std**2) -(0.5 * (1/(std**2))* (x-mu)**2)
 
 def rho_to_sigma(rho):
-    
     sigma = torch.log(1 + torch.exp(rho))
-    
     return sigma
 
 
 def sigma_to_rho(sigma):
-    
     rho = torch.log(torch.exp(sigma) - 1)
-    
     return rho
-
 
 class ProbabilisticLinear(nn.Module):
     __constants__ = ['bias', 'in_features', 'out_features']
@@ -77,14 +68,12 @@ class ProbabilisticLinear(nn.Module):
         self.to(device)
 
     def generate_rand(self, device):
-        
         self.weight_epsilon = torch.randn(size=self.q_weight_mu.size()).to(device)
         self.bias_epsilon = torch.randn(size=self.q_bias_mu.size()).to(device)
         
         return (self.weight_epsilon, self.bias_epsilon)
     
     def reparameterization(self):
-        
         sigma_weight = rho_to_sigma(self.q_weight_rho)
         sigma_bias = rho_to_sigma(self.q_bias_rho)
         
@@ -113,9 +102,12 @@ class ProbabilisticLinear(nn.Module):
         nb = torch.distributions.Normal(self.prior_bias_mu, sigma_bias)
         
         return nw.log_prob(self.weight_sample).sum() + nb.log_prob(self.bias_sample).sum()
+
+    def set_parameters(self, w_sample, b_sample):
+        self.weight_sample = w_sample
+        self.bias_sample = b_sample
     
     def reset_parameters(self):
-        
         torch.nn.init.normal_(self.q_weight_mu, mean=0.0, std=5.0)
         torch.nn.init.constant_(self.q_weight_rho, -1.0)
         torch.nn.init.normal_(self.q_bias_mu, mean=0.0, std=5.0)
@@ -127,11 +119,12 @@ class ProbabilisticLinear(nn.Module):
 
 class Model(nn.Module):
     
-    def __init__(self, H, device):
+    def __init__(self, input_size, output_size, H, L, device):
         super(Model, self).__init__()
         
-        self.linear1 = ProbabilisticLinear(1, H, device)
-        self.linear2 = ProbabilisticLinear(H,1, device)
+        
+        self.linear1 = ProbabilisticLinear(input_size, H, device)
+        self.linear2 = ProbabilisticLinear(H,output_size, device)
         
         self.registered_layers = []
         self.registered_layers.append(self.linear1)
@@ -142,37 +135,41 @@ class Model(nn.Module):
         self.to(device)
                 
     def forward(self, x):
-        
         out = x;
-        
         for k in range(len(self.registered_layers)-1):
-            
             out = torch.tanh(self.registered_layers[k](out))
-            
         out = self.registered_layers[-1](out)
-        
         return out
     
     def resample_parameters(self, device):
-        
         for k in range(len(self.registered_layers)):
-        
             self.registered_layers[k].generate_rand(device)
             self.registered_layers[k].reparameterization()
         
     def count_parameters(self):
-        
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
+    
+    def set_parameters(self, w_samples, b_samples):
+        for k in range(len(self.registered_layers)):
+            self.registered_layers[k].set_parameters(w_samples[k], b_samples[k]) 
+   
+    def q_log_pdf(self):
+        list_LQ = []
+        for k in range(len(self.registered_layers)):
+            list_LQ.append(self.registered_layers[k].q_log_pdf())
+        stack_LQ = torch.stack(list_LQ)
+        return torch.sum(stack_LQ)
+    
+    def prior_log_pdf(self):
+        list_LP = []
+        for k in range(len(self.registered_layers)):
+            list_LP.append(self.registered_layers[k].p_log_pdf())
+        stack_LP = torch.stack(list_LP)
+        return torch.sum(stack_LP)
         
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, device):
-        """
-        Compute the elbo with the reparametrization trick.
-        """
-
         L = []
-        
         for i in range(0, n_samples_ELBO):
-        
             self.resample_parameters(device)
 
             LQ = self.linear1.q_log_pdf() 
@@ -195,7 +192,6 @@ def BBVI(data, n_neurons, n_epoch, n_iter, n_samples_ELBO, opti_params, sigma_no
 
     torch.manual_seed(n_seed)
     np.random.seed(n_seed)
-
 
     x_data = data[0].to(device)
     y_data = data[1].to(device)
