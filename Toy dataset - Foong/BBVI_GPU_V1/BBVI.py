@@ -13,23 +13,13 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
 
-def log_norm(x, mu, std):
-    return -0.5 * torch.log(2*np.pi*std**2) -(0.5 * (1/(std**2))* (x-mu)**2)
-
-def rho_to_sigma(rho):
-    sigma = torch.log(1 + torch.exp(rho))
-    return sigma
-
-
-def sigma_to_rho(sigma):
-    rho = torch.log(torch.exp(sigma) - 1)
-    return rho
-
 class ProbabilisticLinear(nn.Module):
     __constants__ = ['bias', 'in_features', 'out_features']
 
-    def __init__(self, in_features, out_features, device, bias=True):
+    def __init__(self, in_features, out_features, device=None, bias=True):
         super(ProbabilisticLinear, self).__init__()
+        
+        self.device = device
         
         self.in_features = in_features
         self.out_features = out_features
@@ -48,7 +38,8 @@ class ProbabilisticLinear(nn.Module):
         self.reset_parameters()
         
         mu = torch.tensor(0.0)
-        rho = sigma_to_rho(torch.tensor(1.0))
+        sigma = torch.tensor(1.0)
+        rho = torch.log(torch.exp(sigma) - 1)
         
         self.prior_weight_mu = nn.Parameter(torch.Tensor(out_features, in_features))
         self.prior_weight_rho = nn.Parameter(torch.Tensor(out_features, in_features))
@@ -65,47 +56,67 @@ class ProbabilisticLinear(nn.Module):
         nn.init.constant_(self.prior_bias_mu, mu)
         nn.init.constant_(self.prior_bias_rho, rho)
         
-        self.to(device)
+        self.to(self.device)
 
-    def generate_rand(self, device):
-        self.weight_epsilon = torch.randn(size=self.q_weight_mu.size()).to(device)
-        self.bias_epsilon = torch.randn(size=self.q_bias_mu.size()).to(device)
+    def _rho_to_sigma(self, rho):
+        sigma = torch.log(1 + torch.exp(rho))
+        return sigma
+
+    def _sigma_to_rho(self, sigma):
+        rho = torch.log(torch.exp(sigma) - 1)
+        return rho
+
+    def generate_rand(self, M=1):
+        size = [M]+list(self.q_weight_mu.size())
+        self.weight_epsilon = torch.randn(size=size).to(self.device)
+        size = [M]+list(self.q_bias_mu.size())
+        self.bias_epsilon = torch.randn(size=size).to(self.device)
         
         return (self.weight_epsilon, self.bias_epsilon)
     
     def reparameterization(self):
-        sigma_weight = rho_to_sigma(self.q_weight_rho)
-        sigma_bias = rho_to_sigma(self.q_bias_rho)
+        M = self.weight_epsilon.size(0)
+        sigma_weight = self._rho_to_sigma(self.q_weight_rho)
+        sigma_bias = self._rho_to_sigma(self.q_bias_rho)
         
-        self.weight_sample = self.weight_epsilon.mul(sigma_weight).add(self.q_weight_mu)
-        
-        sigma_bias = rho_to_sigma(self.q_bias_rho)
-        
-        self.bias_sample = self.bias_epsilon.mul(sigma_bias).add(self.q_bias_mu)
+        self.weight_sample = self.weight_epsilon.mul(sigma_weight.unsqueeze(0)).add(self.q_weight_mu.unsqueeze(0).repeat(M,1,1))
+        self.bias_sample = self.bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(sigma_bias.unsqueeze(0).repeat(M,1))
         
         return (self.weight_sample, self.bias_sample)
 
     def q_log_pdf(self):
-        sigma_weight = rho_to_sigma(self.q_weight_rho)
-        nw = torch.distributions.Normal(self.q_weight_mu, sigma_weight)
+        M = self.weight_sample.size(0)
         
-        sigma_bias = rho_to_sigma(self.q_bias_rho)
-        nb = torch.distributions.Normal(self.q_bias_mu, sigma_bias)
+        sigma_weight = self._rho_to_sigma(self.q_weight_rho)
+        nw = torch.distributions.Normal(self.q_weight_mu.unsqueeze(0).repeat(M,1,1), sigma_weight.unsqueeze(0).repeat(M,1,1))
         
-        return nw.log_prob(self.weight_sample).sum() + nb.log_prob(self.bias_sample).sum()
+        sigma_bias = self._rho_to_sigma(self.q_bias_rho)
+        nb = torch.distributions.Normal(self.q_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
+        
+        W = nw.log_prob(self.weight_sample).sum()
+        B = nb.log_prob(self.bias_sample).sum()
+        
+        return W + B
     
     def prior_log_pdf(self):
-        sigma_weight = rho_to_sigma(self.prior_weight_rho)
-        nw = torch.distributions.Normal(self.prior_weight_mu, sigma_weight)
+        M = self.weight_sample.size(0)
         
-        sigma_bias = rho_to_sigma(self.prior_bias_rho)
-        nb = torch.distributions.Normal(self.prior_bias_mu, sigma_bias)
+        sigma_weight = self._rho_to_sigma(self.prior_weight_rho)
+        nw = torch.distributions.Normal(self.prior_weight_mu.unsqueeze(0).repeat(M,1,1), sigma_weight.unsqueeze(0).repeat(M,1,1))
         
-        return nw.log_prob(self.weight_sample).sum() + nb.log_prob(self.bias_sample).sum()
+        sigma_bias = self._rho_to_sigma(self.prior_bias_rho)
+        nb = torch.distributions.Normal(self.prior_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
+        
+        W = nw.log_prob(self.weight_sample).sum()
+        B = nb.log_prob(self.bias_sample).sum()
+        
+        return W + B
 
-    def set_parameters(self, w_sample, b_sample):
-        self.weight_sample = w_sample
-        self.bias_sample = b_sample
+    #def set_parameters(self, weight_sample, bias_sample):
+    #    #todo: Make sure this affectation does NOT carry the whole graph that generated it
+    #    print('warning: set_parameters()')
+    #    self.weight_sample = weight_sample
+    #    self.bias_sample = bias_sample
     
     def reset_parameters(self):
         torch.nn.init.normal_(self.q_weight_mu, mean=0.0, std=5.0)
@@ -114,25 +125,31 @@ class ProbabilisticLinear(nn.Module):
         torch.nn.init.constant_(self.q_bias_rho, -1.0)
        
     def forward(self, input):
-        
-        return torch.nn.functional.linear(input, self.weight_sample, bias=self.bias_sample)
+        N = x_data.size(0)
+        return self.weight_sample.matmul(input.t()).add(self.bias_sample.unsqueeze(-1).repeat(1,1,N))
 
-class Model(nn.Module):
     
-    def __init__(self, input_size, output_size, H, L, device):
-        super(Model, self).__init__()
+class VariationalNetwork(nn.Module):
+    def __init__(self, input_size, output_size, layer_width, nb_layers, device=None):
+        super(VariationalNetwork, self).__init__()
         
-        
-        self.linear1 = ProbabilisticLinear(input_size, H, device)
-        self.linear2 = ProbabilisticLinear(H,output_size, device)
-        
+        self.device = device
         self.registered_layers = []
-        self.registered_layers.append(self.linear1)
-        self.registered_layers.append(self.linear2)
+
+        # Dynamically creating layers and registering them as parameters to optimize 
+        layer_dims = [input_size] + [layer_width] * (nb_layers-1) + [output_size]
+        for k in range(nb_layers):
+            a = layer_dims[k]
+            b = layer_dims[k+1]
+            layer = ProbabilisticLinear(a, b, device)
+            exec('self.linear' + str(k+1) + ' = layer')
+            self.registered_layers.append(layer)
         
         self.nb_parameters = self.count_parameters()
-        
         self.to(device)
+        
+    def _log_norm(self, x, mu, std):
+        return -0.5 * torch.log(2*np.pi*std**2) -(0.5 * (1/(std**2))* (x-mu)**2)
                 
     def forward(self, x):
         out = x;
@@ -177,7 +194,7 @@ class Model(nn.Module):
     
             y_pred = self.forward(x_data)
             
-            LL = log_norm(y_data, y_pred.t(), torch.tensor(sigma_noise).to(device)).sum()
+            LL = self._log_norm(y_data, y_pred.t(), torch.tensor(sigma_noise).to(device)).sum()
 
             L.append(LQ-LP-LL)
             
@@ -185,46 +202,52 @@ class Model(nn.Module):
         L = torch.mean(L)
         
         return L
-    
-def BBVI(data, n_neurons, n_epoch, n_iter, n_samples_ELBO, opti_params, sigma_noise, n_seed, gpu, name):
-    
-    device = torch.device('cuda:'+gpu if torch.cuda.is_available() else 'cpu')
 
-    torch.manual_seed(n_seed)
-    np.random.seed(n_seed)
 
-    x_data = data[0].to(device)
-    y_data = data[1].to(device)
-    
-    model = Model(n_neurons, device)
-    
-    learning_rate, patience, factor = opti_params
-    
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=factor,verbose=True)
-    optimizer.zero_grad()
-
-    liveloss = PlotLosses(fig_path='Results/BBVI_LOSS_PLOT_'+name)
-
-    for j in range(n_epoch):
+class VariationalOptimizer():
+    def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None):
+        self.model = model
+        self.sigma_noise = sigma_noise
+        self.device = model.device
         
-        logs = {}
-        losses = [None] * n_iter
-        
-        for k in range(n_iter):
-            optimizer.zero_grad()
-            loss = model.compute_elbo(x_data, y_data, n_samples_ELBO, sigma_noise, device)
-            losses[k] = loss
-            loss.backward()
-            optimizer.step()
+        self.optimizer = optimizer(model.parameters(), **optimizer_params)
+        if scheduler is None:           
+            self.scheduler = None
+        else:
+            self.scheduler = scheduler(self.optimizer, **scheduler_params)
             
-        logs['expected_loss'] = torch.stack(losses).mean().detach().clone().cpu().numpy()
-        logs['learning rate'] = optimizer.param_groups[0]['lr']
-        liveloss.update(logs)
-        liveloss.draw()
-        scheduler.step(logs['expected_loss'])
-        
-    return model
+    def run(self, data, n_epoch=100, n_iter=1, n_ELBO_samples=1, seed=None, plot=False, savePath=None, saveName=None):
+        if seed is not None:
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+
+        x_data = data[0].to(self.device)
+        y_data = data[1].to(self.device)
+
+        self.optimizer.zero_grad()
+
+        liveloss = PlotLosses(fig_path=str(savePath)+str(saveName))
+
+        for j in range(n_epoch):
+            logs = {}
+            losses = [None] * n_iter
+
+            for k in range(n_iter):
+                self.optimizer.zero_grad()
+                loss = self.model.compute_elbo(x_data, y_data, n_ELBO_samples, self.sigma_noise, self.device)
+                losses[k] = loss
+                loss.backward()
+                self.optimizer.step()
+
+            logs['expected_loss'] = torch.stack(losses).mean().detach().clone().cpu().numpy()
+            logs['learning rate'] = self.optimizer.param_groups[0]['lr']
+            liveloss.update(logs)
+            if plot is True:
+                liveloss.draw()
+            if self.scheduler is not None:
+                self.scheduler.step(logs['expected_loss'])
+
+        return self.model
 
 
 def plot_BBVI_Uncertainty(model, data, name, gpu):
