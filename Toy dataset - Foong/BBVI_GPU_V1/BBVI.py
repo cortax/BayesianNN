@@ -71,8 +71,6 @@ class ProbabilisticLinear(nn.Module):
         self.weight_epsilon = torch.randn(size=size).to(self.device)
         size = [M]+list(self.q_bias_mu.size())
         self.bias_epsilon = torch.randn(size=size).to(self.device)
-        
-        return (self.weight_epsilon, self.bias_epsilon)
     
     def reparameterization(self):
         M = self.weight_epsilon.size(0)
@@ -81,8 +79,6 @@ class ProbabilisticLinear(nn.Module):
         
         self.weight_sample = self.weight_epsilon.mul(sigma_weight.unsqueeze(0)).add(self.q_weight_mu.unsqueeze(0).repeat(M,1,1))
         self.bias_sample = self.bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(sigma_bias.unsqueeze(0).repeat(M,1))
-        
-        return (self.weight_sample, self.bias_sample)
 
     def q_log_pdf(self):
         M = self.weight_sample.size(0)
@@ -125,8 +121,10 @@ class ProbabilisticLinear(nn.Module):
         torch.nn.init.constant_(self.q_bias_rho, -1.0)
        
     def forward(self, input):
-        N = x_data.size(0)
-        return self.weight_sample.matmul(input.t()).add(self.bias_sample.unsqueeze(-1).repeat(1,1,N))
+        M = self.weight_sample.size(0)
+        if input.dim() < 3:
+            input = input.unsqueeze(0).repeat(M,1,1)
+        return input.matmul(self.weight_sample.permute(0,2,1)).add(self.bias_sample.unsqueeze(-1).permute(0,2,1))
 
     
 class VariationalNetwork(nn.Module):
