@@ -29,11 +29,11 @@ class ProbabilisticLinear(nn.Module):
         self.q_bias_mu = nn.Parameter(torch.Tensor(out_features))
         self.q_bias_rho = nn.Parameter(torch.Tensor(out_features))
         
-        self.weight_epsilon = torch.Tensor(out_features, in_features)
-        self.bias_epsilon = torch.Tensor(out_features, in_features)
+        self.weight_epsilon = None # torch.Tensor(out_features, in_features)
+        self.bias_epsilon = None #torch.Tensor(out_features, in_features)
         
-        self.weight_sample = torch.Tensor(out_features, in_features)
-        self.bias_sample = torch.Tensor(out_features, in_features)
+        self.weight_sample = None #torch.Tensor(out_features, in_features)
+        self.bias_sample = None #torch.Tensor(out_features, in_features)
         
         self.reset_parameters()
         
@@ -78,7 +78,7 @@ class ProbabilisticLinear(nn.Module):
         sigma_bias = self._rho_to_sigma(self.q_bias_rho)
         
         self.weight_sample = self.weight_epsilon.mul(sigma_weight.unsqueeze(0)).add(self.q_weight_mu.unsqueeze(0).repeat(M,1,1))
-        self.bias_sample = self.bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(sigma_bias.unsqueeze(0).repeat(M,1))
+        self.bias_sample = self.bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(self.q_bias_mu.unsqueeze(0).repeat(M,1))
 
     def q_log_pdf(self):
         M = self.weight_sample.size(0)
@@ -156,9 +156,9 @@ class VariationalNetwork(nn.Module):
         out = self.registered_layers[-1](out)
         return out
     
-    def resample_parameters(self, device):
+    def resample_parameters(self, M=1):
         for k in range(len(self.registered_layers)):
-            self.registered_layers[k].generate_rand(device)
+            self.registered_layers[k].generate_rand(M)
             self.registered_layers[k].reparameterization()
         
     def count_parameters(self):
@@ -178,29 +178,22 @@ class VariationalNetwork(nn.Module):
     def prior_log_pdf(self):
         list_LP = []
         for k in range(len(self.registered_layers)):
-            list_LP.append(self.registered_layers[k].p_log_pdf())
+            list_LP.append(self.registered_layers[k].prior_log_pdf())
         stack_LP = torch.stack(list_LP)
         return torch.sum(stack_LP)
         
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, device):
-        L = []
-        for i in range(0, n_samples_ELBO):
-            self.resample_parameters(device)
+        self.resample_parameters(n_samples_ELBO)
 
-            LQ = self.linear1.q_log_pdf() 
-            LP = self.linear1.prior_log_pdf() 
-    
-            y_pred = self.forward(x_data)
-            
-            LL = self._log_norm(y_data, y_pred.t(), torch.tensor(sigma_noise).to(device)).sum()
+        LQ = self.q_log_pdf()
+        LP = self.prior_log_pdf() 
 
-            L.append(LQ-LP-LL)
-            
-        L = torch.stack(L)
-        L = torch.mean(L)
+        y_pred = self.forward(x_data)
+        LL = self._log_norm(y_pred, y_data, torch.tensor(sigma_noise).to(device))
+
+        L = (LQ - LP - LL.sum())
         
-        return L
-
+        return torch.div(L, n_samples_ELBO)
 
 class VariationalOptimizer():
     def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None):
@@ -244,9 +237,7 @@ class VariationalOptimizer():
                 liveloss.draw()
             if self.scheduler is not None:
                 self.scheduler.step(logs['expected_loss'])
-
         return self.model
-
 
 def plot_BBVI_Uncertainty(model, data, name, gpu):
     
