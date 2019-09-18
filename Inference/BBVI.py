@@ -104,11 +104,13 @@ class ProbabilisticLinear(nn.Module):
         
         return W + B
 
-    #def set_parameters(self, weight_sample, bias_sample):
-    #    #todo: Make sure this affectation does NOT carry the whole graph that generated it
-    #    print('warning: set_parameters()')
-    #    self.weight_sample = weight_sample
-    #    self.bias_sample = bias_sample
+    def lock_rhos(self, lock = False):
+        self.q_weight_rho.requires_grad = lock
+        self.q_bias_rho.requires_grad = lock
+        
+    def lock_mus(self, lock = False):
+        self.q_weight_mu.requires_grad = lock
+        self.q_bias_mu.requires_grad = lock
     
     def reset_parameters(self):
         torch.nn.init.normal_(self.q_weight_mu, mean=0.0, std=5.0)
@@ -151,6 +153,18 @@ class VariationalNetwork(nn.Module):
             out = torch.tanh(self.registered_layers[k](out))
         out = self.registered_layers[-1](out)
         return out
+    
+    def lock_rhos(self, lock = False):
+        for k in range(len(self.registered_layers)):
+            self.registered_layers[k].lock_rhos(lock)
+        
+    def lock_mus(self, lock = False):
+        for k in range(len(self.registered_layers)):
+            self.registered_layers[k].lock_mus(lock)
+            
+    def make_deterministic_rhos(self):
+        for k in range(len(self.registered_layers)):
+            self.registered_layers[k].q_weight_rho = nn.Parameter(self.registered_layers[k].q_weight_rho.new_full(self.registered_layers[k].q_weight_rho.size(), -10.0))
     
     def resample_parameters(self, M=1):
         for k in range(len(self.registered_layers)):
