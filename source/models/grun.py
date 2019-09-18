@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 #from torch.nn.utils.rnn import pack_padded_sequence
+from source.utils.losses import loss_function_picker
+
 
 class GatedRecurrentUnitHnNet(nn.Module):
     def __init__(self, input_size, output_size, 
@@ -26,10 +28,7 @@ class GatedRecurrentUnitHnNet(nn.Module):
         self.predict_layer = nn.Linear(hidden_size * num_layers * (bidirectional + 1), output_size) #(hidden*layers*1, 1)
         
         self.target_type_string = target_type_string
-        if target_type_string=='Regression':
-            self.loss_function = nn.MSELoss()
-        elif target_type_string=='Classification':
-            self.loss_function = nn.CrossEntropyLoss()
+        self.loss_function = loss_function_picker(target_type_string)
              
     def forward(self, input):
         #print('batch:', input)

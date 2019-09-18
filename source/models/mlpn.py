@@ -1,4 +1,5 @@
 import torch.nn as nn
+from source.utils.losses import loss_function_picker
 
 
 class HiddenBlock(nn.Module):
@@ -43,10 +44,7 @@ class MultilayerPerceptronNet(nn.Module):
         self.output_layer = nn.Linear(hidden_sizes[-1], output_size, bias)
 
         self.target_type_string = target_type_string
-        if target_type_string=='Regression':
-            self.loss_function = nn.MSELoss()
-        elif target_type_string=='Classification':
-            self.loss_function = nn.CrossEntropyLoss()
+        self.loss_function = loss_function_picker(target_type_string)
 
     def forward(self, x, debug_prints=False):
         in_drop = self.input_dropout(x)

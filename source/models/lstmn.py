@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 #from torch.nn.utils.rnn import pack_padded_sequence
+from source.utils.losses import loss_function_picker
 
 
 class LongShortTermMemoryHnNet(nn.Module):
@@ -23,10 +24,7 @@ class LongShortTermMemoryHnNet(nn.Module):
         self.predict_layer = nn.Linear(hidden_size * num_layers * (bidirectional + 1), output_size)
 
         self.target_type_string = target_type_string
-        if target_type_string=='Regression':
-            self.loss_function = nn.MSELoss()
-        elif target_type_string=='Classification':
-            self.loss_function = nn.CrossEntropyLoss()
+        self.loss_function = loss_function_picker(target_type_string)
         
     def forward(self, input):
         #print('batch:', input)

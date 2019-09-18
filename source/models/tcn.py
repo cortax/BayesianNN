@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.nn.utils import weight_norm
+from source.utils.losses import loss_function_picker
 
 
 class Chomp1d(nn.Module):
@@ -44,7 +45,7 @@ class TemporalBlock(nn.Module):
         return self.relu(out + res)
 
 class TemporalConvNet(nn.Module):
-    def __init__(self, num_inputs, num_channels, kernel_size=2, dropout=0.2):
+    def __init__(self, num_inputs, num_channels, kernel_size=2, dropout=0.2, target_type_string='Regression'):
         super(TemporalConvNet, self).__init__()
         layers = []
         num_levels = len(num_channels)
@@ -58,10 +59,7 @@ class TemporalConvNet(nn.Module):
         self.network = nn.Sequential(*layers)
 
         self.target_type_string = target_type_string
-        if target_type_string=='Regression':
-            self.loss_function = nn.MSELoss()
-        elif target_type_string=='Classification':
-            self.loss_function = nn.CrossEntropyLoss()
+        self.loss_function = loss_function_picker(target_type_string)
         
     def forward(self, x):
         return self.network(x)

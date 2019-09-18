@@ -4,13 +4,10 @@ Add Helps to redux args ex: help='size of word embeddings'
 
 Save history as JSON or something (required for a better restart training)
 Eval metrics for significant events inside windows
-Think about splitting along features instead of flights
 
 Models: Input changes(LogNorm, Embeddings, autoencoding), 
         Output Net Changes(Better Classif/Regression Head),
-        Attention, 
-        Ensemble,
-        RNN outputs Nets (Instead of H_n)
+        Ensemble
 
 RNN Gradient clipping (with norm ideally)
-Data delta y instead of y
+Try Data delta y instead of y
