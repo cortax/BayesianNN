@@ -162,6 +162,7 @@ class VariationalNetwork(nn.Module):
     def make_deterministic_rhos(self):
         for k in range(len(self.registered_layers)):
             self.registered_layers[k].q_weight_rho = nn.Parameter(self.registered_layers[k].q_weight_rho.new_full(self.registered_layers[k].q_weight_rho.size(), -10.0))
+            self.registered_layers[k].q_bias_rho = nn.Parameter(self.registered_layers[k].q_bias_rho.new_full(self.registered_layers[k].q_bias_rho.size(), -10.0))
     
     def sample_parameters(self, M=1):
         layered_w_samples = []
