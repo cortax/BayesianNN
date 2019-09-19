@@ -177,7 +177,11 @@ class VariationalNetwork(nn.Module):
     def set_parameters(self, w_samples, b_samples):
         for k in range(len(self.registered_layers)):
             self.registered_layers[k].set_parameters(w_samples[k], b_samples[k]) 
-   
+    
+    def KL_log_pdf(self, w_samples, b_samples):
+        self.set_parameters(w_samples, b_samples)
+        return (self.q_log_pdf(), self.prior_log_pdf())
+
     def q_log_pdf(self):
         list_LQ = []
         for k in range(len(self.registered_layers)):
