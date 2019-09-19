@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
 class ProbabilisticLinear(nn.Module):
-    __constants__ = ['bias', 'in_features', 'out_features']
 
     def __init__(self, in_features, out_features, device=None, bias=True):
         super(ProbabilisticLinear, self).__init__()
