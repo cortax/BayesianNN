@@ -25,9 +25,6 @@ class ProbabilisticLinear(nn.Module):
         self.q_bias_mu = nn.Parameter(torch.Tensor(out_features))
         self.q_bias_rho = nn.Parameter(torch.Tensor(out_features))
         
-        self.weight_epsilon = None # torch.Tensor(out_features, in_features)
-        self.bias_epsilon = None #torch.Tensor(out_features, in_features)
-        
         self.weight_sample = None #torch.Tensor(out_features, in_features)
         self.bias_sample = None #torch.Tensor(out_features, in_features)
         
@@ -62,22 +59,22 @@ class ProbabilisticLinear(nn.Module):
         rho = torch.log(torch.exp(sigma) - 1)
         return rho
 
-    def generate_rand(self, M=1):
+    def sample_parameters(self, M=1):
         size = [M]+list(self.q_weight_mu.size())
-        self.weight_epsilon = torch.randn(size=size).to(self.device)
+        weight_epsilon = torch.randn(size=size).to(self.device)
         size = [M]+list(self.q_bias_mu.size())
-        self.bias_epsilon = torch.randn(size=size).to(self.device)
+        bias_epsilon = torch.randn(size=size).to(self.device)
     
-    def reparameterization(self):
-        M = self.weight_epsilon.size(0)
         sigma_weight = self._rho_to_sigma(self.q_weight_rho)
         sigma_bias = self._rho_to_sigma(self.q_bias_rho)
         
-        self.weight_sample = self.weight_epsilon.mul(sigma_weight.unsqueeze(0)).add(self.q_weight_mu.unsqueeze(0).repeat(M,1,1))
-        self.bias_sample = self.bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(self.q_bias_mu.unsqueeze(0).repeat(M,1))
+        self.weight_sample = weight_epsilon.mul(sigma_weight.unsqueeze(0)).add(self.q_weight_mu.unsqueeze(0).repeat(M,1,1))
+        self.bias_sample = bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(self.q_bias_mu.unsqueeze(0).repeat(M,1))
+        
+        return (self.weight_sample, self.bias_sample)
 
-    def q_log_pdf(self):
-        M = self.weight_sample.size(0)
+    def q_log_pdf(self, weight_sample, bias_sample):
+        M = weight_sample.size(0)
         
         sigma_weight = self._rho_to_sigma(self.q_weight_rho)
         nw = torch.distributions.Normal(self.q_weight_mu.unsqueeze(0).repeat(M,1,1), sigma_weight.unsqueeze(0).repeat(M,1,1))
@@ -85,12 +82,12 @@ class ProbabilisticLinear(nn.Module):
         sigma_bias = self._rho_to_sigma(self.q_bias_rho)
         nb = torch.distributions.Normal(self.q_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
         
-        W = nw.log_prob(self.weight_sample).sum()
-        B = nb.log_prob(self.bias_sample).sum()
+        W = nw.log_prob(weight_sample).sum()
+        B = nb.log_prob(bias_sample).sum()
         
         return W + B
     
-    def prior_log_pdf(self):
+    def prior_log_pdf(self, weight_sample, bias_sample):
         M = self.weight_sample.size(0)
         
         sigma_weight = self._rho_to_sigma(self.prior_weight_rho)
@@ -99,18 +96,18 @@ class ProbabilisticLinear(nn.Module):
         sigma_bias = self._rho_to_sigma(self.prior_bias_rho)
         nb = torch.distributions.Normal(self.prior_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
         
-        W = nw.log_prob(self.weight_sample).sum()
-        B = nb.log_prob(self.bias_sample).sum()
+        W = nw.log_prob(weight_sample).sum()
+        B = nb.log_prob(bias_sample).sum()
         
         return W + B
 
-    def lock_rhos(self, lock = False):
-        self.q_weight_rho.requires_grad = lock
-        self.q_bias_rho.requires_grad = lock
+    def requires_grad_rhos(self, v = False):
+        self.q_weight_rho.requires_grad = v
+        self.q_bias_rho.requires_grad = v
         
-    def lock_mus(self, lock = False):
-        self.q_weight_mu.requires_grad = lock
-        self.q_bias_mu.requires_grad = lock
+    def requires_grad_mus(self, v = False):
+        self.q_weight_mu.requires_grad = v
+        self.q_bias_mu.requires_grad = v
     
     def reset_parameters(self):
         torch.nn.init.normal_(self.q_weight_mu, mean=0.0, std=5.0)
@@ -154,22 +151,26 @@ class VariationalNetwork(nn.Module):
         out = self.registered_layers[-1](out)
         return out
     
-    def lock_rhos(self, lock = False):
+    def requires_grad_rhos(self, v = False):
         for k in range(len(self.registered_layers)):
-            self.registered_layers[k].lock_rhos(lock)
+            self.registered_layers[k].requires_grad_rhos(v)
         
-    def lock_mus(self, lock = False):
+    def requires_grad_mus(self, v = False):
         for k in range(len(self.registered_layers)):
-            self.registered_layers[k].lock_mus(lock)
+            self.registered_layers[k].requires_grad_mus(v)
             
     def make_deterministic_rhos(self):
         for k in range(len(self.registered_layers)):
             self.registered_layers[k].q_weight_rho = nn.Parameter(self.registered_layers[k].q_weight_rho.new_full(self.registered_layers[k].q_weight_rho.size(), -10.0))
     
-    def resample_parameters(self, M=1):
+    def sample_parameters(self, M=1):
+        layered_w_samples = []
+        layered_bias_samples = []
+        L = [self.registered_layers[k].sample_parameters(M) for k in range(len(self.registered_layers))]
         for k in range(len(self.registered_layers)):
-            self.registered_layers[k].generate_rand(M)
-            self.registered_layers[k].reparameterization()
+            layered_w_samples.append(L[k][0])
+            layered_bias_samples.append(L[k][1])
+        return (layered_w_samples, layered_bias_samples)
         
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
@@ -182,25 +183,23 @@ class VariationalNetwork(nn.Module):
         self.set_parameters(w_samples, b_samples)
         return (self.q_log_pdf(), self.prior_log_pdf())
 
-    def q_log_pdf(self):
+    def q_log_pdf(self, layered_w_samples, layered_bias_samples):
         list_LQ = []
-        for k in range(len(self.registered_layers)):
-            list_LQ.append(self.registered_layers[k].q_log_pdf())
+        list_LQ = [self.registered_layers[k].q_log_pdf(layered_w_samples[k], layered_bias_samples[k]) for k in range(len(self.registered_layers))]
         stack_LQ = torch.stack(list_LQ)
         return torch.sum(stack_LQ)
     
-    def prior_log_pdf(self):
+    def prior_log_pdf(self, layered_w_samples, layered_bias_samples):
         list_LP = []
-        for k in range(len(self.registered_layers)):
-            list_LP.append(self.registered_layers[k].prior_log_pdf())
+        list_LP = [self.registered_layers[k].prior_log_pdf(layered_w_samples[k], layered_bias_samples[k]) for k in range(len(self.registered_layers))]
         stack_LP = torch.stack(list_LP)
         return torch.sum(stack_LP)
         
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, device):
-        self.resample_parameters(n_samples_ELBO)
+        (layered_w_samples, layered_bias_samples) = self.sample_parameters(n_samples_ELBO)
 
-        LQ = self.q_log_pdf()
-        LP = self.prior_log_pdf() 
+        LQ = self.q_log_pdf(layered_w_samples, layered_bias_samples)
+        LP = self.prior_log_pdf(layered_w_samples, layered_bias_samples)
 
         y_pred = self.forward(x_data)
         LL = self._log_norm(y_pred, y_data, torch.tensor(sigma_noise).to(device))
