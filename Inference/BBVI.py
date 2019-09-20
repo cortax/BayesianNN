@@ -81,10 +81,10 @@ class ProbabilisticLinear(nn.Module):
         sigma_bias = self._rho_to_sigma(self.q_bias_rho)
         nb = torch.distributions.Normal(self.q_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
         
-        W = nw.log_prob(weight_sample).sum()
-        B = nb.log_prob(bias_sample).sum()
+        W = nw.log_prob(weight_sample)
+        B = nb.log_prob(bias_sample)
         
-        return W + B
+        return W.sum(dim=[1,2]) + B.sum(dim=[1]) 
     
     def prior_log_pdf(self, weight_sample, bias_sample):
         M = self.weight_sample.size(0)
@@ -187,7 +187,7 @@ class VariationalNetwork(nn.Module):
         list_LQ = []
         list_LQ = [self.registered_layers[k].q_log_pdf(layered_w_samples[k], layered_bias_samples[k]) for k in range(len(self.registered_layers))]
         stack_LQ = torch.stack(list_LQ)
-        return torch.sum(stack_LQ)
+        return torch.sum(stack_LQ, dim=0)
     
     def prior_log_pdf(self, layered_w_samples, layered_bias_samples):
         list_LP = []
@@ -198,8 +198,8 @@ class VariationalNetwork(nn.Module):
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, device):
         (layered_w_samples, layered_bias_samples) = self.sample_parameters(n_samples_ELBO)
 
-        LQ = self.q_log_pdf(layered_w_samples, layered_bias_samples)
-        LP = self.prior_log_pdf(layered_w_samples, layered_bias_samples)
+        LQ = self.q_log_pdf(layered_w_samples, layered_bias_samples).sum()
+        LP = self.prior_log_pdf(layered_w_samples, layered_bias_samples).sum()
 
         y_pred = self.forward(x_data)
         LL = self._log_norm(y_pred, y_data, torch.tensor(sigma_noise).to(device))
