@@ -87,7 +87,7 @@ class ProbabilisticLinear(nn.Module):
         return W.sum(dim=[1,2]) + B.sum(dim=[1]) 
     
     def prior_log_pdf(self, weight_sample, bias_sample):
-        M = self.weight_sample.size(0)
+        M = weight_sample.size(0)
         
         sigma_weight = self._rho_to_sigma(self.prior_weight_rho)
         nw = torch.distributions.Normal(self.prior_weight_mu.unsqueeze(0).repeat(M,1,1), sigma_weight.unsqueeze(0).repeat(M,1,1))
@@ -95,10 +95,10 @@ class ProbabilisticLinear(nn.Module):
         sigma_bias = self._rho_to_sigma(self.prior_bias_rho)
         nb = torch.distributions.Normal(self.prior_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
         
-        W = nw.log_prob(weight_sample).sum()
-        B = nb.log_prob(bias_sample).sum()
+        W = nw.log_prob(weight_sample)
+        B = nb.log_prob(bias_sample)
         
-        return W + B
+        return W.sum(dim=[1,2]) + B.sum(dim=[1]) 
 
     def requires_grad_rhos(self, v = False):
         self.q_weight_rho.requires_grad = v
@@ -193,7 +193,7 @@ class VariationalNetwork(nn.Module):
         list_LP = []
         list_LP = [self.registered_layers[k].prior_log_pdf(layered_w_samples[k], layered_bias_samples[k]) for k in range(len(self.registered_layers))]
         stack_LP = torch.stack(list_LP)
-        return torch.sum(stack_LP)
+        return torch.sum(stack_LP, dim=0)
         
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, device):
         (layered_w_samples, layered_bias_samples) = self.sample_parameters(n_samples_ELBO)
@@ -254,25 +254,3 @@ class VariationalOptimizer():
             if self.scheduler is not None:
                 self.scheduler.step(logs['expected_loss'])
         return self.model
-
-def plot_BBVI_Uncertainty(model, data, name, gpu):
-    
-    device = torch.device('cuda:'+gpu if torch.cuda.is_available() else 'cpu')
-    x_test = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
-
-    fig, ax = plt.subplots()
-    fig.set_size_inches(11.7, 8.27)
-
-    plt.scatter(data[0].cpu(), data[1].cpu())
-    plt.axis([-2, 2, -2, 6])
-
-    for _ in range(1000): 
-
-        model.linear1.generate_rand(device)
-        model.linear1.reparameterization()
-
-        y_test = model.forward(x_test)
-        
-        plt.plot(x_test.detach().cpu().numpy(), y_test.detach().cpu().numpy(), alpha=0.05, linewidth=1,color='lightblue')
-        
-    plt.savefig('Results/BBVI_PLOT_'+name)
