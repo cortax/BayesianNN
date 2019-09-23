@@ -220,7 +220,7 @@ class VariationalOptimizer():
         else:
             self.scheduler = scheduler(self.optimizer, **scheduler_params)
             
-    def run(self, data, n_epoch=100, n_iter=1, n_ELBO_samples=1, seed=None, plot=False, savePath=None, saveName=None):
+    def run(self, data, n_epoch=100, n_iter=1, n_ELBO_samples=1, seed=None, plot=False, savePath=None, xpName=None, networkName=None, saveName=None):
         if seed is not None:
             torch.manual_seed(seed)
             np.random.seed(seed)
@@ -231,7 +231,7 @@ class VariationalOptimizer():
         self.optimizer.zero_grad()
 
         if saveName is not None and savePath is not None:
-            liveloss = PlotLosses(fig_path=str(savePath)+str(saveName))
+            liveloss = PlotLosses(fig_path=str(savePath)+str(xpName)+'_'+str(networkName)+'_'+str(saveName))
         else:
             liveloss = PlotLosses()
 
@@ -254,3 +254,22 @@ class VariationalOptimizer():
             if self.scheduler is not None:
                 self.scheduler.step(logs['expected_loss'])
         return self.model
+    
+def plot_BBVI(model, data, device, savePath=None, xpName=None, networkName=None, saveName=None):
+    
+    x_test = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 9)
+    plt.axis([-2, 2, -2, 5])
+    plt.scatter(data[0].cpu(), data[1].cpu())
+    
+    for _ in range(1000):
+        
+        model.sample_parameters()
+
+        y_test = model.forward(x_test)
+        plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='lightblue')
+        
+    plt.savefig(savePath + xpName +'_'+ networkName +'_'+ saveName)
+    
