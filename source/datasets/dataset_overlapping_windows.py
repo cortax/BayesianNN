@@ -8,11 +8,12 @@ from source.utils.preprocessing import *
 def get_overlapping_windows_datasets(csv_files_path, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta, train_test_ratio, train_valid_ratio, shuffle=False, random_seed=42):
     #loading CSV
     list_df, list_data_units, list_data_label_type = bomb_csv_to_df(csv_files_path)
-    
+    rescaled_list_df = rescale_list_of_df(list_df)
+
     #Note: Train test and valid are made on flights, not the amount of vectors in total!
     
     #Splitting list of df into train-test
-    list_df_train, list_df_test = split_list_on_ratio(list_df, train_test_ratio, shuffle, random_seed)
+    list_df_train, list_df_test = split_list_on_ratio(rescaled_list_df, train_test_ratio, shuffle, random_seed)
     #Splitting list of train into train-valid
     list_df_train, list_df_valid = split_list_on_ratio(list_df_train, train_valid_ratio, shuffle, random_seed)
     

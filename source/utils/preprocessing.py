@@ -127,6 +127,62 @@ def bomb_csv_to_df(csv_stringLoader):
 
 #TODO: Func to verify if list_data_units and list_data_label_type are all the same
 
+#List df to max array
+def list_df_to_max_array(list_df):
+    maxdflist = []
+    for df in list_df:
+        maxdflist.append(df.describe(include='all').loc[ "max", :].to_numpy())
+        #print(df.describe(include='all').loc[ "max", :].to_numpy())
+    for m in range(len(maxdflist)):
+        #print(m)
+        if m==0:
+            maxarray = maxdflist[m]
+        else:
+            maxarray = np.maximum(maxarray, maxdflist[m])
+    #print(maxarray)
+    return maxarray
+
+#list df to min array
+def list_df_to_min_array(list_df):
+    mindflist = []
+    for df in list_df:
+        mindflist.append(df.describe(include='all').loc[ "min", :].to_numpy())
+        #print(df.describe(include='all').loc[ "max", :].to_numpy())
+    for m in range(len(mindflist)):
+        #print(m)
+        if m==0:
+            minarray = mindflist[m]
+        else:
+            minarray = np.minimum(minarray, mindflist[m])
+    #print(minarray)
+    return minarray
+
+#max and min array to rescaling array (bigger values of both, column-wise)
+def min_max_arrays_to_rescaling_array(minarray, maxarray):
+    rescaling_array = np.maximum(np.absolute(minarray), maxarray)
+    return rescaling_array
+
+#to rescale columns of a single df from a rescaling array
+def rescale_single_df(df, rescaling_array):
+    rescaled_df = pd.DataFrame()
+    for e, (columnName, columnData) in enumerate(list_df[0].iteritems()):
+        #print(e)
+        #print(columnName)
+        #print(columnData)
+        rescaled_df[columnName] = columnData/(rescaling_array[e]+1)
+    return rescaled_df
+
+#rescale a list of df, column-wise
+def rescale_list_of_df(list_df):
+    minarray = list_df_to_min_array(list_df)
+    maxarray = list_df_to_max_array(list_df)
+    rescaling_array = min_max_arrays_to_rescaling_array(minarray, maxarray)
+    
+    rescaled_list_df = []
+    for df in list_df:
+        rescaled_list_df.append(rescale_single_df(df, rescaling_array))
+    return rescaled_list_df
+
 #purely exogeneous (non-regressive)
 def list_df_to_exogeneous_df(list_df, target_choice):
     list_df_features = []
