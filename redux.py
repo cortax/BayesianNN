@@ -36,6 +36,8 @@ parser.add_argument('-target', '--TARGET_CHOICE', action='store',
                     default=1, required=False, type=int)
 parser.add_argument('-delta', '--SHIFT_DELTA', action='store', 
                     default=1, required=False, type=int)
+parser.add_argument('-stride', '--TIME_STRIDE', action='store', 
+                    default=1, required=False, type=int)
 
 #params for dataloader
 parser.add_argument('-ttr', '--TRAIN_TEST_RATIO', action='store', 
@@ -122,7 +124,7 @@ if __name__ == '__main__':
                     args.EPOCHS, args.BATCH_SIZE, args.SAMPLER_TYPE,
                     args.EARLY_STOP, args.PATIENCE, args.COOLDOWN, args.FACTOR, args.LEARNING_RATE, args.NO_VERBOSE, args.THRESHOLD,
                     args.NOT_FORECASTING, args.NO_FEATURE_ENDO, args.NO_FEATURE_EXO, args.TARGET_CHOICE, 
-                    args.WINDOWS_SIZE, args.SHIFT_DELTA,
+                    args.WINDOWS_SIZE, args.SHIFT_DELTA, args.TIME_STRIDE,
                     args.TRAIN_TEST_RATIO, args.TRAIN_VALID_RATIO,
                     args.OPTIM_TYPE, args.WEIGHT_DECAY, args.MOMENTUM, args.DAMPENING,
                     args.HIDDEN_SIZE, args.NUM_LAYERS, args.DROPOUT_HIDDEN, args.DROPOUT_HN,

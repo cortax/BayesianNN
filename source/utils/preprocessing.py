@@ -165,7 +165,7 @@ def min_max_arrays_to_rescaling_array(minarray, maxarray):
 #to rescale columns of a single df from a rescaling array
 def rescale_single_df(df, rescaling_array):
     rescaled_df = pd.DataFrame()
-    for e, (columnName, columnData) in enumerate(list_df[0].iteritems()):
+    for e, (columnName, columnData) in enumerate(df.iteritems()):
         #print(e)
         #print(columnName)
         #print(columnData)
@@ -182,6 +182,13 @@ def rescale_list_of_df(list_df):
     for df in list_df:
         rescaled_list_df.append(rescale_single_df(df, rescaling_array))
     return rescaled_list_df
+
+#shrink df according with strides on rows (remove rows)
+def shrink_timesteps_with_strides(list_df, stride):
+    shrinked_list_df = []
+    for df in list_df:
+        shrinked_list_df.append(df.iloc[::stride, :])
+    return shrinked_list_df
 
 #purely exogeneous (non-regressive)
 def list_df_to_exogeneous_df(list_df, target_choice):

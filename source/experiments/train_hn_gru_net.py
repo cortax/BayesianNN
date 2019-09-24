@@ -17,7 +17,7 @@ def hn_gru_net_main(experiment_number,
                     n_epoch, batch_size, sampler_type,
                     early_stop, patience, cooldown, factor, learning_rate, verbose, threshold,
                     forecasting, feature_endo, feature_exo, target_choice, 
-                    windows_size, shift_delta, 
+                    windows_size, shift_delta, stride,
                     train_test_ratio, train_valid_ratio,
                     optim_type, weight_decay, momentum, dampening,
                     hidden_size, num_layers, dropout_hidden, dropout_Hn,
@@ -33,7 +33,7 @@ def hn_gru_net_main(experiment_number,
     print('Making Dataset')
     train_dataset, valid_dataset, test_dataset = get_overlapping_windows_datasets(csv_path, 
             forecasting, feature_endo, feature_exo, target_choice, 
-            windows_size, shift_delta, 
+            windows_size, shift_delta, stride,
             train_test_ratio, train_valid_ratio, 
             shuffle=False, random_seed=42)
 
