@@ -75,7 +75,7 @@ parser.add_argument('-e', '--EPOCHS', action='store',
                     default=500, required=False, type=int)
 parser.add_argument('-optim', '--OPTIM_TYPE', action='store', 
                     default='adam', required=False, type=str)
-parser.add_argument('--EARLY_STOP', action='store', 
+parser.add_argument('-es', '--EARLY_STOP', action='store', 
                     default=100, required=False, type=int)
 parser.add_argument('--PATIENCE', action='store', 
                     default=50, required=False, type=int)
@@ -84,7 +84,7 @@ parser.add_argument('--COOLDOWN', action='store',
 parser.add_argument('--FACTOR', action='store', 
                     default=0.8, required=False, type=float)
 parser.add_argument('-lr', '--LEARNING_RATE', action='store',
-                    default=0.01, required=False, type=float)                    
+                    default=0.02, required=False, type=float)                    
 parser.add_argument('--NO_VERBOSE', action='store_false', required=False)
 parser.add_argument('--THRESHOLD', action='store',
                     default=1e-6, required=False, type=float)

@@ -54,7 +54,7 @@ def hn_gru_net_main(experiment_number,
     print('Making Model')
     model = GatedRecurrentUnitHnNet(train_dataset.features_size(), train_dataset.labels_size(),
                     windows_size, hidden_size, num_layers, 
-                    target_type_string='Regression',
+                    target_type_string='Regression', 
                     bias=True, batch_first=True, 
                     bidirectional=False, 
                     dropout_hidden=dropout_hidden, dropout_Hn=dropout_Hn)
@@ -113,6 +113,10 @@ def hn_gru_net_main(experiment_number,
     model = load_model(model, best_model_save_string)
     test_loss, test_metrics = test(model, test_loader, 
                                 criterion, use_gpu=use_gpu)
+    print("\ntrue\n")
+    print(test_metrics.true)
+    print("\npred\n")
+    print(test_metrics.pred)
 
     print('End of Main')
     return test_loss, test_metrics, best_model_save_string
