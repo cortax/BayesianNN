@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-def loss_function_picker(target_type_string, loss_name):
+def loss_function_picker(target_type_string, loss_name=''):
     if target_type_string=='Regression':
         if loss_name=='mse':
             return nn.MSELoss()

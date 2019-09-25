@@ -58,9 +58,9 @@ class History:
             self.history['train_mae'].append(train_metrics.mean_abs_error)
             self.history['train_mse'].append(train_metrics.mean_square_error)
 
-            self.history['valid_r2'].append(train_metrics.r2_score)
-            self.history['valid_mae'].append(train_metrics.mean_abs_error)
-            self.history['valid_mse'].append(train_metrics.mean_square_error)
+            self.history['valid_r2'].append(valid_metrics.r2_score)
+            self.history['valid_mae'].append(valid_metrics.mean_abs_error)
+            self.history['valid_mse'].append(valid_metrics.mean_square_error)
 
     def _base_display(self, path_string, file_string):
         epoch = len(self.history['train_loss'])
