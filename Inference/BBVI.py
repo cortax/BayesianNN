@@ -59,6 +59,10 @@ class ProbabilisticLinear(nn.Module):
         return rho
 
     def sample_parameters(self, M=1):
+        if M < 1:
+            self.weight_sample = None 
+            self.bias_sample = None
+            return
         size = [M]+list(self.q_weight_mu.size())
         weight_epsilon = torch.randn(size=size).to(self.device)
         size = [M]+list(self.q_bias_mu.size())
@@ -168,8 +172,9 @@ class VariationalNetwork(nn.Module):
         layered_bias_samples = []
         L = [self.registered_layers[k].sample_parameters(M) for k in range(len(self.registered_layers))]
         for k in range(len(self.registered_layers)):
-            layered_w_samples.append(L[k][0])
-            layered_bias_samples.append(L[k][1])
+            if L[k] is not None:
+                layered_w_samples.append(L[k][0])
+                layered_bias_samples.append(L[k][1])
         return (layered_w_samples, layered_bias_samples)
         
     def count_parameters(self):
