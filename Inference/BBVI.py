@@ -59,10 +59,6 @@ class ProbabilisticLinear(nn.Module):
         return rho
 
     def sample_parameters(self, M=1):
-        if M < 1:
-            self.weight_sample = None 
-            self.bias_sample = None
-            return
         size = [M]+list(self.q_weight_mu.size())
         weight_epsilon = torch.randn(size=size).to(self.device)
         size = [M]+list(self.q_bias_mu.size())
@@ -71,8 +67,12 @@ class ProbabilisticLinear(nn.Module):
         sigma_weight = self._rho_to_sigma(self.q_weight_rho)
         sigma_bias = self._rho_to_sigma(self.q_bias_rho)
         
-        self.weight_sample = weight_epsilon.mul(sigma_weight.unsqueeze(0)).add(self.q_weight_mu.unsqueeze(0).repeat(M,1,1))
-        self.bias_sample = bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(self.q_bias_mu.unsqueeze(0).repeat(M,1))
+        if M > 0:
+            self.weight_sample = weight_epsilon.mul(sigma_weight.unsqueeze(0)).add(self.q_weight_mu.unsqueeze(0).repeat(M,1,1))
+            self.bias_sample = bias_epsilon.mul(sigma_bias.unsqueeze(0)).add(self.q_bias_mu.unsqueeze(0).repeat(M,1))
+        else:
+            self.weight_sample = weight_epsilon.mul(sigma_weight.unsqueeze(0))
+            self.bias_sample = bias_epsilon.mul(sigma_bias.unsqueeze(0))
         
         return (self.weight_sample, self.bias_sample)
 
