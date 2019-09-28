@@ -24,8 +24,8 @@ class ProbabilisticLinear(nn.Module):
         self.q_bias_mu = nn.Parameter(torch.Tensor(out_features))
         self.q_bias_rho = nn.Parameter(torch.Tensor(out_features))
         
-        self.weight_sample = None #torch.Tensor(out_features, in_features)
-        self.bias_sample = None #torch.Tensor(out_features, in_features)
+        self.weight_sample = torch.empty([0, out_features, in_features])
+        self.bias_sample = torch.empty([0, out_features, in_features])
         
         self.reset_parameters()
         
@@ -121,7 +121,11 @@ class ProbabilisticLinear(nn.Module):
     def forward(self, input):
         M = self.weight_sample.size(0)
         if input.dim() < 3:
-            input = input.unsqueeze(0).repeat(M,1,1)
+            if M > 0:
+                input = input.unsqueeze(0).repeat(M,1,1)
+            else:
+                
+                input = torch.empty(s)
         return input.matmul(self.weight_sample.permute(0,2,1)).add(self.bias_sample.unsqueeze(-1).permute(0,2,1))
 
     
