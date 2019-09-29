@@ -24,8 +24,8 @@ class ProbabilisticLinear(nn.Module):
         self.q_bias_mu = nn.Parameter(torch.Tensor(out_features))
         self.q_bias_rho = nn.Parameter(torch.Tensor(out_features))
         
-        self.weight_sample = torch.empty([0, out_features, in_features])
-        self.bias_sample = torch.empty([0, out_features, in_features])
+        self.weight_sample = torch.empty([0, out_features, in_features], device=device)
+        self.bias_sample = torch.empty([0, out_features, in_features], device=device)
         
         self.reset_parameters()
         
@@ -118,15 +118,18 @@ class ProbabilisticLinear(nn.Module):
         torch.nn.init.normal_(self.q_bias_mu, mean=0.0, std=5.0)
         torch.nn.init.constant_(self.q_bias_rho, -1.0)
        
-    def forward(self, input):
+    def forward(self, x):
         M = self.weight_sample.size(0)
-        if input.dim() < 3:
+        if x.dim() < 3:
             if M > 1:
-                input = input.unsqueeze(0).repeat(M,1,1)
+                x = x.unsqueeze(0).repeat(M,1,1)
             else:
-                s = [0] + list(input.shape)
-                input = torch.empty(s)
-        return input.matmul(self.weight_sample.permute(0,2,1)).add(self.bias_sample.unsqueeze(-1).permute(0,2,1))
+                s = [0] + list(x.shape)
+                x = torch.empty(s, device=self.device)
+        if M > 1:
+            return x.matmul(self.weight_sample.permute(0,2,1)).add(self.bias_sample.unsqueeze(-1).permute(0,2,1))
+        else:
+            return x.matmul(self.weight_sample.permute(0,2,1))
 
     
 class VariationalNetwork(nn.Module):
