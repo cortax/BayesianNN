@@ -32,12 +32,15 @@ def df_to_contiguous_sliding_windows(df, window_size, rem_beg=True):
     return windows
 
 #list of dataframes into overlapping sliding windows
-def list_df_to_overlapping_sliding_windows(list_df, window_size):
-    all_windows = []
+def list_df_to_overlapping_sliding_windows(list_df, window_size, mode="extend"):
+    list_windows = []
     for dfs in list_df:
         windows = df_to_overlapping_sliding_windows(dfs, window_size)
-        all_windows.extend(windows)
-    return all_windows
+        if mode=="extend":
+            list_windows.extend(windows)
+        elif mode=="append":
+            list_windows.append(windows)
+    return list_windows
 
 #single dataframe into overlapping sliding windows
 def df_to_overlapping_sliding_windows(dataframe, window_size):
@@ -54,6 +57,29 @@ def remove_df_starting_rows(dataframe, amount_to_remove):
         return df
     else:
         return dataframe
+
+def get_features_and_targets(list_df, forecasting, feature_endo, feature_exo, target_choice, shift_delta):
+    if forecasting: #forecasting task (N step ahead)
+        if feature_endo and not feature_exo:
+            list_df_features, list_df_targets = list_df_forecasting_endo_df(list_df, target_choice, shift_delta)
+        elif feature_exo and not feature_endo:
+            list_df_features, list_df_targets = list_df_forecasting_exo_df(list_df, target_choice, shift_delta)
+        elif feature_endo and feature_exo:
+            list_df_features, list_df_targets = list_df_forecasting_endo_exo_df(list_df, target_choice, shift_delta)
+        else:
+            list_df_features, list_df_targets = list_df_forecasting_endo_exo_df(list_df, target_choice, shift_delta)
+
+    if not forecasting: #Intra step prediction
+        if feature_endo and not feature_exo:
+            list_df_features, list_df_targets = list_df_to_endogeneous_df(list_df, target_choice)
+        elif feature_exo and not feature_endo:
+            list_df_features, list_df_targets = list_df_to_exogeneous_df(list_df, target_choice)
+        elif feature_endo and feature_exo:
+            list_df_features, list_df_targets = list_df_to_endo_exo_df(list_df, target_choice)
+        else:
+            list_df_features, list_df_targets = list_df_to_endo_exo_df(list_df, target_choice)
+
+    return list_df_features, list_df_targets
 
 #function to remove N trailing rows from a dataframe
 def remove_df_ending_rows(dataframe, amount_to_remove):
@@ -181,7 +207,7 @@ def rescale_list_of_df(list_df):
     rescaled_list_df = []
     for df in list_df:
         rescaled_list_df.append(rescale_single_df(df, rescaling_array))
-    return rescaled_list_df
+    return rescaled_list_df, rescaling_array
 
 #shrink df according with strides on rows (remove rows)
 def shrink_timesteps_with_strides(list_df, stride):
@@ -189,6 +215,21 @@ def shrink_timesteps_with_strides(list_df, stride):
     for df in list_df:
         shrinked_list_df.append(df.iloc[::stride, :])
     return shrinked_list_df
+
+def get_rescaled_shrinked_list_df(csv_files_path, stride):
+    list_df, list_data_units, list_data_label_type = bomb_csv_to_df(csv_files_path)
+    rescaled_list_df, rescaling_array = rescale_list_of_df(list_df)
+    shrinked_list_df = shrink_timesteps_with_strides(rescaled_list_df, stride)
+
+    return shrinked_list_df, rescaling_array
+    
+def get_train_valid_test_list_df(list_df, train_test_ratio, train_valid_ratio, shuffle, random_seed):
+    #Splitting list of df into train-test
+    list_df_train, list_df_test = split_list_on_ratio(list_df, train_test_ratio, shuffle, random_seed)
+    #Splitting list of train into train-valid
+    list_df_train, list_df_valid = split_list_on_ratio(list_df_train, train_valid_ratio, shuffle, random_seed)
+
+    return list_df_train, list_df_valid, list_df_test
 
 #purely exogeneous (non-regressive)
 def list_df_to_exogeneous_df(list_df, target_choice):

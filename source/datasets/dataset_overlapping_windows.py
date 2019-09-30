@@ -7,23 +7,20 @@ from source.utils.preprocessing import *
 
 def get_overlapping_windows_datasets(csv_files_path, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta=1, stride=1, train_test_ratio=0.8, train_valid_ratio=0.8, shuffle=False, random_seed=42):
     #loading CSV
-    list_df, list_data_units, list_data_label_type = bomb_csv_to_df(csv_files_path)
-    rescaled_list_df = rescale_list_of_df(list_df)
-    shrinked_list_df = shrink_timesteps_with_strides(rescaled_list_df, stride)
-
+    shrinked_list_df, rescaling_array = get_rescaled_shrinked_list_df(csv_files_path, stride)
     #Note: Train test and valid are made on flights, not the amount of vectors in total!
+    list_df_train, list_df_valid, list_df_test = get_train_valid_test_list_df(shrinked_list_df, train_test_ratio, train_valid_ratio, shuffle, random_seed)
+    ow_ds_train, ow_ds_valid, ow_ds_test = _get_overlapping_windows_datasets(forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta, list_df_train, list_df_valid, list_df_test)
     
-    #Splitting list of df into train-test
-    list_df_train, list_df_test = split_list_on_ratio(shrinked_list_df, train_test_ratio, shuffle, random_seed)
-    #Splitting list of train into train-valid
-    list_df_train, list_df_valid = split_list_on_ratio(list_df_train, train_valid_ratio, shuffle, random_seed)
-    
+    return ow_ds_train, ow_ds_valid, ow_ds_test
+
+def _get_overlapping_windows_datasets(forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta, list_df_train, list_df_valid, list_df_test):
     ow_ds_train = OverlappingWindowsDataset(list_df_train, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
     ow_ds_valid = OverlappingWindowsDataset(list_df_valid, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
     ow_ds_test = OverlappingWindowsDataset(list_df_test, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
     
     return ow_ds_train, ow_ds_valid, ow_ds_test
-    
+
 class OverlappingWindowsDataset(data.Dataset):
     def __init__(self, list_df, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta=1, target_type_string='Regression'):
         #target_choice is a parameter to pick if we use bay 1 (1), bay 2 (2) or both bays (0) as targets

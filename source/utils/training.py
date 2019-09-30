@@ -13,7 +13,7 @@ from torchvision.transforms import ToTensor
 
 from .history import History
 from .metrics import Metrics
-from .model import load_model
+from .model import load_model_state_dict
 from .utils import make_dir
 
     
@@ -27,7 +27,7 @@ def train(model,
 
     early_stop_counter = 0
     last_valid_loss = math.inf
-    best_model_save_string = None
+    best_model_states_save_string = None
     lr_a = _get_LR(optimizer)
     lr_b = _get_LR(optimizer)
 
@@ -49,18 +49,27 @@ def train(model,
 
         if lr_a != lr_b: #reload old best model if lr changed
             print('Changing to Last Best Model')
-            load_model(model, best_model_save_string)
+            load_model_state_dict(model, best_model_states_save_string)
 
         if valid_loss < last_valid_loss: #if new best model
+
             last_valid_loss = valid_loss
             print('New Model Saved (New Best:{:.4f})\n'.format(valid_loss))
             early_stop_counter = 0
+            
             torch_extension = '.torch'
-            model_file_string = file_string + '_epoch{}_validloss{:.4f}_'.format(i, valid_loss)
             folder_path = make_dir(os.path.join('.', 'saved_models', path_string))
-            best_model_save_string = os.path.join(folder_path, model_file_string + torch_extension)
-            #print(best_model_save_string)
-            torch.save(model.state_dict(), best_model_save_string)
+            
+            #saving state best state dict for potential reload
+            model_state_dict_string = file_string + 'best_model_state_dict_'
+            best_model_states_save_string = os.path.join(folder_path, model_state_dict_string + torch_extension)
+            torch.save(model.state_dict(), best_model_states_save_string)
+            
+            #saving new best model
+            entire_model_string = file_string + '_epoch{}_validloss{:.4f}_model_'.format(i, valid_loss)
+            best_entire_model_string = os.path.join(folder_path, entire_model_string + torch_extension)
+            torch.save(model, best_entire_model_string)
+        
         else: #if not a new bets model
             early_stop_counter += 1
             print("No improvement, in the last {} epoch(s), on the valid loss (Best:{:.4f}, Current:{:.4f})\n".format(
@@ -69,7 +78,8 @@ def train(model,
                 print("Early Stop dépassé! Valid loss de {:.4f} atteinte".format(last_valid_loss))
                 break
 
-    return history, best_model_save_string
+    
+    return history, entire_model_string
 
 def terminal_printer(target_type_string, epoch, epoch_training_time, train_loss, valid_loss, train_metrics, valid_metrics):
     if target_type_string == 'Classification':

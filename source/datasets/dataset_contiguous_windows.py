@@ -8,7 +8,7 @@ from source.utils.preprocessing import *
 def get_contiguous_windows_datasets(csv_files_path, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta=1, stride=1, train_test_ratio=0.8, train_valid_ratio=0.8, remove_beg_rows=True, shuffle=False, random_seed=42):
     #loading CSV
     list_df, list_data_units, list_data_label_type = bomb_csv_to_df(csv_files_path)
-    rescaled_list_df = rescale_list_of_df(list_df)
+    rescaled_list_df, _ = rescale_list_of_df(list_df)
     shrinked_list_df = shrink_timesteps_with_strides(rescaled_list_df, stride)
 
     #Note: Train test and valid are made on flights, not the amount of vectors in total!

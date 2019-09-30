@@ -11,6 +11,7 @@ from source.datasets.dataset_overlapping_windows import *
 from source.dataloaders.loaders import *
 from source.utils.history import *
 from source.utils.metrics import *
+from source.utils.inference import *
 
 
 def hn_gru_net_main(experiment_number, 
@@ -89,34 +90,48 @@ def hn_gru_net_main(experiment_number,
                                 verbose=verbose, threshold=threshold, threshold_mode='rel', 
                                 cooldown=cooldown, min_lr=0, eps=1e-08)
 
-    best_model_save_string = None
+    entire_model_string = None
     if restart and restart_file_string is not None:
-        restart_model_weights_string = os.path.join('.', 'saved_models', folder_string, restart_file_string)
-        if os.path.exists(restart_model_weights_string):
-            print('Restarting from Specified Model Weights')
-            model = load_model(model, restart_model_weights_string)
-            best_model_save_string = restart_model_weights_string
+        restart_model_string = os.path.join('.', 'saved_models', folder_string, restart_file_string)
+        if os.path.exists(restart_model_string):
+            print('Restarting from Specified Model and Weights')
+            model = load_entire_model(restart_model_string)
+            entire_model_string = restart_model_string
         else:
             print('Cannot Restart from Specified Model Weights')
     
+    """
     print('Start of Training')
-    history, best_model_save_string = train(model, 
-                                    train_loader, valid_loader, 
-                                    criterion, optimizer, scheduler,
-                                    n_epoch, early_stop, patience,
-                                    folder_string, file_name_string, use_gpu=use_gpu)
+    history, entire_model_string = train(model, 
+                                        train_loader, valid_loader, 
+                                        criterion, optimizer, scheduler,
+                                        n_epoch, early_stop, patience,
+                                        folder_string, file_name_string, use_gpu=use_gpu)
     
     print('Saving Training History')
     history.history_display(folder_string, file_name_string)
+    """
 
     print('Start of Testing')
-    model = load_model(model, best_model_save_string)
+    model = load_entire_model(entire_model_string)
     test_loss, test_metrics = test(model, test_loader, 
                                 criterion, use_gpu=use_gpu)
+
+    print('Starting Inference Module')
+    inference(csv_path, stride, 
+            train_test_ratio, train_valid_ratio,  
+            forecasting, feature_endo, feature_exo, 
+            target_choice, shift_delta, 
+            windows_size, 
+            entire_model_string, target_type_string='Regression', 
+            use_gpu=False)
+    
+    """
     print("\ntrue\n")
     print(test_metrics.true)
     print("\npred\n")
     print(test_metrics.pred)
+    """
 
     print('End of Main')
-    return test_loss, test_metrics, best_model_save_string
+    return test_loss, test_metrics, entire_model_string

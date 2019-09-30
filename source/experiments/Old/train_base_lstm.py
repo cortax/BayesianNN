@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from source.dataset.dataset_single_feature_contiguous import get_single_feature_multiple_datasets
 from source.loaders.dataloaders import get_train_valid_test_generic_loaders, getWeightedRandomSampler
 from source.utils.training import train, test
-from source.utils.model import load_model
+from source.utils.model import load_model_state_dict
 from source.models.lstm import IndexLSTMModel
 from source.utils.strategy import ModelStrategy, EchoStrategy, PureNaiveStrategy, BalancedDynamicNaiveStrategy, BalancedLookAheadNaiveStrategy
 from source.utils.portfolio import Portfolio, save_pf_values

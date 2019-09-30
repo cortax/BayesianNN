@@ -1,6 +1,7 @@
 import argparse
 
 from source.experiments.train_hn_gru_net import *
+from source.utils.inference import *
 
 
 parser = argparse.ArgumentParser()
@@ -23,7 +24,7 @@ Non-Required
 """
 #params for restarts
 parser.add_argument('-r', '--RESTART', action='store_true', required=False)
-parser.add_argument('-rmws', '--RESTART_MODEL_WEIGHTS_STRING', action='store',
+parser.add_argument('-rm', '--RESTART_MODEL', action='store',
                     default=None, required=False, type=str)
 
 #params for dataset
@@ -38,7 +39,7 @@ parser.add_argument('-delta', '--SHIFT_DELTA', action='store',
                     default=1, required=False, type=int)
 parser.add_argument('-stride', '--TIME_STRIDE', action='store', 
                     default=1, required=False, type=int)
-
+                    
 #params for dataloader
 parser.add_argument('-ttr', '--TRAIN_TEST_RATIO', action='store', 
                     default=0.8, required=False, type=float)
@@ -98,9 +99,6 @@ parser.add_argument('--DAMPENING', action='store',
 def debug():
     print('TODO... Maybe')
 
-def recall_test():
-    print('TODO')
-
 if __name__ == '__main__':
     #TODO: The comments on what arg is used by what module
     args = parser.parse_args()
@@ -112,9 +110,6 @@ if __name__ == '__main__':
     if args.MODULE=='debug':
         print('debug')
         debug()
-    elif args.MODULE=='recall':
-        print('Recall Test')
-        recall_test()
     elif args.MODULE=='model':
         print('model')
         if args.MODULE_MODE=='train':
@@ -129,5 +124,5 @@ if __name__ == '__main__':
                     args.OPTIM_TYPE, args.WEIGHT_DECAY, args.MOMENTUM, args.DAMPENING,
                     args.HIDDEN_SIZE, args.NUM_LAYERS, args.DROPOUT_HIDDEN, args.DROPOUT_HN,
                     args.RANDOM_SEED, args.NUM_WORKERS, args.NO_GPU, args.GPU_DEVICE_ID, 
-                    args.RESTART, args.RESTART_MODEL_WEIGHTS_STRING
+                    args.RESTART, args.RESTART_MODEL
                     )
