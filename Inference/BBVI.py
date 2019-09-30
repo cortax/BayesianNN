@@ -121,12 +121,12 @@ class ProbabilisticLinear(nn.Module):
     def forward(self, x):
         M = self.weight_sample.size(0)
         if x.dim() < 3:
-            if M > 1:
+            if M > 0:
                 x = x.unsqueeze(0).repeat(M,1,1)
             else:
                 s = [0] + list(x.shape)
                 x = torch.empty(s, device=self.device)
-        if M > 1:
+        if M > 0:
             return x.matmul(self.weight_sample.permute(0,2,1)).add(self.bias_sample.unsqueeze(-1).permute(0,2,1))
         else:
             return x.matmul(self.weight_sample.permute(0,2,1))
