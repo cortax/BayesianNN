@@ -1,5 +1,5 @@
 import numpy as np
-
+import math
 import torch
 from torch import nn
 from torch import functional as F
@@ -221,10 +221,12 @@ class VariationalNetwork(nn.Module):
         return torch.div(L, n_samples_ELBO)
 
 class VariationalOptimizer():
-    def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None):
+    def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None, min_lr=None, adaptive_ELBO_variance_rate=None):
         self.model = model
         self.sigma_noise = sigma_noise
         self.device = model.device
+        self.min_lr = min_lr
+        self.adaptive_ELBO_variance_rate = adaptive_ELBO_variance_rate
         
         self.optimizer = optimizer(model.parameters(), **optimizer_params)
         if scheduler is None:           
@@ -247,6 +249,10 @@ class VariationalOptimizer():
         else:
             liveloss = PlotLosses()
 
+        if self.adaptive_ELBO_variance_rate is not None:
+            a = None
+            b = None
+            
         for j in range(n_epoch):
             logs = {}
             losses = [None] * n_iter
@@ -259,12 +265,30 @@ class VariationalOptimizer():
                 self.optimizer.step()
 
             logs['expected_loss'] = torch.stack(losses).mean().detach().clone().cpu().numpy()
+            logs['std_loss'] = torch.stack(losses).std().detach().clone().cpu().numpy()
             logs['learning rate'] = self.optimizer.param_groups[0]['lr']
+            logs['n_ELBO_samples'] = n_ELBO_samples
             liveloss.update(logs)
             if plot is True:
                 liveloss.draw()
             if self.scheduler is not None:
                 self.scheduler.step(logs['expected_loss'])
+                if self.min_lr is not None and self.optimizer.param_groups[0]['lr'] < self.min_lr:
+                    return self.model
+            
+            if self.adaptive_ELBO_variance_rate is not None:
+                a = b
+                b = logs['expected_loss']
+                if a is not None:
+                    delta = a-b
+                    print(delta)
+                    if delta > self.adaptive_ELBO_variance_rate*torch.stack(losses).std().detach().clone().cpu().numpy():
+                        n_ELBO_samples = int(math.floor(0.8*n_ELBO_samples))
+                        if n_ELBO_samples < 2:
+                            n_ELBO_samples = 2
+                    else:
+                        n_ELBO_samples = int(math.ceil(1.1*n_ELBO_samples))
+                    
         return self.model
     
 def plot_BBVI(model, data, device, savePath=None, xpName=None, networkName=None, saveName=None):
