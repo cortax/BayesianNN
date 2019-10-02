@@ -300,21 +300,42 @@ class VariationalOptimizer():
                     
         return self.model
     
-def plot_BBVI(model, data, device, savePath=None, xpName=None, networkName=None, saveName=None):
+def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, networkName=None, saveName=None):
     
     x_test = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
 
     fig, ax = plt.subplots()
     fig.set_size_inches(12, 9)
-    plt.axis([-2, 2, -2, 5])
+    plt.axis([-2, 2, -2, 3])
     plt.scatter(data[0].cpu(), data[1].cpu())
     
-    for _ in range(1000):
+    x_data = data[0].to(device)
+    y_data = data[1].to(device)
+    y_data = y_data.unsqueeze(-1)
+
+    x_data_validation = data_val[0].to(device)
+    y_data_validation = data_val[1].to(device)
+    y_data_validation = y_data_validation.unsqueeze(-1)
+    
+    y_pred_validation = model.forward(x_data_validation)
+    
+    LL = model._log_norm(y_pred_validation, y_data_validation, torch.tensor(0.1).to(device))
+    LL = LL.sum(dim=[1,2]).mean().detach().cpu().numpy()
+    
+    L_ELBO = model.compute_elbo(x_data, y_data, n_samples_ELBO=2000, sigma_noise=0.1, device=device).detach().cpu().numpy()
+    
+    
+    y = torch.cos(4.0*(x_test+0.2))
+    plt.plot(x_test.cpu(), y.cpu())
+    for _ in range(1500):
         
         model.sample_parameters()
 
         y_test = model.forward(x_test)
         plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='lightblue')
-        
-    plt.savefig(savePath + xpName +'_'+ networkName +'_'+ saveName)
+    plt.text(-1.7, 2, 'Expected Loglikelihood:'+str(LL), fontsize=12)
+    plt.text(-1.7, 2.5, 'Last ELBO:'+str(L_ELBO), fontsize=12)
+  
+
+    plt.savefig(savePath + saveName +'_'+ networkName)
     
