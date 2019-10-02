@@ -223,12 +223,11 @@ class VariationalNetwork(nn.Module):
         return torch.div(L, n_samples_ELBO)
 
 class VariationalOptimizer():
-    def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None, min_lr=None, adaptive_ELBO_variance_rate=None):
+    def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None, min_lr=None):
         self.model = model
         self.sigma_noise = sigma_noise
         self.device = model.device
         self.min_lr = min_lr
-        self.adaptive_ELBO_variance_rate = adaptive_ELBO_variance_rate
         
         self.optimizer = optimizer(model.parameters(), **optimizer_params)
         if scheduler is None:           
@@ -250,10 +249,7 @@ class VariationalOptimizer():
             liveloss = PlotLosses(fig_path=str(savePath)+str(xpName)+'_'+str(networkName)+'_'+str(saveName))
         else:
             liveloss = PlotLosses()
-
-        if self.adaptive_ELBO_variance_rate is not None:
-            score = []
-            
+      
         for j in range(n_epoch):
             logs = {}
             losses = [None] * n_iter
@@ -266,9 +262,7 @@ class VariationalOptimizer():
                 self.optimizer.step()
 
             logs['expected_loss'] = torch.stack(losses).mean().detach().clone().cpu().numpy()
-            logs['std_loss'] = torch.stack(losses).std().detach().clone().cpu().numpy()
             logs['learning rate'] = self.optimizer.param_groups[0]['lr']
-            logs['n_ELBO_samples'] = n_ELBO_samples
             liveloss.update(logs)
             if plot is True:
                 liveloss.draw()
@@ -278,26 +272,6 @@ class VariationalOptimizer():
                 if self.min_lr is not None and self.optimizer.param_groups[0]['lr'] < self.min_lr:
                     return self.model
             
-            if self.adaptive_ELBO_variance_rate is not None:
-                score.append(float(logs['expected_loss']))
-                if len(score) > 20:
-                    del score[0]
-
-                    x = torch.tensor(range(len(score))).unsqueeze(-1)
-                    y = torch.tensor(score).unsqueeze(-1)
-                    A = LinearRegression().fit(x,y).coef_[0][0]  
-                    R = A / torch.stack(losses).std().detach().clone().cpu().numpy()
-                    
-                    print(R)
-                    if -R < self.adaptive_ELBO_variance_rate :
-                        n_ELBO_samples = math.ceil(n_ELBO_samples*1.1)
-                        print('up')
-                    else:
-                        n_ELBO_samples = math.floor(n_ELBO_samples*0.9)
-                        print('down')
-                        if n_ELBO_samples < 2:
-                            n_ELBO_samples = 2
-                    
         return self.model
     
 def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, networkName=None, saveName=None):
