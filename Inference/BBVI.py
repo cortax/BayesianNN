@@ -326,7 +326,7 @@ def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, network
     
     
     y = torch.cos(4.0*(x_test+0.2))
-    plt.plot(x_test.cpu(), y.cpu())
+    plt.plot(x_test.cpu().detach().clone().numpy(), y.cpu().detach().clone().numpy())
     for _ in range(1500):
         
         model.sample_parameters()
