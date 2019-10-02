@@ -4,6 +4,8 @@ import torch
 from torch import nn
 from torch import functional as F
 
+from sklearn.linear_model import LinearRegression
+
 from livelossplot import PlotLosses
 
 import matplotlib.pyplot as plt
@@ -250,8 +252,7 @@ class VariationalOptimizer():
             liveloss = PlotLosses()
 
         if self.adaptive_ELBO_variance_rate is not None:
-            a = None
-            b = None
+            score = []
             
         for j in range(n_epoch):
             logs = {}
@@ -271,23 +272,31 @@ class VariationalOptimizer():
             liveloss.update(logs)
             if plot is True:
                 liveloss.draw()
+            
             if self.scheduler is not None:
                 self.scheduler.step(logs['expected_loss'])
                 if self.min_lr is not None and self.optimizer.param_groups[0]['lr'] < self.min_lr:
                     return self.model
             
             if self.adaptive_ELBO_variance_rate is not None:
-                a = b
-                b = logs['expected_loss']
-                if a is not None:
-                    delta = a-b
-                    print(delta)
-                    if delta > self.adaptive_ELBO_variance_rate*torch.stack(losses).std().detach().clone().cpu().numpy():
-                        n_ELBO_samples = int(math.floor(0.8*n_ELBO_samples))
+                score.append(float(logs['expected_loss']))
+                if len(score) > 20:
+                    del score[0]
+
+                    x = torch.tensor(range(len(score))).unsqueeze(-1)
+                    y = torch.tensor(score).unsqueeze(-1)
+                    A = LinearRegression().fit(x,y).coef_[0][0]  
+                    R = A / torch.stack(losses).std().detach().clone().cpu().numpy()
+                    
+                    print(R)
+                    if -R < self.adaptive_ELBO_variance_rate :
+                        n_ELBO_samples = math.ceil(n_ELBO_samples*1.1)
+                        print('up')
+                    else:
+                        n_ELBO_samples = math.floor(n_ELBO_samples*0.9)
+                        print('down')
                         if n_ELBO_samples < 2:
                             n_ELBO_samples = 2
-                    else:
-                        n_ELBO_samples = int(math.ceil(1.1*n_ELBO_samples))
                     
         return self.model
     
