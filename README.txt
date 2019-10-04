@@ -1,4 +1,4 @@
-#README
+﻿#README
 
 ## ORGANISATION
 
@@ -25,6 +25,6 @@ Il y a (4) dossiers:
 
 EXP1: BBVI
 EXP2: SGD
-EXP3: SGD puis BBVI
+EXP3: SGD puis BBVI (mu, rho)
 EXP4: MCMC
-EXP5: BBVI expansion
+EXP5: SGD puis BBVI (rho expansion) 
