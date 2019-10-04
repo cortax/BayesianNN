@@ -1,10 +1,8 @@
 import numpy as np
-import math
+
 import torch
 from torch import nn
 from torch import functional as F
-
-from sklearn.linear_model import LinearRegression
 
 from livelossplot import PlotLosses
 
@@ -135,9 +133,10 @@ class ProbabilisticLinear(nn.Module):
 
     
 class VariationalNetwork(nn.Module):
-    def __init__(self, input_size, output_size, layer_width, nb_layers, device=None):
+    def __init__(self, input_size, output_size, layer_width, nb_layers, activation=torch.tanh, device=None):
         super(VariationalNetwork, self).__init__()
         
+        self.activation = activation
         self.device = device
         self.registered_layers = []
 
@@ -159,7 +158,7 @@ class VariationalNetwork(nn.Module):
     def forward(self, x):
         out = x;
         for k in range(len(self.registered_layers)-1):
-            out = torch.tanh(self.registered_layers[k](out))
+            out = self.activation(self.registered_layers[k](out))
         out = self.registered_layers[-1](out)
         return out
     
@@ -223,11 +222,10 @@ class VariationalNetwork(nn.Module):
         return torch.div(L, n_samples_ELBO)
 
 class VariationalOptimizer():
-    def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None, min_lr=None):
+    def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None):
         self.model = model
         self.sigma_noise = sigma_noise
         self.device = model.device
-        self.min_lr = min_lr
         
         self.optimizer = optimizer(model.parameters(), **optimizer_params)
         if scheduler is None:           
@@ -249,7 +247,7 @@ class VariationalOptimizer():
             liveloss = PlotLosses(fig_path=str(savePath)+str(xpName)+'_'+str(networkName)+'_'+str(saveName))
         else:
             liveloss = PlotLosses()
-      
+
         for j in range(n_epoch):
             logs = {}
             losses = [None] * n_iter
@@ -266,12 +264,8 @@ class VariationalOptimizer():
             liveloss.update(logs)
             if plot is True:
                 liveloss.draw()
-            
             if self.scheduler is not None:
                 self.scheduler.step(logs['expected_loss'])
-                if self.min_lr is not None and self.optimizer.param_groups[0]['lr'] < self.min_lr:
-                    return self.model
-            
         return self.model
     
 def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, networkName=None, saveName=None):
@@ -300,7 +294,7 @@ def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, network
     
     
     y = torch.cos(4.0*(x_test+0.2))
-    plt.plot(x_test.cpu().detach().clone().numpy(), y.cpu().detach().clone().numpy())
+    plt.plot(x_test.cpu(), y.cpu())
     for _ in range(1500):
         
         model.sample_parameters()
