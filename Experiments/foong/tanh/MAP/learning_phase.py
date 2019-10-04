@@ -8,7 +8,7 @@ from Inference import BBVI
 import torch
 
 
-def train_model(layer_width, nb_layers, activation):
+def train_model(layer_width, nb_layers, activation, seed):
     device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     data = torch.load('data/foong_data.pt')
     x_data = data[0].to(device)
@@ -25,13 +25,13 @@ def train_model(layer_width, nb_layers, activation):
     Net.requires_grad_rhos(False)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
-    Net = voptimizer.run((x_data,y_data), n_epoch=int(250+2*i), n_iter=250, seed=seed, n_ELBO_samples=1, plot=True)
+    Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=250, seed=seed, n_ELBO_samples=1, plot=False)
 
     return Net
 
 if __name__ == "__main__":
     activation = torch.tanh
-    Net = train_model(10, 2, activation)
+    Net = train_model(10, 2, activation, 1)
 
     
 

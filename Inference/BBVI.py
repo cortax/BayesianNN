@@ -4,8 +4,6 @@ import torch
 from torch import nn
 from torch import functional as F
 
-from sklearn.linear_model import LinearRegression
-
 from livelossplot import PlotLosses
 
 import matplotlib.pyplot as plt
