@@ -53,8 +53,7 @@ if __name__ == "__main__":
                     Net = train_model(W, L, activation, j)
                     print('training completed')
 
-                    print('write')
-                    print(pathname+filename)
+                    print('write:' + pathname+filename)
                     filehandler = open(pathname+filename, 'wb') 
                     pickle.dump(Net, filehandler)
                     filehandler.close()

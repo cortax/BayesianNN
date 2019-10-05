@@ -11,7 +11,7 @@ import ftplib
 def upload(filehandler, xpsubdir, filename):
     session = ftplib.FTP('23.233.203.221','bombardier','blackneuron')
     session.cwd( xpsubdir )
-    session.storbinary(filename, filehandler)     
+    session.storbinary('STOR '+filename, filehandler)     
     session.quit()
 
 def fileexists(pathname, filename):
