@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 pathname = cwd+'/models/'
 
                 if not FTPTools.fileexists(pathname.split('Experiments')[1], filename):
-                    Net = train_model(W, L, activation, j)
+                    Net, training_infos = train_model(W, L, activation, j)
 
                     filehandler = open(pathname+filename, 'wb') 
                     pickle.dump(Net, filehandler)
