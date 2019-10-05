@@ -8,6 +8,7 @@ sys.path.append( rootdir )
 from Inference import BBVI 
 import _pickle as pickle
 import torch
+import FTPTools
 
 def train_model(layer_width, nb_layers, activation, seed):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -41,11 +42,14 @@ if __name__ == "__main__":
     for L in nb_layer:
         for W in layer_size:
             for j in range(nb_trial):
-                filename = cwd+'/models/' + str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
-                if not os.path.exists(filename):
+                filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
+                pathname = cwd+'/models/'
+
+                if not FTPTools.fileexists(pathname.split('Experiments')[1], filename):
                     Net = train_model(W, L, activation, j)
-                    filehandler = open(filename, 'wb') 
+                    filehandler = open(pathname+filename, 'wb') 
                     pickle.dump(Net, filehandler)
+                    FTPTools.upload
                     filehandler.close()
     
     
