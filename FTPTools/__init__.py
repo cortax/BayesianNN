@@ -18,6 +18,5 @@ def fileexists(pathname, filename):
     session = ftplib.FTP('23.233.203.221','bombardier','blackneuron')
     session.cwd( pathname ) 
     L = session.nlst()
-    print(L)
     session.quit()
     return filename in L

@@ -49,8 +49,9 @@ if __name__ == "__main__":
 
                 if not FTPTools.fileexists(pathname.split('Experiments')[1], filename):
                     print('file does not exists')
-
+                    print('training begin')
                     Net = train_model(W, L, activation, j)
+                    print('training completed')
 
                     print('write')
                     print(pathname+filename)
