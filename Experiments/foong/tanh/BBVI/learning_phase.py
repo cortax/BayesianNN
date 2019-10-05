@@ -25,7 +25,7 @@ def train_model(layer_width, nb_layers, activation, seed):
     Net = BBVI.VariationalNetwork(input_size=1, output_size=1, layer_width=layer_width, nb_layers=nb_layers, activation=activation, device=device)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
-    Net = voptimizer.run((x_data,y_data), n_epoch=2, n_iter=250, seed=seed, n_ELBO_samples=250, verbose=1)
+    Net = voptimizer.run((x_data,y_data), n_epoch=2, n_iter=250, seed=seed, n_ELBO_samples=100, verbose=1)
 
     return Net
 
@@ -43,11 +43,26 @@ if __name__ == "__main__":
                 filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
                 pathname = cwd+'/models/'
 
+                print(pathname)
+                print(filename)
+                print(pathname.split('Experiments')[1])
+
                 if not FTPTools.fileexists(pathname.split('Experiments')[1], filename):
+                    print('file does not exists')
+
                     Net = train_model(W, L, activation, j)
+
+                    print('write')
+                    print(pathname+filename)
                     filehandler = open(pathname+filename, 'wb') 
                     pickle.dump(Net, filehandler)
-                    FTPTools.upload
+                    filehandler.close()
+
+                    print('upload')
+                    print(pathname.split('Experiments')[1])
+                    print(filename)
+                    filehandler = open(pathname+filename, 'rb') 
+                    FTPTools.upload(filehandler, pathname.split('Experiments')[1], filename)
                     filehandler.close()
 
     
