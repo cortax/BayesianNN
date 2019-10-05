@@ -29,24 +29,45 @@ def train_model(layer_width, nb_layers, activation, seed):
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
     Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=250, seed=seed, n_ELBO_samples=1, verbose=1)
 
-    return Net
+    training_infos = [str(optimizer), str(optimizer_params), str(scheduler), str(scheduler_params)]
+
+    return Net, training_infos
+
+def create_log(model_name, training_infos):
+    
+    log = open(cwd + '/logs/' + model_name + '.txt', 'w+')
+
+    log.write('Optimizer: ' + training_infos[0] + ', ' + training_infos[1] + '\n')
+    log.write('Scheduler: ' + training_infos[2] + ', ' + training_infos[3] + '\n')
+
+    log.close()
+
 
 if __name__ == "__main__":
     activation = torch.tanh
-    layer_size = [10,25,50,100]
-    nb_layer = [2,3,4]
-    nb_trial = 10
+
+    layer_size = [2]
+    nb_layer = [2]
+    nb_trial = 1
+
+#    layer_size = [10,25,50,100]
+#    nb_layer = [2,3,4]
+#    nb_trial = 10
 
     os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
 
     for L in nb_layer:
         for W in layer_size:
             for j in range(nb_trial):
-                filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
+
+                Net_name = str(L) + 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
+                filename = cwd+'/models/' +  Net_name
+
                 pathname = cwd+'/models/'
 
                 if not FTPTools.fileexists(pathname.split('Experiments')[1], filename):
-                    Net = train_model(W, L, activation, j)
+                    Net, Net_training_infos = train_model(W, L, activation, j)
+                    create_log(Net_name, Net_training_infos)
                     filehandler = open(pathname+filename, 'wb') 
                     pickle.dump(Net, filehandler)
                     FTPTools.upload
