@@ -279,9 +279,10 @@ class VariationalOptimizer():
             if self.scheduler is not None:
                 self.scheduler.step(expected_loss)
                 if self.min_lr is not None and learning_rate < self.min_lr:
-                    return self.model
+                    last_epoch = j
+                    return self.model, last_epoch
             
-        return self.model
+        return self.model, n_epoch
     
 def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, networkName=None, saveName=None):
     
