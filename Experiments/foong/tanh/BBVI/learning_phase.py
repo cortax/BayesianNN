@@ -11,7 +11,7 @@ import torch
 
 def train_model(layer_width, nb_layers, activation, seed):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    data = torch.load(rootdir + '/data/foong_data.pt')
+    data = torch.load(rootdir + '/Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
     y_data = y_data.unsqueeze(-1)
