@@ -25,9 +25,11 @@ def train_model(layer_width, nb_layers, activation, seed):
     Net = BBVI.VariationalNetwork(input_size=1, output_size=1, layer_width=layer_width, nb_layers=nb_layers, activation=activation, device=device)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
-    Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=250, seed=seed, n_ELBO_samples=100, verbose=1)
+    Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=75, verbose=1)
 
-    return Net
+    training_infos = [str(optimizer), str(optimizer_params), str(scheduler), str(scheduler_params)]
+
+    return Net, training_infos
 
 if __name__ == "__main__":
     activation = torch.tanh
@@ -36,6 +38,7 @@ if __name__ == "__main__":
     nb_trial = 10
 
     os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
+    os.makedirs(os.path.dirname(cwd+'/logs/'), exist_ok=True) 
 
     for L in nb_layer:
         for W in layer_size:
@@ -54,10 +57,12 @@ if __name__ == "__main__":
                     FTPTools.upload(filehandler, pathname.split('Experiments')[1], filename)
                     filehandler.close()
 
-    
-    
+                    log = open(cwd + '/logs/' + filename + '.txt', 'w+')
+                    log.write('Optimizer: ' + training_infos[0] + ', ' + training_infos[1] + '\n')
+                    log.write('Scheduler: ' + training_infos[2] + ', ' + training_infos[3] + '\n')
+                    log.close()
 
-    
-    
-    
-
+                    filehandler = open(cwd + '/logs/' + filename + '.txt', 'rb') 
+                    logpathname = cwd+'/logs/'
+                    FTPTools.upload(filehandler, logpathname.split('Experiments')[1], filename + '.txt')
+                    filehandler.close()
