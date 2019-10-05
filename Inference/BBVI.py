@@ -154,9 +154,9 @@ class VariationalNetwork(nn.Module):
         
     def _log_norm(self, x, mu, std):
         return -0.5 * torch.log(2*np.pi*std**2) -(0.5 * (1/(std**2))* (x-mu)**2)
-                
+              
     def forward(self, x):
-        out = x;
+        out = x
         for k in range(len(self.registered_layers)-1):
             out = self.activation(self.registered_layers[k](out))
         out = self.registered_layers[-1](out)
@@ -234,7 +234,7 @@ class VariationalOptimizer():
         else:
             self.scheduler = scheduler(self.optimizer, **scheduler_params)
             
-    def run(self, data, n_epoch=100, n_iter=1, n_ELBO_samples=1, seed=None, plot=False, savePath=None, xpName=None, networkName=None, saveName=None):
+    def run(self, data, n_epoch=100, n_iter=1, n_ELBO_samples=1, seed=None, plot=False, log=False, verbose=0):
         if seed is not None:
             torch.manual_seed(seed)
             np.random.seed(seed)
@@ -244,10 +244,11 @@ class VariationalOptimizer():
 
         self.optimizer.zero_grad()
 
-        if saveName is not None and savePath is not None:
-            liveloss = PlotLosses(fig_path=str(savePath)+str(xpName)+'_'+str(networkName)+'_'+str(saveName))
-        else:
+        if plot:
             liveloss = PlotLosses()
+
+        if log:
+            self.log = []
 
         for j in range(n_epoch):
             logs = {}
@@ -260,14 +261,24 @@ class VariationalOptimizer():
                 loss.backward()
                 self.optimizer.step()
 
-            logs['expected_loss'] = torch.stack(losses).mean().detach().clone().cpu().numpy()
-            logs['learning rate'] = self.optimizer.param_groups[0]['lr']
-            liveloss.update(logs)
-            if plot is True:
+            expected_loss = torch.stack(losses).mean().detach().clone().cpu().numpy()
+            learning_rate = self.optimizer.param_groups[0]['lr']
+
+            if plot:
+                logs['expected_loss'] = expected_loss
+                logs['learning rate'] = learning_rate
+                liveloss.update(logs)
                 liveloss.draw()
+
+            if verbose >= 1:
+                print("Epoch: {0:6d} / training loss: {1:16.3f} / learning rate: {2:1.7f}".format(j,expected_loss,learning_rate))
+
+            if log:
+                self.log.append("Epoch: {0:6d} / training loss: {1:16.3f} / learning rate: {2:1.7f}".format(j,expected_loss,learning_rate))
+
             if self.scheduler is not None:
-                self.scheduler.step(logs['expected_loss'])
-                if self.min_lr is not None and self.optimizer.param_groups[0]['lr'] < self.min_lr:
+                self.scheduler.step(expected_loss)
+                if self.min_lr is not None and learning_rate < self.min_lr:
                     return self.model
             
         return self.model

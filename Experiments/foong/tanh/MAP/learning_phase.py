@@ -2,15 +2,16 @@ import sys
 import os
 from os.path import dirname
 cwd = os.path.dirname(os.path.realpath(__file__))
-sys.path.append( dirname(dirname(dirname(dirname(cwd)))) )
+rootdir = dirname(dirname(dirname(dirname(cwd))))
+sys.path.append( rootdir )
 
 from Inference import BBVI 
+import _pickle as pickle
 import torch
 
-
 def train_model(layer_width, nb_layers, activation, seed):
-    device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
-    data = torch.load('data/foong_data.pt')
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    data = torch.load(rootdir + '/data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
     y_data = y_data.unsqueeze(-1)
@@ -25,13 +26,31 @@ def train_model(layer_width, nb_layers, activation, seed):
     Net.requires_grad_rhos(False)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
-    Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=250, seed=seed, n_ELBO_samples=1, plot=False)
+    Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=250, seed=seed, n_ELBO_samples=1, verbose=1)
 
     return Net
 
 if __name__ == "__main__":
     activation = torch.tanh
-    Net = train_model(10, 2, activation, 1)
+    layer_size = [10,25,50,100]
+    nb_layer = [2,3,4]
+    nb_trial = 10
 
+    os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
+
+    for L in nb_layer:
+        for W in layer_size:
+            for j in range(nb_trial):
+                filename = cwd+'/models/' + str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
+                if not os.path.exists(filename):
+                    Net = train_model(W, L, activation, j)
+                    filehandler = open(filename, 'wb') 
+                    pickle.dump(Net, filehandler)
+                    filehandler.close()
+    
+    
+
+    
+    
     
 
