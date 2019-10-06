@@ -50,7 +50,7 @@ if __name__ == "__main__":
                 filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
                 pathname = cwd+'/models/'
 
-                if not FTPTools.fileexists(pathname.split('Experiments')[1], filename):
+                if not os.path.exists(pathname+filename): 
                     start_time = time.time() 
                     Net, training_infos = train_model(W, L, activation, j)
                     training_time = time.time() - start_time 
@@ -59,19 +59,10 @@ if __name__ == "__main__":
                     pickle.dump(Net, filehandler)
                     filehandler.close()
 
-                    filehandler = open(pathname+filename, 'rb') 
-                    FTPTools.upload(filehandler, pathname.split('Experiments')[1], filename)
-                    filehandler.close()
-
                     log = open(cwd + '/logs/' + filename + '.txt', 'w+')
                     log.write('Training time: ' + str(training_time) + '\n') 
                     log.write('Number of epochs: ' + training_infos[0] + '\n') 
                 
                     log.write('Optimizer: ' + training_infos[1] + ', ' + training_infos[2] + '\n') 
                     log.write('Scheduler: ' + training_infos[3] + ', ' + training_infos[4] + '\n') 
-                    log.close()
-                    
-                    filehandler = open(cwd + '/logs/' + filename + '.txt', 'rb') 
-                    logpathname = cwd+'/logs/'
-                    FTPTools.upload(filehandler, logpathname.split('Experiments')[1], filename + '.txt')
-                    filehandler.close()
+                    log.close()        
