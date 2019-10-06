@@ -1,8 +1,16 @@
 import sys
 import os
 from os.path import dirname
-cwd = os.path.dirname(os.path.realpath(__file__))
-rootdir = dirname(dirname(dirname(dirname(cwd))))
+
+try:
+    cwd = os.path.dirname(os.path.realpath(__file__))
+except:
+    cwd = os.getcwd()
+
+#print(cwd.split('BayesianNN')[0]+'BayesianNN/')
+rootdir = cwd.split('BayesianNN')[0]+'BayesianNN/'
+#rootdir = dirname(dirname(dirname(dirname(cwd))))
+print(rootdir)
 sys.path.append( rootdir )
 
 from Inference import BBVI 
@@ -29,7 +37,7 @@ def train_model(layer_width, nb_layers, activation, seed):
     Net.requires_grad_rhos(False)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
-    Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
+    Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=1, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
 
     training_infos = [str(last_epoch), str(optimizer), str(optimizer_params), str(scheduler), str(scheduler_params)] 
 
