@@ -13,6 +13,7 @@ import time
 
 def train_model(layer_width, nb_layers, activation, seed):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    print(device)
     data = torch.load(rootdir + '/Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
@@ -28,7 +29,7 @@ def train_model(layer_width, nb_layers, activation, seed):
     Net.requires_grad_rhos(False)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
-    Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=3, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
+    Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
 
     training_infos = [str(last_epoch), str(optimizer), str(optimizer_params), str(scheduler), str(scheduler_params)] 
 
