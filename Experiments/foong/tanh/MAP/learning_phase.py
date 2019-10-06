@@ -9,7 +9,7 @@ from Inference import BBVI
 import _pickle as pickle
 import torch
 import FTPTools
-import time
+import time 
 
 def train_model(layer_width, nb_layers, activation, seed):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -28,9 +28,9 @@ def train_model(layer_width, nb_layers, activation, seed):
     Net.requires_grad_rhos(False)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
-    Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
+    Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
 
-    training_infos = [str(last_epoch), str(optimizer), str(optimizer_params), str(scheduler), str(scheduler_params)]
+    training_infos = [str(last_epoch), str(optimizer), str(optimizer_params), str(scheduler), str(scheduler_params)] 
 
     return Net, training_infos
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     activation = torch.tanh
     layer_size = [10,25,50,100]
     nb_layer = [2,3,4]
-    nb_trial = 10
+    nb_trial = 30
 
     os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
     os.makedirs(os.path.dirname(cwd+'/logs/'), exist_ok=True) 
@@ -50,7 +50,9 @@ if __name__ == "__main__":
                 pathname = cwd+'/models/'
 
                 if not FTPTools.fileexists(pathname.split('Experiments')[1], filename):
+                    start_time = time.time() 
                     Net, training_infos = train_model(W, L, activation, j)
+                    training_time = time.time() - start_time 
 
                     filehandler = open(pathname+filename, 'wb') 
                     pickle.dump(Net, filehandler)
@@ -61,10 +63,13 @@ if __name__ == "__main__":
                     filehandler.close()
 
                     log = open(cwd + '/logs/' + filename + '.txt', 'w+')
-                    log.write('Optimizer: ' + training_infos[0] + ', ' + training_infos[1] + '\n')
-                    log.write('Scheduler: ' + training_infos[2] + ', ' + training_infos[3] + '\n')
+                    log.write('Training time: ' + str(training_time) + '\n') 
+                    log.write('Number of epochs: ' + training_infos[0] + '\n') 
+                
+                    log.write('Optimizer: ' + training_infos[1] + ', ' + training_infos[2] + '\n') 
+                    log.write('Scheduler: ' + training_infos[3] + ', ' + training_infos[4] + '\n') 
                     log.close()
-
+                    
                     filehandler = open(cwd + '/logs/' + filename + '.txt', 'rb') 
                     logpathname = cwd+'/logs/'
                     FTPTools.upload(filehandler, logpathname.split('Experiments')[1], filename + '.txt')
