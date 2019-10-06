@@ -1,9 +1,18 @@
 import sys
 import os
 from os.path import dirname
-cwd = os.path.dirname(os.path.realpath(__file__))
-rootdir = dirname(dirname(dirname(dirname(cwd))))
+
+try:
+    rootdir = os.path.dirname(os.path.realpath(__file__))
+except:
+    rootdir = os.getcwd()
+
+rootdir = rootdir.split('BayesianNN')[0]+'BayesianNN/'
+print(rootdir)
 sys.path.append( rootdir )
+
+cwd = rootdir + 'Experiments/foong/tanh/BBVI/'
+print(cwd)
 
 from Inference import BBVI 
 import _pickle as pickle
@@ -39,6 +48,7 @@ if __name__ == "__main__":
     nb_layer = [2,3,4]
     nb_trial = 30
 
+    print('making dirs')
     os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
     os.makedirs(os.path.dirname(cwd+'/logs/'), exist_ok=True) 
 
@@ -47,6 +57,9 @@ if __name__ == "__main__":
             for j in range(nb_trial):
                 filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
                 pathname = cwd+'/models/'
+
+                print(filename)
+                print(pathname)
 
                 if not os.path.exists(pathname+filename): 
                     start_time = time.time() 
@@ -63,4 +76,4 @@ if __name__ == "__main__":
                 
                     log.write('Optimizer: ' + training_infos[1] + ', ' + training_infos[2] + '\n') 
                     log.write('Scheduler: ' + training_infos[3] + ', ' + training_infos[4] + '\n') 
-                    log.close()  
+                    log.close()        
