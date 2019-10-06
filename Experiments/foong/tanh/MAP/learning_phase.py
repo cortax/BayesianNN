@@ -50,6 +50,7 @@ if __name__ == "__main__":
     nb_layer = [2,3,4]
     nb_trial = 30
 
+    print('making dirs')
     os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
     os.makedirs(os.path.dirname(cwd+'/logs/'), exist_ok=True) 
 
@@ -58,6 +59,9 @@ if __name__ == "__main__":
             for j in range(nb_trial):
                 filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
                 pathname = cwd+'/models/'
+
+                print(filename)
+                print(pathname)
 
                 if not os.path.exists(pathname+filename): 
                     start_time = time.time() 
