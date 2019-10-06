@@ -3,15 +3,16 @@ import os
 from os.path import dirname
 
 try:
-    cwd = os.path.dirname(os.path.realpath(__file__))
+    rootdir = os.path.dirname(os.path.realpath(__file__))
 except:
-    cwd = os.getcwd()
+    rootdir = os.getcwd()
 
-#print(cwd.split('BayesianNN')[0]+'BayesianNN/')
-rootdir = cwd.split('BayesianNN')[0]+'BayesianNN/'
-#rootdir = dirname(dirname(dirname(dirname(cwd))))
+rootdir = rootdir.split('BayesianNN')[0]+'BayesianNN/'
 print(rootdir)
 sys.path.append( rootdir )
+
+cwd = rootdir + 'Experiments/foong/tanh/MAP/'
+print(cwd)
 
 from Inference import BBVI 
 import _pickle as pickle
