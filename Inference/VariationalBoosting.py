@@ -3,6 +3,8 @@ import math
 import torch
 from torch import nn
 from torch import functional as F
+from Inference.BBVI import VariationalNetwork
+from Inference import BBVI
 
 from livelossplot import PlotLosses
 
@@ -139,7 +141,7 @@ class VariationalBoostingOptimizer():
                                                self.mixture.layer_width, self.mixture.nb_layers, \
                                                device=self.mixture.device)
 
-                voptimizer = BBVI.VariationalOptimizer(model=new_component, sigma_noise=sigma_noise, \
+                voptimizer = BBVI.VariationalOptimizer(model=new_component, sigma_noise=self.sigma_noise, \
                              optimizer=self.optimizer, optimizer_params=self.optimizer_params, \
                              scheduler=self.scheduler, scheduler_params=self.scheduler_params, min_lr=self.min_lr)
                 new_component, epoch_count = voptimizer.run((x_data,y_data), n_epoch=n_epoch, n_iter=n_iter, n_ELBO_samples=n_ELBO_samples, plot=plot)
@@ -149,13 +151,13 @@ class VariationalBoostingOptimizer():
                                                    self.mixture.layer_width, self.mixture.nb_layers, \
                                                    device=self.mixture.device)
 
-                new_unscaled_proportion = nn.Parameter(torch.tensor(0.0, requires_grad=True, device=device), requires_grad = True)
+                new_unscaled_proportion = nn.Parameter(torch.tensor(0.0, requires_grad=True, device=self.device), requires_grad = True)
 
                 parameters = list(new_component.parameters()) + [new_unscaled_proportion]
                 vo = self.optimizer(parameters, **self.optimizer_params)
 
                 if self.scheduler is not None:
-                    s = scheduler(vo, **self.scheduler_params)
+                    s = self.scheduler(vo, **self.scheduler_params)
 
                 vo.zero_grad()
 
@@ -169,7 +171,7 @@ class VariationalBoostingOptimizer():
                     for k in range(n_iter):
                         vo.zero_grad()
                         new_proportion = torch.sigmoid(new_unscaled_proportion)
-                        loss = mix.compute_elbo(x_data, y_data, n_samples_ELBO=n_ELBO_samples, sigma_noise=sigma_noise, new_component=new_component, new_proportion=new_proportion)
+                        loss = self.mixture.compute_elbo(x_data, y_data, n_samples_ELBO=n_ELBO_samples, sigma_noise=self.sigma_noise, new_component=new_component, new_proportion=new_proportion)
                         losses[k] = loss
                         loss.backward()
                         vo.step()
