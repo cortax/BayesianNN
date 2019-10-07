@@ -151,7 +151,7 @@ class VariationalBoostingOptimizer():
                                                    self.mixture.layer_width, self.mixture.nb_layers, \
                                                    device=self.mixture.device)
 
-                new_unscaled_proportion = nn.Parameter(torch.tensor(0.0, requires_grad=True, device=self.device), requires_grad = True)
+                new_unscaled_proportion = nn.Parameter(torch.tensor(0.0, requires_grad=False, device=self.device), requires_grad = False)
 
                 parameters = list(new_component.parameters()) + [new_unscaled_proportion]
                 vo = self.optimizer(parameters, **self.optimizer_params)
