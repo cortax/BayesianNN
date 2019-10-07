@@ -8,6 +8,7 @@ import torch.optim as optim
 import torch.utils.data as tData
 import torch.nn.functional as func
 import sklearn.metrics as met
+import matplotlib.pyplot as plt
 
 from torchvision.transforms import ToTensor
 
@@ -18,63 +19,112 @@ from .utils import make_dir
 from .training import validate
 from .losses import loss_function_picker
 from .preprocessing import *
+from source.datasets.dataset_overlapping_windows import *
 
 
-def inference(csv_files_path, stride, 
+def bomb_overlapping_inference(csv_files_path, stride, 
             train_test_ratio, train_valid_ratio, 
             forecasting, feature_endo, feature_exo, 
             target_choice, shift_delta, 
             windows_size, 
-            entire_model_string, target_type_string='Regression', 
+            entire_model_string, 
+            folder_string, file_name_string, 
+            target_type_string='Regression', 
             use_gpu=False):
     
     print('Preparing Data')
-
-    list_df, rescaling_array = get_rescaled_shrinked_list_df(csv_files_path, stride)
+    list_df, (rescaling_array, rescaling_col_names) = get_rescaled_shrinked_list_df(csv_files_path, stride)
     list_df_train, list_df_valid, list_df_test = get_train_valid_test_list_df(list_df, train_test_ratio, train_valid_ratio, shuffle=False, random_seed=42)
-
-    #list_df_train_features, list_df_train_targets = get_features_and_targets(list_df_train, forecasting, feature_endo, feature_exo, target_choice, shift_delta)
-    #list_df_valid_features, list_df_valid_targets = get_features_and_targets(list_df_valid, forecasting, feature_endo, feature_exo, target_choice, shift_delta)
-    list_df_test_features, list_df_test_targets = get_features_and_targets(list_df_test, forecasting, feature_endo, feature_exo, target_choice, shift_delta)
-
-    list_df_test_features_windows = list_df_to_overlapping_sliding_windows(list_df_test_features, windows_size, mode="append")
-    list_df_test_targets_windows = list_df_to_overlapping_sliding_windows(list_df_test_targets, windows_size, mode="append")
-    #print(list_df_test_features_windows)
-    #print(list_df_test_targets_windows)
+    rescaling_values = get_targets_rescaling_values(rescaling_array, rescaling_col_names, target_choice)
 
     print('Loading Model and Getting Criterion')
     model = load_entire_model(entire_model_string)
-    #model.eval()
-    loss_function = loss_function_picker(target_type_string)
+    loss_function = loss_function_picker(target_type_string, loss_name='mse')
 
     #iterate on all df, getting the predictions and the ground truths
-    print('Running Inference')
-    for d in range(len(list_df_test)):
-        #TODO: Convert this list_df_test_features_windows and list_df_test_targets_windows into inference dataset object
-        test_loader = tData.DataLoader(test_dataset)
+    print('Running Inference...')
+    print('For Test')
+    forloop_inference(list_df_test, forecasting, feature_endo, feature_exo, 
+                    target_choice, windows_size, shift_delta, 
+                    model, loss_function, use_gpu, rescaling_values, 
+                    folder_string, file_name_string + 'test')
 
-        """
-        with torch.no_grad():
-            true = []
-            pred = []
-            print('d:', d)
-            for w, window in enumerate(list_df_test_features_windows[d]):
-                print('w, window', w, window)
-                output = model(window.tolist())
-                pred.extend(output)
-                true.extend(list_df_test_targets_windows[d][w][-1].tolist())
-            #print(true)
-        """
+    print('For Valid')
+    forloop_inference(list_df_valid, forecasting, feature_endo, feature_exo, 
+                        target_choice, windows_size, shift_delta, 
+                        model, loss_function, use_gpu, rescaling_values, 
+                        folder_string, file_name_string + 'valid')
+    print('For Train')
+    forloop_inference(list_df_train, forecasting, feature_endo, feature_exo, 
+                    target_choice, windows_size, shift_delta, 
+                    model, loss_function, use_gpu, rescaling_values, 
+                    folder_string, file_name_string + 'train')
 
-        test_loss, test_metrics = validate(model, test_loader, loss_function, use_gpu)
+def forloop_inference(list_df, 
+                    forecasting, feature_endo, feature_exo, 
+                    target_choice, windows_size, shift_delta, 
+                    model, loss_function, use_gpu, 
+                    rescaling_values, 
+                    folder_string, file_name_string):
+    for idx in range(len(list_df)):
+        #ow_ds_train = OverlappingWindowsInferenceDataset(list_df_train, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
+        #ow_ds_valid = OverlappingWindowsInferenceDataset(list_df_valid, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
+        overlapping_windows_inference_dataset = OverlappingWindowsInferenceDataset(idx, list_df, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
+        loader = tData.DataLoader(overlapping_windows_inference_dataset)
+
+        _, metrics = validate(model, loader, loss_function, use_gpu)
         
-        #TODO: Unprepare data in true and pred
+        #Unprepare data in true and pred
+        true = [t*(rescaling_values+1) for t in metrics.true]
+        pred = [p*(rescaling_values+1) for p in metrics.pred]
+        rmse = get_rmse(true, pred)
 
-        #TODO: Plot true vs pred
-        
-        """
-        if model.target_type_string == 'Classification':
-            print('Test:\n\tLoss: {}\n\tAccuracy: {}\n\tF1 Score (0.5): {}'.format(test_loss, test_metrics.accuracy, test_metrics.f1))
-        elif model.target_type_string == 'Regression':
-            print('Test:\n\tLoss: {}\n\tR2: {}\n\tMSE: {}\n\tMAE: {}'.format(test_loss, test_metrics.r2_score, test_metrics.mean_square_error, test_metrics.mean_abs_error))
-        """
+        #Plot true vs pred
+        title_string = f'_Index_{idx}_RMSE_{rmse:.2f}'
+        inference_plot(true, pred, title_string, folder_string, file_name_string, options='save')
+
+
+def pick_targets(target_choice):
+    if target_choice==0:
+        targets_names_list = ['1st AVIONICS BAY BULK TEMP', '2nd AVIONICS BAY BULK TEMP']
+    elif target_choice==1:
+        targets_names_list = ['1st AVIONICS BAY BULK TEMP']
+    elif target_choice==2:
+        targets_names_list = ['2nd AVIONICS BAY BULK TEMP']
+    else:
+        #target_choice=1
+        targets_names_list = ['1st AVIONICS BAY BULK TEMP']
+    return targets_names_list
+
+def get_targets_rescaling_values(rescaling_array, rescaling_col_names, target_choice):
+    targets_names_list = pick_targets(target_choice)
+    index_of_names = []
+    for col_name_idx, col_name in enumerate(targets_names_list):
+        idx = rescaling_col_names.index(col_name)
+        index_of_names.append(idx)
+    rescaling_values = rescaling_array[index_of_names]
+    return rescaling_values
+
+def inference_plot(true, pred, title_string, path_string, file_string, options='save'):
+    plt.clf()
+    plt.ylabel('Temperature')
+    plt.xlabel('Timesteps')
+    plt.plot(true, label="True")
+    plt.plot(pred, label="Pred")
+    plt.title(title_string)
+    plt.legend()
+    #plt.show()
+    if options == 'save':
+        img_extension = '.png'
+        base_name = '_inference' + title_string
+        folder_path = make_dir(os.path.join('.', 'plots', path_string))
+        save_string = os.path.join(folder_path, file_string + base_name + img_extension)
+        plt.savefig(save_string)
+
+def get_rmse(true, pred):
+    list_mse = []
+    for n in range(len(true)):
+        diff_sq = (true[n] - pred[n])**2
+        list_mse.append(diff_sq)
+    rmse = np.sqrt(np.sum(list_mse))
+    return rmse

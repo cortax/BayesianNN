@@ -89,10 +89,6 @@ def remove_df_ending_rows(dataframe, amount_to_remove):
     else:
         return dataframe
 
-#function for ordering files. Very basic (hardcoded positions)
-def sortKeyFunc(s):
-    return int(os.path.basename(s)[12:-4])
-
 #list of dataframe rows into vectors
 def list_df_rows_to_vectors(list_df):
     all_vectors = []
@@ -122,6 +118,10 @@ def split_list_on_ratio(liste, ratio, shuffle=False, random_seed=42):
     list_part_b = liste[index_where_to_split:]
     
     return list_part_a, list_part_b
+
+#function for ordering files. Very basic (hardcoded positions)
+def sortKeyFunc(s):
+    return int(os.path.basename(s)[12:-4])
 
 #loading multiple csv into multiple dataframes, where each csv is a dataframe. Partly hardcoded for a bombardier flight test CSV files.
 def bomb_csv_to_df(csv_stringLoader):
@@ -207,7 +207,7 @@ def rescale_list_of_df(list_df):
     rescaled_list_df = []
     for df in list_df:
         rescaled_list_df.append(rescale_single_df(df, rescaling_array))
-    return rescaled_list_df, rescaling_array
+    return rescaled_list_df, (rescaling_array, list_df[0].columns.to_list())
 
 #shrink df according with strides on rows (remove rows)
 def shrink_timesteps_with_strides(list_df, stride):

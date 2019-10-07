@@ -118,20 +118,15 @@ def hn_gru_net_main(experiment_number,
                                 criterion, use_gpu=use_gpu)
 
     print('Starting Inference Module')
-    inference(csv_path, stride, 
+    bomb_overlapping_inference(csv_path, stride, 
             train_test_ratio, train_valid_ratio,  
             forecasting, feature_endo, feature_exo, 
             target_choice, shift_delta, 
             windows_size, 
-            entire_model_string, target_type_string='Regression', 
+            entire_model_string, 
+            folder_string, file_name_string, 
+            target_type_string='Regression', 
             use_gpu=False)
-    
-    """
-    print("\ntrue\n")
-    print(test_metrics.true)
-    print("\npred\n")
-    print(test_metrics.pred)
-    """
 
     print('End of Main')
     return test_loss, test_metrics, entire_model_string
