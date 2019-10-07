@@ -173,14 +173,32 @@ class VariationalBoostingOptimizer():
                         losses[k] = loss
                         loss.backward()
                         vo.step()
-
-                    logs['expected_loss'] = torch.stack(losses).mean().detach().clone().cpu().numpy()
-                    logs['learning rate'] = vo.param_groups[0]['lr']
-                    liveloss.update(logs)
+                        
+                    expected_loss = torch.stack(losses).mean().detach().clone().cpu().numpy()
+                    learning_rate = vo.param_groups[0]['lr']
 
                     if plot is True:
+                        logs['expected_loss'] = expected_loss
+                        logs['learning rate'] = learning_rate
+                        liveloss.update(logs)
                         liveloss.draw()
+                        
+                    if verbose >= 1:
+                        print("Epoch: {0:6d} / training loss: {1:16.3f} / learning rate: {2:1.7f}".format(j,expected_loss,learning_rate))    
+                        
+                    if log:
+                        self.log.append("Epoch: {0:6d} / training loss: {1:16.3f} / learning rate: {2:1.7f}".format(j,expected_loss,learning_rate))
+                    
                     if s is not None:
                         s.step(logs['expected_loss'])
-
-        return self.mixture
+                        
+                    if self.scheduler is not None:
+                        s.step(expected_loss)
+                        if self.min_lr is not None and learning_rate < self.min_lr:
+                            new_proportion = torch.sigmoid(new_unscaled_proportion)
+                            self.mixture.add_component(new_component, torch.tensor(new_proportion, device=self.mixture.device))
+                            return self.mixture
+                new_proportion = torch.sigmoid(new_unscaled_proportion)
+                self.mixture.add_component(new_component, new_proportion)
+        return self.mixture    
+    
