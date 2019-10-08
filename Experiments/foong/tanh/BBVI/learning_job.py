@@ -52,9 +52,8 @@ if __name__ == "__main__":
     with open('job_parameters_array', 'r') as f:
         lines = f.read().splitlines()
         
+    idx = int(sys.argv[1])
     
-    
-    idx = int(sys.argv[1][0])
     args = lines[idx].split(';')
     L = int(args[0])
     W = int(args[1])
