@@ -118,8 +118,20 @@ if __name__ == "__main__":
                 filename = cwd + '/models/' + Net_name
                 filehandler = open(filename, 'rb') 
                 Net = pickle.load(filehandler)
+                device = Net.linear1.q_weight_mu.device
+
+                x_data = data[0].to(device)
+                y_data = data[1].to(device)
+                y_data = y_data.unsqueeze(-1)
                 
-#                Net.to(device)
+                x_data_validation = data[0].to(device)
+                y_data_validation = data[1].to(device)
+                y_data_validation = y_data_validation.unsqueeze(-1)
+
+                x_data_test = data[0].to(device)
+                y_data_test = data[1].to(device)
+                y_data_test = y_data_test.unsqueeze(-1)
+                
                 filehandler.close()
                 
                 INFOS = plot(Net, Net_name)
