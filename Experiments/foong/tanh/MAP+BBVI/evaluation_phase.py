@@ -60,9 +60,6 @@ def plot(model, model_name):
     plt.text(-1.7, 1.75, 'ELBO (test): '+ str(ELBO_test), fontsize=10)
    
     plt.savefig(cwd + '/plots/' + model_name)
-    
-    fig.clear()
-    plt.close(fig)
 
     return INFOS
     
