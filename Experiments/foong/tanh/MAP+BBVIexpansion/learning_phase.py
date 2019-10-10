@@ -11,8 +11,7 @@ rootdir = rootdir.split('BayesianNN')[0]+'BayesianNN/'
 print(rootdir)
 sys.path.append( rootdir )
 
-cwd = rootdir + 'Experiments/foong/tanh/MAP+BBVI/'
-cwd_BBVI = rootdir + 'Experiments/foong/tanh/BBVI/'
+cwd = rootdir + 'Experiments/foong/tanh/BBVI/'
 print(cwd)
 
 from Inference import BBVI 
@@ -21,7 +20,7 @@ import torch
 import FTPTools
 import time 
 
-def train_model(layer_width, nb_layers, activation, seed, Net):
+def train_model(layer_width, nb_layers, activation, seed):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
     data = torch.load(rootdir + '/Data/foong_data.pt')
@@ -34,16 +33,16 @@ def train_model(layer_width, nb_layers, activation, seed, Net):
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
     scheduler_params = {'patience': 5, 'factor': 0.8}
 
-    #Net = BBVI.VariationalNetwork(input_size=1, output_size=1, layer_width=layer_width, nb_layers=nb_layers, activation=activation, device=device)
+    Net = BBVI.VariationalNetwork(input_size=1, output_size=1, layer_width=layer_width, nb_layers=nb_layers, activation=activation, device=device)
     
-    #Net.make_deterministic_rhos()
-    #Net.requires_grad_rhos(False)
+    Net.make_deterministic_rhos()
+    Net.requires_grad_rhos(False)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
     Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
     
     Net.requires_grad_rhos(True)
-
+    
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
     Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=75, verbose=1)
 
@@ -53,45 +52,36 @@ def train_model(layer_width, nb_layers, activation, seed, Net):
 
 if __name__ == "__main__":
     activation = torch.tanh
+    layer_size = [10,25,50,100]
+    nb_layer = [2,3,4]
+    nb_trial = 30
 
     print('making dirs')
     os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
     os.makedirs(os.path.dirname(cwd+'/logs/'), exist_ok=True) 
 
-    with open('job_parameters_array', 'r') as f:
-        lines = f.read().splitlines()
-        
-    idx = int(sys.argv[1])
-    
-    args = lines[idx].split(';')
-    L = int(args[0])
-    W = int(args[1])
-    j = int(args[2])
-    
+    for L in nb_layer:
+        for W in layer_size:
+            for j in range(nb_trial):
+                filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
+                pathname = cwd+'/models/'
 
-    filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
-    pathname = cwd+'/models/'
+                print(filename)
+                print(pathname)
 
-    print(filename)
-    print(pathname)
+                if not os.path.exists(pathname+filename): 
+                    start_time = time.time() 
+                    Net, training_infos = train_model(W, L, activation, j)
+                    training_time = time.time() - start_time 
 
-    if not os.path.exists(pathname+filename): 
-        filehandler = open(cwd_BBVI+'/models/'+filename, 'rb') 
-        Net = pickle.load(filehandler)
-        filehandler.close()
-        
-        start_time = time.time() 
-        Net, training_infos = train_model(W, L, activation, j, Net)
-        training_time = time.time() - start_time 
+                    filehandler = open(pathname+filename, 'wb') 
+                    pickle.dump(Net, filehandler)
+                    filehandler.close()
 
-        filehandler = open(pathname+filename, 'wb') 
-        pickle.dump(Net, filehandler)
-        filehandler.close()
-
-        log = open(cwd + '/logs/' + filename + '.txt', 'w+')
-        log.write('Training time: ' + str(training_time) + '\n') 
-        log.write('Number of epochs: ' + training_infos[0] + '\n') 
-
-        log.write('Optimizer: ' + training_infos[1] + ', ' + training_infos[2] + '\n') 
-        log.write('Scheduler: ' + training_infos[3] + ', ' + training_infos[4] + '\n') 
-        log.close()        
+                    log = open(cwd + '/logs/' + filename + '.txt', 'w+')
+                    log.write('Training time: ' + str(training_time) + '\n') 
+                    log.write('Number of epochs: ' + training_infos[0] + '\n') 
+                
+                    log.write('Optimizer: ' + training_infos[1] + ', ' + training_infos[2] + '\n') 
+                    log.write('Scheduler: ' + training_infos[3] + ', ' + training_infos[4] + '\n') 
+                    log.close()        

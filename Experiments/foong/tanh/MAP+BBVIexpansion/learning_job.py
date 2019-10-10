@@ -81,7 +81,7 @@ if __name__ == "__main__":
         filehandler.close()
         
         start_time = time.time() 
-        Net, training_infos = train_model(W, L, activation, j, Net)
+        Net, training_infos = train_model(W, L, activation, j)
         training_time = time.time() - start_time 
 
         filehandler = open(pathname+filename, 'wb') 
