@@ -70,7 +70,7 @@ if __name__ == "__main__":
     
 
     filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
-    pathname = cwd+'/models/'
+    pathname = cwd+'models/'
 
     print(filename)
     print(pathname)
