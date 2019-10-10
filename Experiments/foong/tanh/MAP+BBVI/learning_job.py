@@ -76,7 +76,7 @@ if __name__ == "__main__":
     print(pathname)
 
     if not os.path.exists(pathname+filename): 
-        filehandler = open(cwd_BBVI+'/models/'+filename, 'rb') 
+        filehandler = open(cwd_BBVI+'models/'+filename, 'rb') 
         Net = pickle.load(filehandler)
         filehandler.close()
         
