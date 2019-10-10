@@ -34,6 +34,14 @@ def train_model(layer_width, nb_layers, activation, seed):
     scheduler_params = {'patience': 5, 'factor': 0.8}
 
     Net = BBVI.VariationalNetwork(input_size=1, output_size=1, layer_width=layer_width, nb_layers=nb_layers, activation=activation, device=device)
+    
+    Net.make_deterministic_rhos()
+    Net.requires_grad_rhos(False)
+
+    voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
+    Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=1, verbose=1)
+    
+    Net.requires_grad_rhos(True)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
     Net, last_epoch = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=75, verbose=1)
