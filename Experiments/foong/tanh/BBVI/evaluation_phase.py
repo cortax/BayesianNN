@@ -120,18 +120,21 @@ if __name__ == "__main__":
                 Net = pickle.load(filehandler)
                 device = Net.linear1.q_weight_mu.device
 
+                data = torch.load(rootdir + '/Data/foong_data.pt')
                 x_data = data[0].to(device)
                 y_data = data[1].to(device)
                 y_data = y_data.unsqueeze(-1)
-                
+
+                data = torch.load(rootdir +'/Data/foong_data_validation.pt')
                 x_data_validation = data[0].to(device)
                 y_data_validation = data[1].to(device)
                 y_data_validation = y_data_validation.unsqueeze(-1)
 
+                data = torch.load(rootdir +'/Data/foong_data_test.pt')
                 x_data_test = data[0].to(device)
                 y_data_test = data[1].to(device)
                 y_data_test = y_data_test.unsqueeze(-1)
-                
+
                 x_linspace = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
                 
                 filehandler.close()
