@@ -137,6 +137,11 @@ class VariationalNetwork(nn.Module):
         super(VariationalNetwork, self).__init__()
         
         self.activation = activation
+        self.input_size = input_size
+        self.output_size = output_size
+        self.layer_width = layer_width
+        self.nb_layers = nb_layers
+        
         self.device = device
         self.registered_layers = []
 
@@ -220,6 +225,51 @@ class VariationalNetwork(nn.Module):
         L = (LQ - LP - LL.sum())
         
         return torch.div(L, n_samples_ELBO)
+    
+    def get_network(self):
+        network = {}
+        
+        network['activation'] = self.activation
+        network['input_size'] = self.input_size
+        network['output_size'] = self.output_size
+        network['layer_width'] = self.layer_width
+        network['nb_layers'] = self.nb_layers
+        
+        registered_layers = []
+
+        for L in self.registered_layers:
+            d = {}
+            d['q_weight_mu'] = L.q_weight_mu.to('cpu')
+            d['q_weight_rho'] = L.q_weight_rho.to('cpu')
+            d['q_bias_mu'] = L.q_bias_mu.to('cpu')
+            d['q_bias_rho'] = L.q_bias_rho.to('cpu')
+            registered_layers.append(d)
+        network['registered_layers'] = registered_layers
+        
+        return network
+    
+    def set_network(self, network):
+        self.activation = network['activation']
+        self.input_size = network['input_size'] 
+        self.output_size = network['output_size']
+        self.layer_width = network['layer_width']
+        self.nb_layers = network['nb_layers']
+        
+        registered_layers = []
+
+        for i, d in enumerate(network['registered_layers']):
+            self.registered_layers[i].q_weight_mu = torch.nn.Parameter(d['q_weight_mu'])
+            self.registered_layers[i].q_weight_rho = torch.nn.Parameter(d['q_weight_rho'])
+            self.registered_layers[i].q_bias_mu = torch.nn.Parameter(d['q_bias_mu'])
+            self.registered_layers[i].q_bias_rho = torch.nn.Parameter(d['q_bias_rho'])
+            
+    def set_device(self, device):
+        for i in range(len(self.registered_layers)):
+            self.registered_layers[i].q_weight_mu = torch.nn.Parameter(self.registered_layers[i].q_weight_mu.to(device))
+            self.registered_layers[i].q_weight_rho = torch.nn.Parameter(self.registered_layers[i].q_weight_rho.to(device))
+            self.registered_layers[i].q_bias_mu = torch.nn.Parameter(self.registered_layers[i].q_bias_mu.to(device))
+            self.registered_layers[i].q_bias_rho = torch.nn.Parameter(self.registered_layers[i].q_bias_rho.to(device))
+
 
 class VariationalOptimizer():
     def __init__(self, model, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None, min_lr=None):
