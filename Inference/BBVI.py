@@ -278,6 +278,8 @@ class VariationalOptimizer():
         self.device = model.device
         self.min_lr = min_lr
         
+        self.last_epoch = None
+        
         self.optimizer = optimizer(model.parameters(), **optimizer_params)
         if scheduler is None:           
             self.scheduler = None
@@ -329,10 +331,10 @@ class VariationalOptimizer():
             if self.scheduler is not None:
                 self.scheduler.step(expected_loss)
                 if self.min_lr is not None and learning_rate < self.min_lr:
-                    last_epoch = j
-                    return self.model, last_epoch
-            
-        return self.model, n_epoch
+                    self.last_epoch = j
+                    return self.model
+        self.last_epoch = n_epoch    
+        return self.model
     
 def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, networkName=None, saveName=None):
     
