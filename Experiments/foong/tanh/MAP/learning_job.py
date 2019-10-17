@@ -11,13 +11,12 @@ rootdir = rootdir.split('BayesianNN')[0]+'BayesianNN/'
 print(rootdir)
 sys.path.append( rootdir )
 
-cwd = rootdir + 'Experiments/foong/tanh/BBVI/'
+cwd = rootdir + 'Experiments/foong/tanh/MAP/'
 print(cwd)
 
 from Inference import BBVI 
 import _pickle as pickle
 import torch
-import FTPTools
 import time 
 
 def train_model(layer_width, nb_layers, activation, seed):
@@ -46,8 +45,8 @@ if __name__ == "__main__":
     activation = torch.tanh
 
     print('making dirs')
-    os.makedirs(os.path.dirname(cwd+'/models/'), exist_ok=True) 
-    os.makedirs(os.path.dirname(cwd+'/logs/'), exist_ok=True) 
+    os.makedirs(os.path.dirname(cwd+'models/'), exist_ok=True) 
+    os.makedirs(os.path.dirname(cwd+'logs/'), exist_ok=True) 
 
     with open('job_parameters_array', 'r') as f:
         lines = f.read().splitlines()
@@ -61,7 +60,7 @@ if __name__ == "__main__":
     
 
     filename = str(L)+ 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
-    pathname = cwd+'/models/'
+    pathname = cwd+'models/'
 
     print(filename)
     print(pathname)
@@ -70,12 +69,13 @@ if __name__ == "__main__":
         start_time = time.time() 
         Net, training_infos = train_model(W, L, activation, j)
         training_time = time.time() - start_time 
-
+        
         filehandler = open(pathname+filename, 'wb') 
-        pickle.dump(Net, filehandler)
+        netparam = Net.get_network()
+        pickle.dump(netparam, filehandler)
         filehandler.close()
 
-        log = open(cwd + '/logs/' + filename + '.txt', 'w+')
+        log = open(cwd + 'logs/' + filename + '.txt', 'w+')
         log.write('Training time: ' + str(training_time) + '\n') 
         log.write('Number of epochs: ' + training_infos[0] + '\n') 
 
