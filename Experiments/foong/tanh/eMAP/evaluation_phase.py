@@ -116,9 +116,19 @@ if __name__ == "__main__":
             for j in range(nb_trial):
                 Net_name = str(L) + 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
                 filename = cwd + '/models/' + Net_name
-                filehandler = open(filename, 'rb') 
-                Net = pickle.load(filehandler)
-                device = Net.linear1.q_weight_mu.device
+
+                try:
+                    filehandler = open(filename, 'rb')
+                except FileNotFoundError:
+                    continue
+
+                netparam = pickle.load(filehandler)
+                Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
+                                        output_size=netparam['output_size'],
+                                        layer_width=netparam['layer_width'],
+                                        nb_layers=netparam['nb_layers'])
+                Net.set_network(netparam)    
+                Net.set_device(device)
 
                 data = torch.load(rootdir + '/Data/foong_data.pt')
                 x_data = data[0].to(device)
@@ -141,6 +151,3 @@ if __name__ == "__main__":
                 
                 INFOS = plot(Net, Net_name)
                 update_log(Net, Net_name, INFOS)
-
-                
-
