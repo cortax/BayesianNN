@@ -13,9 +13,10 @@ plt.style.use('ggplot')
 
 
 class MixtureVariationalNetwork(nn.Module):
-    def __init__(self, input_size, output_size, layer_width, nb_layers, device=None):
+    def __init__(self, input_size, output_size, layer_width, nb_layers, activation=torch.tanh, device=None):
         super(MixtureVariationalNetwork, self).__init__()
         
+        self.activation = activation
         self.layer_width = layer_width
         self.input_size = input_size
         self.output_size = output_size
@@ -111,6 +112,45 @@ class MixtureVariationalNetwork(nn.Module):
         return -0.5 * torch.log(2*np.pi*std**2) -(0.5 * (1/(std**2))* (x-mu)**2)
     
     
+    def get_mixture(self):
+        mixture = {}
+        
+        mixture['activation'] = self.activation
+        mixture['input_size'] = self.input_size
+        mixture['output_size'] = self.output_size
+        mixture['layer_width'] = self.layer_width
+        mixture['nb_layers'] = self.nb_layers
+        
+        components = []
+        for c in self.components:
+            components.append(c.get_network())
+            
+        mixture['components'] = components
+        mixture['pi'] = self.pi.to('cpu')
+
+        return mixture
+    
+    
+    def set_mixture(self, mixture):
+        self.activation = mixture['activation']
+        self.input_size = mixture['input_size'] 
+        self.output_size = mixture['output_size']
+        self.layer_width = mixture['layer_width']
+        self.nb_layers = mixture['nb_layers']
+
+        for i, newparam in enumerate(mixture['components']):
+            Net = VariationalNetwork(self.input_size, self.output_size, self.layer_width, self.nb_layers, self.activation)
+            Net.set_network(newparam)
+            self.add_component(Net, torch.tensor(0.5))
+            
+        self.pi = mixture['pi']
+
+            
+    def set_device(self, device):
+        for c in self.components:
+            c.set_device(device)
+    
+    
 class VariationalBoostingOptimizer():
     def __init__(self, mixture, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None, min_lr=None):
         self.mixture = mixture
@@ -144,7 +184,8 @@ class VariationalBoostingOptimizer():
                 voptimizer = BBVI.VariationalOptimizer(model=new_component, sigma_noise=self.sigma_noise, \
                              optimizer=self.optimizer, optimizer_params=self.optimizer_params, \
                              scheduler=self.scheduler, scheduler_params=self.scheduler_params, min_lr=self.min_lr)
-                new_component, epoch_count = voptimizer.run((x_data,y_data), n_epoch=n_epoch, n_iter=n_iter, n_ELBO_samples=n_ELBO_samples, plot=plot)
+                new_component = voptimizer.run((x_data,y_data), n_epoch=n_epoch, n_iter=n_iter, n_ELBO_samples=n_ELBO_samples, plot=plot)
+                #epoch_count = voptimizer.last_epoch
                 self.mixture.add_component(new_component, torch.tensor(1.0, device=self.mixture.device))
             else:
                 new_component = VariationalNetwork(self.mixture.input_size, self.mixture.output_size, \
