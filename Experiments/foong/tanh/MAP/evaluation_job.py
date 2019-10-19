@@ -130,7 +130,7 @@ if __name__ == "__main__":
         print('no model found')
         sys.exit()
 
-    print(os.path.exists(cwd + '/plots/' + Net_name + '.png'))
+    print(cwd + '/plots/' + Net_name + '.png')
     if os.path.exists(cwd + '/plots/' + Net_name + '.png'):
         print('plot exists')
         sys.exit()
