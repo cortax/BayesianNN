@@ -13,12 +13,13 @@ import torch
 import matplotlib.pyplot as plt
 
 def plot(model, model_name):
-        
-    y_train = model.forward(x_data)    
-        
-    y_validation = model.forward(x_data_validation)
+    device = model.device
 
-    y_test = model.forward(x_data_test)
+    model.sample_parameters(1000)
+    y_train = model.forward(x_data).to(device) 
+        
+    y_validation = model.forward(x_data_validation).to(device)
+    y_test = model.forward(x_data_test).to(device)
     
     ELL_train = model._log_norm(y_train, y_data, torch.tensor(0.1).to(device))
     ELL_train = ELL_train.sum(dim=[1,2]).mean().detach().cpu().numpy()
@@ -61,6 +62,8 @@ def plot(model, model_name):
    
     plt.savefig(cwd + '/plots/' + model_name)
 
+    plt.close(fig)
+
     return INFOS
     
     
@@ -83,6 +86,7 @@ def update_log(model, model_name, INFOS):
 if __name__ == "__main__":
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = 'cpu'
 
     activation = torch.tanh
 
@@ -128,8 +132,7 @@ if __name__ == "__main__":
                                         layer_width=netparam['layer_width'],
                                         nb_layers=netparam['nb_layers'])
                 Net.set_network(netparam)
-
-                device = Net.linear1.q_weight_mu.device
+                Net.set_device(device)
 
                 data = torch.load(rootdir + '/Data/foong_data.pt')
                 x_data = data[0].to(device)
