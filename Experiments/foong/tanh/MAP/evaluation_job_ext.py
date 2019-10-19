@@ -11,6 +11,8 @@ from Inference import BBVI
 import _pickle as pickle
 import torch
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 def plot(model, model_name):
     device = model.device
@@ -38,6 +40,8 @@ def plot(model, model_name):
     INFOS = [ELL_train, ELL_val, ELL_test, ELBO_train, ELBO_val, ELBO_test]
     
     y_real = torch.cos(4.0 * (x_linspace + 0.2))
+
+    print('plotting...')
     
     fig = plt.figure() 
 #    plt.title(model_name)
@@ -123,8 +127,15 @@ if __name__ == "__main__":
     try:
         filehandler = open(filename, 'rb')
     except FileNotFoundError:
+        print('no model found')
         sys.exit()
 
+    print(cwd + '/plots/' + Net_name + '.png')
+    if os.path.exists(cwd + '/plots/' + Net_name + '.png'):
+        print('plot exists')
+        sys.exit()
+
+    print('loading network')
     netparam = pickle.load(filehandler)
     Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
                             output_size=netparam['output_size'],
@@ -152,6 +163,7 @@ if __name__ == "__main__":
     
     filehandler.close()
     
+    print('data loaded')
     INFOS = plot(Net, Net_name)
     update_log(Net, Net_name, INFOS)
 
