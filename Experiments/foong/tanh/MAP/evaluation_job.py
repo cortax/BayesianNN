@@ -11,6 +11,8 @@ from Inference import BBVI
 import _pickle as pickle
 import torch
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 def plot(model, model_name):
     device = model.device
