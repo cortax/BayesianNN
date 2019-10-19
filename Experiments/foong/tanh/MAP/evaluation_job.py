@@ -125,6 +125,9 @@ if __name__ == "__main__":
     except FileNotFoundError:
         sys.exit()
 
+    if os.path.exists(cwd + '/plots/' + model_name):
+        sys.exit()
+
     netparam = pickle.load(filehandler)
     Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
                             output_size=netparam['output_size'],
