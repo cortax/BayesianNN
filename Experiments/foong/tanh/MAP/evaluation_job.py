@@ -130,10 +130,12 @@ if __name__ == "__main__":
         print('no model found')
         sys.exit()
 
-    if os.path.exists(cwd + '/plots/' + Net_name):
+    print(os.path.exists(cwd + '/plots/' + Net_name + '.png'))
+    if os.path.exists(cwd + '/plots/' + Net_name + '.png'):
         print('plot exists')
         sys.exit()
 
+    print('loading network')
     netparam = pickle.load(filehandler)
     Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
                             output_size=netparam['output_size'],
@@ -161,6 +163,7 @@ if __name__ == "__main__":
     
     filehandler.close()
     
+    print('data loaded')
     INFOS = plot(Net, Net_name)
     update_log(Net, Net_name, INFOS)
 
