@@ -41,6 +41,8 @@ def plot(model, model_name):
     
     y_real = torch.cos(4.0 * (x_linspace + 0.2))
     
+    print('plotting...')
+
     fig = plt.figure() 
 #    plt.title(model_name)
     plt.axis([-2, 2, -2, 3.5])
@@ -125,9 +127,11 @@ if __name__ == "__main__":
     try:
         filehandler = open(filename, 'rb')
     except FileNotFoundError:
+        print('no model found')
         sys.exit()
 
     if os.path.exists(cwd + '/plots/' + model_name):
+        print('plot exists')
         sys.exit()
 
     netparam = pickle.load(filehandler)
