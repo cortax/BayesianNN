@@ -2,14 +2,14 @@ Make/Tests Models objects (Make: CNN, Dilated CNN, NeuralODEN, MaxoutN)
 Update pipelines for "test recalling" of models (recall models to retrain midway is complete)
 Add Helps to redux args ex: help='size of word embeddings'
 
-Save history as JSON or something (required for a better restart training and beter inference module)
+Save history as JSON or something (required for a better restart training)
 Eval metrics for significant events inside windows
 
-Models: Input changes(LogNorm, Embeddings, autoencoding), 
+Models: Input changes(Autoencoding), 
         Output Net Changes(Better Classif/Regression Head),
         Ensemble
-        Inference module
 
 RNN Gradient clipping (with norm ideally)
 Try Data delta y instead of y
 
+ResNet/DenseNet de RNN

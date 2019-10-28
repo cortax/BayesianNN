@@ -100,7 +100,6 @@ def hn_gru_net_main(experiment_number,
         else:
             print('Cannot Restart from Specified Model Weights')
     
-    """
     print('Start of Training')
     history, entire_model_string = train(model, 
                                         train_loader, valid_loader, 
@@ -110,7 +109,6 @@ def hn_gru_net_main(experiment_number,
     
     print('Saving Training History')
     history.history_display(folder_string, file_name_string)
-    """
 
     print('Start of Testing')
     model = load_entire_model(entire_model_string)

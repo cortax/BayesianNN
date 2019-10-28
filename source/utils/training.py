@@ -79,7 +79,7 @@ def train(model,
                 break
 
     
-    return history, entire_model_string
+    return history, best_entire_model_string
 
 def terminal_printer(target_type_string, epoch, epoch_training_time, train_loss, valid_loss, train_metrics, valid_metrics):
     if target_type_string == 'Classification':

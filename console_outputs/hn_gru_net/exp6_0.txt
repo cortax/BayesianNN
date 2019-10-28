@@ -1,0 +1,21 @@
+
+----------ARGUMENTS----------
+
+Namespace(BATCH_SIZE=32, COOLDOWN=0, DAMPENING=0.0, DROPOUT_HIDDEN=0.0, DROPOUT_HN=0.0, EARLY_STOP=250, EPOCHS=2000, EXPERIMENT_NUMBER=6, FACTOR=0.8, GPU_DEVICE_ID=0, HIDDEN_SIZE=256, LEARNING_RATE=0.02, MODEL='hn_gru_net', MODULE='model', MODULE_MODE='train', MOMENTUM=0.9, NOT_FORECASTING=False, NO_FEATURE_ENDO=False, NO_FEATURE_EXO=True, NO_GPU=True, NO_VERBOSE=True, NUM_LAYERS=2, NUM_WORKERS=4, OPTIM_TYPE='adam', PATIENCE=50, RANDOM_SEED=42, RESTART=False, RESTART_MODEL=None, SAMPLER_TYPE=None, SHIFT_DELTA=1, TARGET_CHOICE=1, THRESHOLD=1e-06, TIME_STRIDE=30, TRAIN_TEST_RATIO=0.8, TRAIN_VALID_RATIO=0.8, WEIGHT_DECAY=0.0, WINDOWS_SIZE=32) 
+
+
+----------MODULE START----------
+
+model
+Start of Main
+Making Dataset
+Loading:./DataBombardier/2sec/flight_test_1.csv
+Loading:./DataBombardier/2sec/flight_test_3.csv
+Loading:./DataBombardier/2sec/flight_test_4.csv
+Loading:./DataBombardier/2sec/flight_test_5.csv
+Loading:./DataBombardier/2sec/flight_test_6.csv
+Loading:./DataBombardier/2sec/flight_test_7.csv
+Loading:./DataBombardier/2sec/flight_test_8.csv
+Loading:./DataBombardier/2sec/flight_test_9.csv
+Loading:./DataBombardier/2sec/flight_test_10.csv
+Loading:./DataBombardier/2sec/flight_test_11.csv

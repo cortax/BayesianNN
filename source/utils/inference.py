@@ -67,11 +67,8 @@ def forloop_inference(list_df,
                     rescaling_values, 
                     folder_string, file_name_string):
     for idx in range(len(list_df)):
-        #ow_ds_train = OverlappingWindowsInferenceDataset(list_df_train, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
-        #ow_ds_valid = OverlappingWindowsInferenceDataset(list_df_valid, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
         overlapping_windows_inference_dataset = OverlappingWindowsInferenceDataset(idx, list_df, forecasting, feature_endo, feature_exo, target_choice, windows_size, shift_delta)
         loader = tData.DataLoader(overlapping_windows_inference_dataset)
-
         _, metrics = validate(model, loader, loss_function, use_gpu)
         
         #Unprepare data in true and pred
@@ -82,7 +79,6 @@ def forloop_inference(list_df,
         #Plot true vs pred
         title_string = f'_Index_{idx}_RMSE_{rmse:.2f}'
         inference_plot(true, pred, title_string, folder_string, file_name_string, options='save')
-
 
 def pick_targets(target_choice):
     if target_choice==0:

@@ -1,0 +1,1741 @@
+
+----------ARGUMENTS----------
+
+Namespace(BATCH_SIZE=128, COOLDOWN=0, DAMPENING=0.0, DROPOUT_HIDDEN=0.0, DROPOUT_HN=0.0, EARLY_STOP=250, EPOCHS=2000, EXPERIMENT_NUMBER=3, FACTOR=0.8, GPU_DEVICE_ID=0, HIDDEN_SIZE=128, LEARNING_RATE=0.02, MODEL='hn_gru_net', MODULE='model', MODULE_MODE='train', MOMENTUM=0.9, NOT_FORECASTING=True, NO_FEATURE_ENDO=True, NO_FEATURE_EXO=True, NO_GPU=True, NO_VERBOSE=True, NUM_LAYERS=1, NUM_WORKERS=4, OPTIM_TYPE='adam', PATIENCE=50, RANDOM_SEED=42, RESTART=False, RESTART_MODEL=None, SAMPLER_TYPE=None, SHIFT_DELTA=1, TARGET_CHOICE=1, THRESHOLD=1e-06, TIME_STRIDE=30, TRAIN_TEST_RATIO=0.8, TRAIN_VALID_RATIO=0.8, WEIGHT_DECAY=0.0, WINDOWS_SIZE=32) 
+
+
+----------MODULE START----------
+
+model
+Start of Main
+Making Dataset
+Loading:./DataBombardier/2sec/flight_test_1.csv
+Loading:./DataBombardier/2sec/flight_test_3.csv
+Loading:./DataBombardier/2sec/flight_test_4.csv
+Loading:./DataBombardier/2sec/flight_test_5.csv
+Loading:./DataBombardier/2sec/flight_test_6.csv
+Loading:./DataBombardier/2sec/flight_test_7.csv
+Loading:./DataBombardier/2sec/flight_test_8.csv
+Loading:./DataBombardier/2sec/flight_test_9.csv
+Loading:./DataBombardier/2sec/flight_test_10.csv
+Loading:./DataBombardier/2sec/flight_test_11.csv
+Not using any Special Sampler
+Making Loaders
+Making all 3 Loaders with Training Shuffle at: True
+Making Model
+loss_name is unspecified or unrecognized, using default: MSE
+Managing Cuda devices
+Not Running on CUDA Device
+Making Optimizer, Scheduler and Getting Criterion
+Start of Training
+Epoch 0 - Training time: 1.26s - Train loss: 0.1086 - Valid loss: 0.1957 - Train R2: -2.3988 - Valid R2: -30.3588 - Train MSE: 0.1087 - Valid MSE: 0.2034 - Train MAE: 0.2900 - Valid MAE: 0.4459
+New Model Saved (New Best:0.1957)
+
+Epoch 1 - Training time: 1.44s - Train loss: 0.0066 - Valid loss: 0.0088 - Train R2: 0.7944 - Valid R2: -0.4339 - Train MSE: 0.0066 - Valid MSE: 0.0093 - Train MAE: 0.0676 - Valid MAE: 0.0891
+New Model Saved (New Best:0.0088)
+
+Epoch 2 - Training time: 1.26s - Train loss: 0.0007 - Valid loss: 0.0006 - Train R2: 0.9766 - Valid R2: 0.9168 - Train MSE: 0.0007 - Valid MSE: 0.0005 - Train MAE: 0.0222 - Valid MAE: 0.0174
+New Model Saved (New Best:0.0006)
+
+Epoch 3 - Training time: 1.33s - Train loss: 0.0003 - Valid loss: 0.0007 - Train R2: 0.9893 - Valid R2: 0.9064 - Train MSE: 0.0003 - Valid MSE: 0.0006 - Train MAE: 0.0155 - Valid MAE: 0.0210
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0006, Current:0.0007)
+
+Epoch 4 - Training time: 1.35s - Train loss: 0.0002 - Valid loss: 0.0005 - Train R2: 0.9936 - Valid R2: 0.9280 - Train MSE: 0.0002 - Valid MSE: 0.0005 - Train MAE: 0.0108 - Valid MAE: 0.0177
+New Model Saved (New Best:0.0005)
+
+Epoch 5 - Training time: 1.27s - Train loss: 0.0001 - Valid loss: 0.0005 - Train R2: 0.9953 - Valid R2: 0.9351 - Train MSE: 0.0001 - Valid MSE: 0.0004 - Train MAE: 0.0092 - Valid MAE: 0.0166
+New Model Saved (New Best:0.0005)
+
+Epoch 6 - Training time: 0.87s - Train loss: 0.0001 - Valid loss: 0.0004 - Train R2: 0.9959 - Valid R2: 0.9435 - Train MSE: 0.0001 - Valid MSE: 0.0004 - Train MAE: 0.0086 - Valid MAE: 0.0152
+New Model Saved (New Best:0.0004)
+
+Epoch 7 - Training time: 1.28s - Train loss: 0.0001 - Valid loss: 0.0004 - Train R2: 0.9963 - Valid R2: 0.9530 - Train MSE: 0.0001 - Valid MSE: 0.0003 - Train MAE: 0.0084 - Valid MAE: 0.0137
+New Model Saved (New Best:0.0004)
+
+Epoch 8 - Training time: 1.25s - Train loss: 0.0001 - Valid loss: 0.0003 - Train R2: 0.9969 - Valid R2: 0.9551 - Train MSE: 0.0001 - Valid MSE: 0.0003 - Train MAE: 0.0070 - Valid MAE: 0.0133
+New Model Saved (New Best:0.0003)
+
+Epoch 9 - Training time: 1.29s - Train loss: 0.0001 - Valid loss: 0.0003 - Train R2: 0.9973 - Valid R2: 0.9633 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0067 - Valid MAE: 0.0119
+New Model Saved (New Best:0.0003)
+
+Epoch 10 - Training time: 1.29s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9976 - Valid R2: 0.9683 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0062 - Valid MAE: 0.0110
+New Model Saved (New Best:0.0002)
+
+Epoch 11 - Training time: 1.34s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9978 - Valid R2: 0.9671 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0058 - Valid MAE: 0.0112
+New Model Saved (New Best:0.0002)
+
+Epoch 12 - Training time: 1.27s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9978 - Valid R2: 0.9668 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0060 - Valid MAE: 0.0115
+New Model Saved (New Best:0.0002)
+
+Epoch 13 - Training time: 1.43s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9980 - Valid R2: 0.9715 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0059 - Valid MAE: 0.0107
+New Model Saved (New Best:0.0002)
+
+Epoch 14 - Training time: 1.43s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9983 - Valid R2: 0.9747 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0052 - Valid MAE: 0.0100
+New Model Saved (New Best:0.0002)
+
+Epoch 15 - Training time: 1.67s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9978 - Valid R2: 0.9776 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0067 - Valid MAE: 0.0091
+New Model Saved (New Best:0.0002)
+
+Epoch 16 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0002 - Train R2: 0.9984 - Valid R2: 0.9768 - Train MSE: 0.0000 - Valid MSE: 0.0002 - Train MAE: 0.0050 - Valid MAE: 0.0096
+New Model Saved (New Best:0.0002)
+
+Epoch 17 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0002 - Train R2: 0.9985 - Valid R2: 0.9747 - Train MSE: 0.0000 - Valid MSE: 0.0002 - Train MAE: 0.0049 - Valid MAE: 0.0104
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0002, Current:0.0002)
+
+Epoch 18 - Training time: 1.47s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9986 - Valid R2: 0.9783 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0048 - Valid MAE: 0.0094
+New Model Saved (New Best:0.0001)
+
+Epoch 19 - Training time: 1.17s - Train loss: 0.0000 - Valid loss: 0.0002 - Train R2: 0.9987 - Valid R2: 0.9764 - Train MSE: 0.0000 - Valid MSE: 0.0002 - Train MAE: 0.0045 - Valid MAE: 0.0100
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0002)
+
+Epoch 20 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9987 - Valid R2: 0.9801 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0047 - Valid MAE: 0.0090
+New Model Saved (New Best:0.0001)
+
+Epoch 21 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0002 - Train R2: 0.9986 - Valid R2: 0.9760 - Train MSE: 0.0000 - Valid MSE: 0.0002 - Train MAE: 0.0050 - Valid MAE: 0.0103
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0002)
+
+Epoch 22 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9773 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0042 - Valid MAE: 0.0099
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 23 - Training time: 0.96s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9768 - Train MSE: 0.0000 - Valid MSE: 0.0002 - Train MAE: 0.0044 - Valid MAE: 0.0101
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 24 - Training time: 1.03s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9987 - Valid R2: 0.9842 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0048 - Valid MAE: 0.0077
+New Model Saved (New Best:0.0001)
+
+Epoch 25 - Training time: 1.37s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9835 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0047 - Valid MAE: 0.0081
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 26 - Training time: 1.47s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9986 - Valid R2: 0.9763 - Train MSE: 0.0000 - Valid MSE: 0.0002 - Train MAE: 0.0050 - Valid MAE: 0.0104
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 27 - Training time: 1.06s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9990 - Valid R2: 0.9811 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0038 - Valid MAE: 0.0089
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 28 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9991 - Valid R2: 0.9842 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0037 - Valid MAE: 0.0080
+New Model Saved (New Best:0.0001)
+
+Epoch 29 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9805 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0047 - Valid MAE: 0.0093
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 30 - Training time: 1.40s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9991 - Valid R2: 0.9859 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0039 - Valid MAE: 0.0074
+New Model Saved (New Best:0.0001)
+
+Epoch 31 - Training time: 1.16s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9990 - Valid R2: 0.9811 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0039 - Valid MAE: 0.0090
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 32 - Training time: 1.46s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9992 - Valid R2: 0.9872 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0035 - Valid MAE: 0.0070
+New Model Saved (New Best:0.0001)
+
+Epoch 33 - Training time: 1.35s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9989 - Valid R2: 0.9800 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0043 - Valid MAE: 0.0094
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 34 - Training time: 1.23s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9983 - Valid R2: 0.9786 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0063 - Valid MAE: 0.0100
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 35 - Training time: 1.37s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9987 - Valid R2: 0.9854 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0053 - Valid MAE: 0.0079
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 36 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9992 - Valid R2: 0.9859 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0035 - Valid MAE: 0.0077
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 37 - Training time: 1.55s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9993 - Valid R2: 0.9882 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0033 - Valid MAE: 0.0068
+New Model Saved (New Best:0.0001)
+
+Epoch 38 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9993 - Valid R2: 0.9891 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0035 - Valid MAE: 0.0065
+New Model Saved (New Best:0.0001)
+
+Epoch 39 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9993 - Valid R2: 0.9911 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0032 - Valid MAE: 0.0054
+New Model Saved (New Best:0.0001)
+
+Epoch 40 - Training time: 1.77s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9979 - Valid R2: 0.9737 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0070 - Valid MAE: 0.0115
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0002)
+
+Epoch 41 - Training time: 1.56s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9994 - Valid R2: 0.9916 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0029 - Valid MAE: 0.0053
+New Model Saved (New Best:0.0001)
+
+Epoch 42 - Training time: 1.73s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9994 - Valid R2: 0.9916 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0033 - Valid MAE: 0.0054
+New Model Saved (New Best:0.0001)
+
+Epoch 43 - Training time: 1.64s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9992 - Valid R2: 0.9883 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0042 - Valid MAE: 0.0071
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 44 - Training time: 1.35s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9995 - Valid R2: 0.9908 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0029 - Valid MAE: 0.0059
+New Model Saved (New Best:0.0001)
+
+Epoch 45 - Training time: 1.41s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9995 - Valid R2: 0.9914 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0028 - Valid MAE: 0.0057
+New Model Saved (New Best:0.0001)
+
+Epoch 46 - Training time: 1.34s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9981 - Valid R2: 0.9853 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0070 - Valid MAE: 0.0084
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 47 - Training time: 1.16s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9984 - Valid R2: 0.9896 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0065 - Valid MAE: 0.0067
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 48 - Training time: 1.01s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9996 - Valid R2: 0.9924 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0025 - Valid MAE: 0.0053
+New Model Saved (New Best:0.0001)
+
+Epoch 49 - Training time: 1.55s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9995 - Valid R2: 0.9929 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0051
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0001, Current:0.0001)
+
+Epoch 50 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9931 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0049
+New Model Saved (New Best:0.0000)
+
+Epoch 51 - Training time: 1.66s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9933 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0049
+New Model Saved (New Best:0.0000)
+
+Epoch 52 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9940 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0029 - Valid MAE: 0.0047
+New Model Saved (New Best:0.0000)
+
+Epoch 53 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9992 - Valid R2: 0.9923 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0043 - Valid MAE: 0.0054
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 54 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9986 - Valid R2: 0.9896 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0061 - Valid MAE: 0.0069
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 55 - Training time: 1.37s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9938 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0037 - Valid MAE: 0.0047
+New Model Saved (New Best:0.0000)
+
+Epoch 56 - Training time: 1.35s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9987 - Valid R2: 0.9915 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0059 - Valid MAE: 0.0059
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 57 - Training time: 1.55s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9989 - Valid R2: 0.9925 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0052 - Valid MAE: 0.0054
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 58 - Training time: 1.55s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9992 - Valid R2: 0.9916 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0042 - Valid MAE: 0.0057
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 59 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9941 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0027 - Valid MAE: 0.0047
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 60 - Training time: 1.46s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9941 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0029 - Valid MAE: 0.0049
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 61 - Training time: 1.14s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9993 - Valid R2: 0.9936 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0040 - Valid MAE: 0.0051
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 62 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9950 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0043
+New Model Saved (New Best:0.0000)
+
+Epoch 63 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9949 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0045
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 64 - Training time: 1.35s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9989 - Valid R2: 0.9920 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0053 - Valid MAE: 0.0059
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 65 - Training time: 1.36s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9980 - Valid R2: 0.9899 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0074 - Valid MAE: 0.0071
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 66 - Training time: 1.26s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9979 - Valid R2: 0.9874 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0077 - Valid MAE: 0.0077
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 67 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9941 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0045 - Valid MAE: 0.0048
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 68 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9952 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0029 - Valid MAE: 0.0042
+New Model Saved (New Best:0.0000)
+
+Epoch 69 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9990 - Valid R2: 0.9912 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0052 - Valid MAE: 0.0063
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 70 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9960 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0038
+New Model Saved (New Best:0.0000)
+
+Epoch 71 - Training time: 1.31s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9982 - Valid R2: 0.9888 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0070 - Valid MAE: 0.0074
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 72 - Training time: 1.33s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9991 - Valid R2: 0.9929 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0047 - Valid MAE: 0.0053
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 73 - Training time: 1.30s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9984 - Valid R2: 0.9894 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0068 - Valid MAE: 0.0071
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 74 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9949 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0044
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 75 - Training time: 1.40s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0037
+New Model Saved (New Best:0.0000)
+
+Epoch 76 - Training time: 0.99s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9962 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0039
+New Model Saved (New Best:0.0000)
+
+Epoch 77 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9991 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0049 - Valid MAE: 0.0043
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 78 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9986 - Valid R2: 0.9919 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0063 - Valid MAE: 0.0061
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 79 - Training time: 0.87s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0035 - Valid MAE: 0.0039
+New Model Saved (New Best:0.0000)
+
+Epoch 80 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0034
+New Model Saved (New Best:0.0000)
+
+Epoch 81 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0037
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 82 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9965 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0036
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 83 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9951 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0046
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 84 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9962 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0038
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 85 - Training time: 0.89s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9970 - Valid R2: 0.9797 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0094 - Valid MAE: 0.0107
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 86 - Training time: 1.12s - Train loss: 0.0001 - Valid loss: 0.0000 - Train R2: 0.9978 - Valid R2: 0.9925 - Train MSE: 0.0001 - Valid MSE: 0.0000 - Train MAE: 0.0079 - Valid MAE: 0.0060
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 87 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9967 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0036
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 88 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9988 - Valid R2: 0.9947 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0056 - Valid MAE: 0.0049
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 89 - Training time: 0.96s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0028 - Valid MAE: 0.0034
+New Model Saved (New Best:0.0000)
+
+Epoch 90 - Training time: 0.92s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9984 - Valid R2: 0.9893 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0069 - Valid MAE: 0.0075
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 91 - Training time: 1.81s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9985 - Valid R2: 0.9940 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0064 - Valid MAE: 0.0051
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 92 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9965 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0038
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 93 - Training time: 0.94s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0039 - Valid MAE: 0.0032
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 94 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0045
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 95 - Training time: 1.33s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9939 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0054
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 96 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9967 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0037
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 97 - Training time: 1.19s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9972 - Valid R2: 0.9796 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0091 - Valid MAE: 0.0108
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 98 - Training time: 1.11s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9991 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0050 - Valid MAE: 0.0038
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 99 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9966 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0039
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 100 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9961 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0041
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 101 - Training time: 1.26s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9975 - Valid R2: 0.9806 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0086 - Valid MAE: 0.0105
+No improvement, in the last 12 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 102 - Training time: 1.13s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0042 - Valid MAE: 0.0045
+No improvement, in the last 13 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 103 - Training time: 1.02s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9957 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0039 - Valid MAE: 0.0040
+No improvement, in the last 14 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 104 - Training time: 1.10s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9955 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0045
+No improvement, in the last 15 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 105 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9960 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0042
+No improvement, in the last 16 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 106 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9974 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0033
+New Model Saved (New Best:0.0000)
+
+Epoch 107 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9974 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0035 - Valid MAE: 0.0032
+New Model Saved (New Best:0.0000)
+
+Epoch 108 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9960 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0043
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 109 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9966 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0039
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 110 - Training time: 1.41s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9976 - Valid R2: 0.9875 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0083 - Valid MAE: 0.0083
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 111 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0030
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 112 - Training time: 1.57s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9966 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0041 - Valid MAE: 0.0037
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 113 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0033
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 114 - Training time: 1.18s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9964 - Valid R2: 0.9766 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0104 - Valid MAE: 0.0118
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0002)
+
+Epoch 115 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0027 - Valid MAE: 0.0033
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 116 - Training time: 1.70s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9948 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0050
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 117 - Training time: 1.24s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9976 - Valid R2: 0.9835 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0084 - Valid MAE: 0.0097
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 118 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0037
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 119 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0034 - Valid MAE: 0.0027
+New Model Saved (New Best:0.0000)
+
+Epoch 120 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9961 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0029 - Valid MAE: 0.0038
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 121 - Training time: 0.99s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0042 - Valid MAE: 0.0041
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 122 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0030
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 123 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9972 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0035
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 124 - Training time: 1.12s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0027
+New Model Saved (New Best:0.0000)
+
+Epoch 125 - Training time: 1.47s - Train loss: 0.0001 - Valid loss: 0.0000 - Train R2: 0.9981 - Valid R2: 0.9964 - Train MSE: 0.0001 - Valid MSE: 0.0000 - Train MAE: 0.0072 - Valid MAE: 0.0040
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 126 - Training time: 1.78s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9957 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0044
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 127 - Training time: 1.76s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9975 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0032
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 128 - Training time: 1.85s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9972 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0035
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 129 - Training time: 1.39s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9963 - Valid R2: 0.9835 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0106 - Valid MAE: 0.0097
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 130 - Training time: 1.40s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9966 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0040
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 131 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0024 - Valid MAE: 0.0041
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 132 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9953 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0047
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 133 - Training time: 1.33s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0042
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 134 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9948 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0051
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 135 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9988 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0058 - Valid MAE: 0.0040
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 136 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9985 - Valid R2: 0.9855 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0067 - Valid MAE: 0.0089
+No improvement, in the last 12 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 137 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0029
+No improvement, in the last 13 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 138 - Training time: 1.26s - Train loss: 0.0001 - Valid loss: 0.0000 - Train R2: 0.9983 - Valid R2: 0.9965 - Train MSE: 0.0001 - Valid MSE: 0.0000 - Train MAE: 0.0070 - Valid MAE: 0.0039
+No improvement, in the last 14 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 139 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9965 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0040
+No improvement, in the last 15 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 140 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9939 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0056
+No improvement, in the last 16 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 141 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9991 - Valid R2: 0.9941 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0050 - Valid MAE: 0.0055
+No improvement, in the last 17 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 142 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9974 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0032 - Valid MAE: 0.0031
+No improvement, in the last 18 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 143 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0027
+New Model Saved (New Best:0.0000)
+
+Epoch 144 - Training time: 1.58s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9991 - Valid R2: 0.9902 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0050 - Valid MAE: 0.0073
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 145 - Training time: 1.52s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0029 - Valid MAE: 0.0037
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 146 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0038
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 147 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0035 - Valid MAE: 0.0039
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 148 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9974 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0033
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 149 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0028
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 150 - Training time: 1.02s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0047
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 151 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0029
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 152 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9994 - Valid R2: 0.9907 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0039 - Valid MAE: 0.0071
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 153 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0031
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 154 - Training time: 1.40s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9982 - Valid R2: 0.9829 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0074 - Valid MAE: 0.0100
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 155 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0028
+New Model Saved (New Best:0.0000)
+
+Epoch 156 - Training time: 1.67s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0036
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 157 - Training time: 1.49s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0030
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 158 - Training time: 1.44s - Train loss: 0.0002 - Valid loss: 0.0002 - Train R2: 0.9948 - Valid R2: 0.9741 - Train MSE: 0.0002 - Valid MSE: 0.0002 - Train MAE: 0.0126 - Valid MAE: 0.0125
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0002)
+
+Epoch 159 - Training time: 1.40s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9975 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0041 - Valid MAE: 0.0033
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 160 - Training time: 1.51s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9948 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0025 - Valid MAE: 0.0050
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 161 - Training time: 1.40s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9972 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0036
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 162 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0043 - Valid MAE: 0.0035
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 163 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0028
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 164 - Training time: 1.41s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0035 - Valid MAE: 0.0025
+New Model Saved (New Best:0.0000)
+
+Epoch 165 - Training time: 1.51s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9929 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0037 - Valid MAE: 0.0062
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 166 - Training time: 1.41s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9996 - Valid R2: 0.9926 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0063
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 167 - Training time: 0.98s - Train loss: 0.0003 - Valid loss: 0.0004 - Train R2: 0.9899 - Valid R2: 0.9391 - Train MSE: 0.0003 - Valid MSE: 0.0004 - Train MAE: 0.0178 - Valid MAE: 0.0197
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0004)
+
+Epoch 168 - Training time: 1.22s - Train loss: 0.0002 - Valid loss: 0.0001 - Train R2: 0.9934 - Valid R2: 0.9751 - Train MSE: 0.0002 - Valid MSE: 0.0002 - Train MAE: 0.0144 - Valid MAE: 0.0120
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 169 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9988 - Valid R2: 0.9958 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0057 - Valid MAE: 0.0040
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 170 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9975 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0035
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 171 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9991 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0051 - Valid MAE: 0.0031
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 172 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0042
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 173 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0036
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 174 - Training time: 0.95s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9955 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0028 - Valid MAE: 0.0048
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 175 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9990 - Valid R2: 0.9964 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0053 - Valid MAE: 0.0040
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 176 - Training time: 1.96s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9946 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0038 - Valid MAE: 0.0053
+No improvement, in the last 12 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 177 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9987 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0060 - Valid MAE: 0.0030
+No improvement, in the last 13 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 178 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9956 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0027 - Valid MAE: 0.0049
+No improvement, in the last 14 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 179 - Training time: 1.90s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9957 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0047
+No improvement, in the last 15 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 180 - Training time: 1.52s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9990 - Valid R2: 0.9965 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0054 - Valid MAE: 0.0041
+No improvement, in the last 16 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 181 - Training time: 1.76s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0027 - Valid MAE: 0.0022
+New Model Saved (New Best:0.0000)
+
+Epoch 182 - Training time: 1.56s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0043 - Valid MAE: 0.0030
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 183 - Training time: 1.02s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9943 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0056
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 184 - Training time: 1.69s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9914 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0060 - Valid MAE: 0.0070
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 185 - Training time: 1.61s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9961 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0044
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 186 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0021
+New Model Saved (New Best:0.0000)
+
+Epoch 187 - Training time: 2.15s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0023
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 188 - Training time: 1.50s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0025 - Valid MAE: 0.0038
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 189 - Training time: 1.55s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9987 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0062 - Valid MAE: 0.0042
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 190 - Training time: 1.71s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0046 - Valid MAE: 0.0040
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 191 - Training time: 1.57s - Train loss: 0.0002 - Valid loss: 0.0001 - Train R2: 0.9945 - Valid R2: 0.9788 - Train MSE: 0.0002 - Valid MSE: 0.0001 - Train MAE: 0.0130 - Valid MAE: 0.0113
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 192 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9987 - Valid R2: 0.9955 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0059 - Valid MAE: 0.0047
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 193 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0024
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 194 - Training time: 1.90s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9939 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0036 - Valid MAE: 0.0057
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 195 - Training time: 1.80s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9986 - Valid R2: 0.9952 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0064 - Valid MAE: 0.0049
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 196 - Training time: 1.36s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0023
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 197 - Training time: 1.59s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9957 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0047
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 198 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9987 - Valid R2: 0.9839 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0061 - Valid MAE: 0.0098
+No improvement, in the last 12 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 199 - Training time: 1.23s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9982 - Valid R2: 0.9837 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0073 - Valid MAE: 0.0097
+No improvement, in the last 13 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 200 - Training time: 1.59s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0028
+No improvement, in the last 14 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 201 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9955 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0048
+No improvement, in the last 15 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 202 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9889 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0059 - Valid MAE: 0.0081
+No improvement, in the last 16 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 203 - Training time: 1.19s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9975 - Valid R2: 0.9866 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0086 - Valid MAE: 0.0089
+No improvement, in the last 17 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 204 - Training time: 1.20s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9979 - Valid R2: 0.9778 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0078 - Valid MAE: 0.0116
+No improvement, in the last 18 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 205 - Training time: 1.22s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9982 - Valid R2: 0.9816 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0072 - Valid MAE: 0.0105
+No improvement, in the last 19 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 206 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0031
+No improvement, in the last 20 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 207 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0026
+No improvement, in the last 21 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 208 - Training time: 1.69s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0046 - Valid MAE: 0.0023
+No improvement, in the last 22 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 209 - Training time: 1.28s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9959 - Valid R2: 0.9885 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0113 - Valid MAE: 0.0081
+No improvement, in the last 23 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 210 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0039
+No improvement, in the last 24 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 211 - Training time: 1.72s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0025
+No improvement, in the last 25 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 212 - Training time: 1.74s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0020
+New Model Saved (New Best:0.0000)
+
+Epoch 213 - Training time: 2.14s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9986 - Valid R2: 0.9917 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0064 - Valid MAE: 0.0069
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 214 - Training time: 1.62s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0033
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 215 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0039
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 216 - Training time: 1.32s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9976 - Valid R2: 0.9871 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0082 - Valid MAE: 0.0084
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 217 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9961 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0044
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 218 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9880 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0059 - Valid MAE: 0.0084
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 219 - Training time: 1.47s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9971 - Valid R2: 0.9736 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0092 - Valid MAE: 0.0128
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0002)
+
+Epoch 220 - Training time: 1.68s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0040 - Valid MAE: 0.0046
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 221 - Training time: 1.68s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0025
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 222 - Training time: 1.15s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9971 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0037
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 223 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9994 - Valid R2: 0.9915 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0039 - Valid MAE: 0.0069
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 224 - Training time: 1.41s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0048 - Valid MAE: 0.0026
+No improvement, in the last 12 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 225 - Training time: 0.98s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0039 - Valid MAE: 0.0029
+No improvement, in the last 13 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 226 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0040
+No improvement, in the last 14 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 227 - Training time: 1.48s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0034 - Valid MAE: 0.0022
+No improvement, in the last 15 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 228 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9972 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0037
+No improvement, in the last 16 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 229 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0024
+No improvement, in the last 17 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 230 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0032
+No improvement, in the last 18 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 231 - Training time: 1.21s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9965 - Valid R2: 0.9897 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0103 - Valid MAE: 0.0077
+No improvement, in the last 19 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 232 - Training time: 1.23s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9984 - Valid R2: 0.9844 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0069 - Valid MAE: 0.0097
+No improvement, in the last 20 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 233 - Training time: 1.63s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9992 - Valid R2: 0.9909 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0047 - Valid MAE: 0.0073
+No improvement, in the last 21 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 234 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9991 - Valid R2: 0.9899 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0051 - Valid MAE: 0.0077
+No improvement, in the last 22 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 235 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0031
+No improvement, in the last 23 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 236 - Training time: 1.35s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0039
+No improvement, in the last 24 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 237 - Training time: 1.23s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9954 - Valid R2: 0.9707 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0114 - Valid MAE: 0.0134
+No improvement, in the last 25 epoch(s), on the valid loss (Best:0.0000, Current:0.0002)
+
+Epoch 238 - Training time: 1.24s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9956 - Valid R2: 0.9809 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0116 - Valid MAE: 0.0105
+No improvement, in the last 26 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 239 - Training time: 0.91s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0026
+No improvement, in the last 27 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 240 - Training time: 1.47s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0023
+No improvement, in the last 28 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 241 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0028
+No improvement, in the last 29 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 242 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0029
+No improvement, in the last 30 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 243 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0028
+No improvement, in the last 31 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 244 - Training time: 1.04s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0040 - Valid MAE: 0.0047
+No improvement, in the last 32 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 245 - Training time: 1.29s - Train loss: 0.0001 - Valid loss: 0.0002 - Train R2: 0.9964 - Valid R2: 0.9713 - Train MSE: 0.0001 - Valid MSE: 0.0002 - Train MAE: 0.0105 - Valid MAE: 0.0134
+No improvement, in the last 33 epoch(s), on the valid loss (Best:0.0000, Current:0.0002)
+
+Epoch 246 - Training time: 1.57s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9972 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0037
+No improvement, in the last 34 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 247 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0028
+No improvement, in the last 35 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 248 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9966 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0032 - Valid MAE: 0.0034
+No improvement, in the last 36 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 249 - Training time: 0.93s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9910 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0060 - Valid MAE: 0.0071
+No improvement, in the last 37 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 250 - Training time: 1.46s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0038
+No improvement, in the last 38 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 251 - Training time: 1.60s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0027 - Valid MAE: 0.0020
+No improvement, in the last 39 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 252 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0027
+No improvement, in the last 40 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 253 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0035 - Valid MAE: 0.0024
+No improvement, in the last 41 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 254 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9960 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0046 - Valid MAE: 0.0045
+No improvement, in the last 42 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 255 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9963 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0045
+No improvement, in the last 43 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 256 - Training time: 1.17s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9978 - Valid R2: 0.9853 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0082 - Valid MAE: 0.0094
+No improvement, in the last 44 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 257 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9991 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0049 - Valid MAE: 0.0027
+No improvement, in the last 45 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 258 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0040
+No improvement, in the last 46 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 259 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0037
+No improvement, in the last 47 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 260 - Training time: 1.65s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0040 - Valid MAE: 0.0051
+No improvement, in the last 48 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 261 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0021
+No improvement, in the last 49 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 262 - Training time: 1.68s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0025
+No improvement, in the last 50 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 263 - Training time: 1.45s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9984 - Valid R2: 0.9831 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0066 - Valid MAE: 0.0101
+Epoch   263: reducing learning rate of group 0 to 1.6000e-02.
+Changing to Last Best Model
+No improvement, in the last 51 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 264 - Training time: 1.61s - Train loss: 0.0007 - Valid loss: 0.0007 - Train R2: 0.9780 - Valid R2: 0.8677 - Train MSE: 0.0007 - Valid MSE: 0.0009 - Train MAE: 0.0205 - Valid MAE: 0.0234
+No improvement, in the last 52 epoch(s), on the valid loss (Best:0.0000, Current:0.0007)
+
+Epoch 265 - Training time: 1.23s - Train loss: 0.0001 - Valid loss: 0.0005 - Train R2: 0.9977 - Valid R2: 0.9359 - Train MSE: 0.0001 - Valid MSE: 0.0004 - Train MAE: 0.0069 - Valid MAE: 0.0171
+No improvement, in the last 53 epoch(s), on the valid loss (Best:0.0000, Current:0.0005)
+
+Epoch 266 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9994 - Valid R2: 0.9801 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0036 - Valid MAE: 0.0097
+No improvement, in the last 54 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 267 - Training time: 1.61s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9992 - Valid R2: 0.9889 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0043 - Valid MAE: 0.0074
+No improvement, in the last 55 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 268 - Training time: 1.80s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9996 - Valid R2: 0.9868 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0025 - Valid MAE: 0.0079
+No improvement, in the last 56 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 269 - Training time: 1.76s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9946 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0051
+No improvement, in the last 57 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 270 - Training time: 1.64s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9951 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0048
+No improvement, in the last 58 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 271 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9946 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0050
+No improvement, in the last 59 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 272 - Training time: 1.69s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9934 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0056
+No improvement, in the last 60 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 273 - Training time: 1.57s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0029 - Valid MAE: 0.0035
+No improvement, in the last 61 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 274 - Training time: 1.61s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0047
+No improvement, in the last 62 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 275 - Training time: 1.82s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9967 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0040
+No improvement, in the last 63 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 276 - Training time: 1.59s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0033
+No improvement, in the last 64 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 277 - Training time: 1.85s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0032
+No improvement, in the last 65 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 278 - Training time: 1.40s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9972 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0036
+No improvement, in the last 66 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 279 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0030
+No improvement, in the last 67 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 280 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0031
+No improvement, in the last 68 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 281 - Training time: 1.52s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9974 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0035
+No improvement, in the last 69 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 282 - Training time: 1.58s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0026
+No improvement, in the last 70 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 283 - Training time: 1.46s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0029
+No improvement, in the last 71 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 284 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9950 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0051
+No improvement, in the last 72 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 285 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0033
+No improvement, in the last 73 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 286 - Training time: 1.44s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0024
+No improvement, in the last 74 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 287 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0024
+No improvement, in the last 75 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 288 - Training time: 1.84s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0031
+No improvement, in the last 76 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 289 - Training time: 1.82s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0033
+No improvement, in the last 77 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 290 - Training time: 1.78s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0036
+No improvement, in the last 78 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 291 - Training time: 1.80s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0032
+No improvement, in the last 79 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 292 - Training time: 1.77s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0033
+No improvement, in the last 80 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 293 - Training time: 1.77s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0023
+No improvement, in the last 81 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 294 - Training time: 2.17s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0029
+No improvement, in the last 82 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 295 - Training time: 1.68s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0019
+New Model Saved (New Best:0.0000)
+
+Epoch 296 - Training time: 2.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0026
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 297 - Training time: 1.96s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0020
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 298 - Training time: 1.83s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0020
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 299 - Training time: 2.08s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0019
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 300 - Training time: 1.78s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0023
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 301 - Training time: 1.61s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0024 - Valid MAE: 0.0019
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 302 - Training time: 1.69s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0027
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 303 - Training time: 1.73s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0017
+New Model Saved (New Best:0.0000)
+
+Epoch 304 - Training time: 2.67s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0032
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 305 - Training time: 2.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0018
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 306 - Training time: 1.72s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0023
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 307 - Training time: 1.68s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0021
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 308 - Training time: 1.97s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0020
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 309 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0027
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 310 - Training time: 2.06s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0026
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 311 - Training time: 2.03s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0035
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 312 - Training time: 1.67s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9937 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0044 - Valid MAE: 0.0060
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 313 - Training time: 1.76s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0030
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 314 - Training time: 1.71s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0020
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 315 - Training time: 1.55s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0028
+No improvement, in the last 12 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 316 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0022
+No improvement, in the last 13 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 317 - Training time: 1.65s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0029
+No improvement, in the last 14 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 318 - Training time: 1.70s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0027
+No improvement, in the last 15 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 319 - Training time: 1.68s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0018
+No improvement, in the last 16 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 320 - Training time: 2.11s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9993 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0017
+New Model Saved (New Best:0.0000)
+
+Epoch 321 - Training time: 2.37s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0032
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 322 - Training time: 1.76s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0025
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 323 - Training time: 1.65s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0031
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 324 - Training time: 1.71s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0031
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 325 - Training time: 1.71s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0023
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 326 - Training time: 1.49s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9975 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0037
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 327 - Training time: 1.51s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0025
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 328 - Training time: 1.67s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0024 - Valid MAE: 0.0019
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 329 - Training time: 1.33s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0018
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 330 - Training time: 1.66s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0028
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 331 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0046 - Valid MAE: 0.0038
+No improvement, in the last 11 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 332 - Training time: 1.39s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0027
+No improvement, in the last 12 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 333 - Training time: 1.48s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0026
+No improvement, in the last 13 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 334 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0017
+No improvement, in the last 14 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 335 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0017
+No improvement, in the last 15 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 336 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0019
+No improvement, in the last 16 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 337 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0025
+No improvement, in the last 17 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 338 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0017
+No improvement, in the last 18 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 339 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0024 - Valid MAE: 0.0019
+No improvement, in the last 19 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 340 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0030
+No improvement, in the last 20 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 341 - Training time: 1.81s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9967 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0048 - Valid MAE: 0.0036
+No improvement, in the last 21 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 342 - Training time: 1.89s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0031
+No improvement, in the last 22 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 343 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0034
+No improvement, in the last 23 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 344 - Training time: 1.67s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0024
+No improvement, in the last 24 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 345 - Training time: 1.74s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0027
+No improvement, in the last 25 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 346 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0033
+No improvement, in the last 26 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 347 - Training time: 1.51s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9950 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0036 - Valid MAE: 0.0053
+No improvement, in the last 27 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 348 - Training time: 1.50s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0022
+No improvement, in the last 28 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 349 - Training time: 1.48s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0034
+No improvement, in the last 29 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 350 - Training time: 1.60s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0022
+No improvement, in the last 30 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 351 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9944 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0031 - Valid MAE: 0.0056
+No improvement, in the last 31 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 352 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0028
+No improvement, in the last 32 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 353 - Training time: 1.44s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9984 - Valid R2: 0.9878 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0070 - Valid MAE: 0.0084
+No improvement, in the last 33 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 354 - Training time: 1.76s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9937 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0056
+No improvement, in the last 34 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 355 - Training time: 1.39s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9931 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0043 - Valid MAE: 0.0061
+No improvement, in the last 35 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 356 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0038
+No improvement, in the last 36 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 357 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0038 - Valid MAE: 0.0030
+No improvement, in the last 37 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 358 - Training time: 1.44s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0034 - Valid MAE: 0.0024
+No improvement, in the last 38 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 359 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9956 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0046
+No improvement, in the last 39 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 360 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0025
+No improvement, in the last 40 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 361 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0021
+No improvement, in the last 41 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 362 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0019
+No improvement, in the last 42 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 363 - Training time: 1.03s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0039 - Valid MAE: 0.0042
+No improvement, in the last 43 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 364 - Training time: 1.57s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9966 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0040
+No improvement, in the last 44 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 365 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0020
+No improvement, in the last 45 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 366 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9988 - Valid R2: 0.9944 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0059 - Valid MAE: 0.0056
+No improvement, in the last 46 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 367 - Training time: 1.47s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0028
+No improvement, in the last 47 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 368 - Training time: 1.57s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0028
+No improvement, in the last 48 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 369 - Training time: 1.48s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9988 - Valid R2: 0.9929 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0060 - Valid MAE: 0.0064
+No improvement, in the last 49 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 370 - Training time: 1.77s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9979 - Valid R2: 0.9905 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0080 - Valid MAE: 0.0073
+No improvement, in the last 50 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 371 - Training time: 1.36s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9948 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0037 - Valid MAE: 0.0054
+Epoch   371: reducing learning rate of group 0 to 1.2800e-02.
+Changing to Last Best Model
+No improvement, in the last 51 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 372 - Training time: 1.27s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9965 - Valid R2: 0.9850 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0101 - Valid MAE: 0.0072
+No improvement, in the last 52 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 373 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9942 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0053
+No improvement, in the last 53 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 374 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9975 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0034
+No improvement, in the last 54 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 375 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0033
+No improvement, in the last 55 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 376 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0027
+No improvement, in the last 56 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 377 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0027 - Valid MAE: 0.0022
+No improvement, in the last 57 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 378 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9975 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0034
+No improvement, in the last 58 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 379 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0025
+No improvement, in the last 59 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 380 - Training time: 1.13s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0026
+No improvement, in the last 60 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 381 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0024
+No improvement, in the last 61 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 382 - Training time: 1.50s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0028
+No improvement, in the last 62 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 383 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0027 - Valid MAE: 0.0024
+No improvement, in the last 63 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 384 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0021
+No improvement, in the last 64 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 385 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0025
+No improvement, in the last 65 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 386 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0018
+No improvement, in the last 66 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 387 - Training time: 1.63s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0023
+No improvement, in the last 67 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 388 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0020
+No improvement, in the last 68 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 389 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0025 - Valid MAE: 0.0040
+No improvement, in the last 69 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 390 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0026
+No improvement, in the last 70 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 391 - Training time: 0.83s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0030
+No improvement, in the last 71 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 392 - Training time: 0.89s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9974 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0036
+No improvement, in the last 72 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 393 - Training time: 1.51s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0021
+No improvement, in the last 73 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 394 - Training time: 1.85s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0021
+No improvement, in the last 74 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 395 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0024
+No improvement, in the last 75 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 396 - Training time: 1.83s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9987 - Valid R2: 0.9937 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0059 - Valid MAE: 0.0056
+No improvement, in the last 76 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 397 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0024
+No improvement, in the last 77 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 398 - Training time: 1.13s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0018
+No improvement, in the last 78 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 399 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9958 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0041 - Valid MAE: 0.0048
+No improvement, in the last 79 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 400 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0024
+No improvement, in the last 80 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 401 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0022
+No improvement, in the last 81 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 402 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9950 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0053
+No improvement, in the last 82 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 403 - Training time: 1.31s - Train loss: 0.0001 - Valid loss: 0.0000 - Train R2: 0.9978 - Valid R2: 0.9921 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0083 - Valid MAE: 0.0064
+No improvement, in the last 83 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 404 - Training time: 0.94s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9991 - Valid R2: 0.9881 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0047 - Valid MAE: 0.0083
+No improvement, in the last 84 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 405 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0028
+No improvement, in the last 85 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 406 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0036
+No improvement, in the last 86 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 407 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0022
+No improvement, in the last 87 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 408 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9945 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0028 - Valid MAE: 0.0054
+No improvement, in the last 88 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 409 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9937 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0036 - Valid MAE: 0.0060
+No improvement, in the last 89 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 410 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0027
+No improvement, in the last 90 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 411 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9988 - Valid R2: 0.9932 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0058 - Valid MAE: 0.0059
+No improvement, in the last 91 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 412 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0022
+No improvement, in the last 92 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 413 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9951 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0052
+No improvement, in the last 93 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 414 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0019
+No improvement, in the last 94 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 415 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0026
+No improvement, in the last 95 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 416 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0039
+No improvement, in the last 96 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 417 - Training time: 1.06s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9978 - Valid R2: 0.9822 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0082 - Valid MAE: 0.0103
+No improvement, in the last 97 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 418 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0020
+No improvement, in the last 98 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 419 - Training time: 1.31s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0022
+No improvement, in the last 99 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 420 - Training time: 1.76s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0021
+No improvement, in the last 100 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 421 - Training time: 1.37s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9960 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0035 - Valid MAE: 0.0042
+No improvement, in the last 101 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 422 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0021
+Epoch   422: reducing learning rate of group 0 to 1.0240e-02.
+Changing to Last Best Model
+No improvement, in the last 102 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 423 - Training time: 1.10s - Train loss: 0.0001 - Valid loss: 0.0001 - Train R2: 0.9975 - Valid R2: 0.9846 - Train MSE: 0.0001 - Valid MSE: 0.0001 - Train MAE: 0.0075 - Valid MAE: 0.0072
+No improvement, in the last 103 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 424 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9961 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0043
+No improvement, in the last 104 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 425 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0033
+No improvement, in the last 105 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 426 - Training time: 0.86s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9970 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0038
+No improvement, in the last 106 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 427 - Training time: 1.14s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9952 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0049
+No improvement, in the last 107 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 428 - Training time: 1.46s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0031
+No improvement, in the last 108 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 429 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0029
+No improvement, in the last 109 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 430 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9936 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0040 - Valid MAE: 0.0058
+No improvement, in the last 110 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 431 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0037 - Valid MAE: 0.0026
+No improvement, in the last 111 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 432 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0032
+No improvement, in the last 112 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 433 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9966 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0025 - Valid MAE: 0.0042
+No improvement, in the last 113 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 434 - Training time: 0.94s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0035
+No improvement, in the last 114 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 435 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0029
+No improvement, in the last 115 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 436 - Training time: 1.39s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9959 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0034 - Valid MAE: 0.0047
+No improvement, in the last 116 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 437 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9993 - Valid R2: 0.9932 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0043 - Valid MAE: 0.0062
+No improvement, in the last 117 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 438 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0022
+No improvement, in the last 118 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 439 - Training time: 1.33s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0024
+No improvement, in the last 119 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 440 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0027
+No improvement, in the last 120 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 441 - Training time: 1.56s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0024
+No improvement, in the last 121 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 442 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0031
+No improvement, in the last 122 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 443 - Training time: 1.74s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9967 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0037 - Valid MAE: 0.0039
+No improvement, in the last 123 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 444 - Training time: 1.35s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9964 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0044
+No improvement, in the last 124 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 445 - Training time: 1.50s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9961 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0025 - Valid MAE: 0.0044
+No improvement, in the last 125 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 446 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0021
+No improvement, in the last 126 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 447 - Training time: 1.37s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0020
+No improvement, in the last 127 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 448 - Training time: 1.44s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9965 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0046 - Valid MAE: 0.0040
+No improvement, in the last 128 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 449 - Training time: 1.36s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0026
+No improvement, in the last 129 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 450 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9944 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0038 - Valid MAE: 0.0055
+No improvement, in the last 130 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 451 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9975 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0042 - Valid MAE: 0.0030
+No improvement, in the last 131 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 452 - Training time: 1.48s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0039
+No improvement, in the last 132 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 453 - Training time: 1.41s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9988 - Valid R2: 0.9918 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0057 - Valid MAE: 0.0068
+No improvement, in the last 133 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 454 - Training time: 1.64s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0030
+No improvement, in the last 134 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 455 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0020
+No improvement, in the last 135 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 456 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0031
+No improvement, in the last 136 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 457 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0029
+No improvement, in the last 137 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 458 - Training time: 1.10s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0024
+No improvement, in the last 138 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 459 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0041
+No improvement, in the last 139 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 460 - Training time: 2.15s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0032 - Valid MAE: 0.0021
+No improvement, in the last 140 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 461 - Training time: 1.97s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0020
+No improvement, in the last 141 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 462 - Training time: 1.63s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9989 - Valid R2: 0.9899 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0057 - Valid MAE: 0.0078
+No improvement, in the last 142 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 463 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0034
+No improvement, in the last 143 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 464 - Training time: 1.54s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9995 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0039 - Valid MAE: 0.0027
+No improvement, in the last 144 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 465 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9967 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0025 - Valid MAE: 0.0042
+No improvement, in the last 145 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 466 - Training time: 1.41s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0020
+No improvement, in the last 146 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 467 - Training time: 1.64s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0019
+No improvement, in the last 147 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 468 - Training time: 1.58s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9992 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0046 - Valid MAE: 0.0032
+No improvement, in the last 148 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 469 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9991 - Valid R2: 0.9943 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0050 - Valid MAE: 0.0057
+No improvement, in the last 149 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 470 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0018
+No improvement, in the last 150 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 471 - Training time: 1.73s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0028
+No improvement, in the last 151 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 472 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9967 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0042
+No improvement, in the last 152 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 473 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0028
+Epoch   473: reducing learning rate of group 0 to 8.1920e-03.
+Changing to Last Best Model
+No improvement, in the last 153 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 474 - Training time: 0.99s - Train loss: 0.0000 - Valid loss: 0.0002 - Train R2: 0.9985 - Valid R2: 0.9676 - Train MSE: 0.0000 - Valid MSE: 0.0002 - Train MAE: 0.0054 - Valid MAE: 0.0133
+No improvement, in the last 154 epoch(s), on the valid loss (Best:0.0000, Current:0.0002)
+
+Epoch 475 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9994 - Valid R2: 0.9877 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0038 - Valid MAE: 0.0080
+No improvement, in the last 155 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 476 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0031
+No improvement, in the last 156 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 477 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0028
+No improvement, in the last 157 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 478 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0025
+No improvement, in the last 158 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 479 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0029
+No improvement, in the last 159 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 480 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9957 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0047
+No improvement, in the last 160 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 481 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0024
+No improvement, in the last 161 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 482 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0030
+No improvement, in the last 162 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 483 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0022
+No improvement, in the last 163 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 484 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0025
+No improvement, in the last 164 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 485 - Training time: 1.38s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0020
+No improvement, in the last 165 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 486 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0037
+No improvement, in the last 166 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 487 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0041
+No improvement, in the last 167 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 488 - Training time: 1.17s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0022
+No improvement, in the last 168 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 489 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0021
+No improvement, in the last 169 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 490 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0030
+No improvement, in the last 170 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 491 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0021
+No improvement, in the last 171 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 492 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0040
+No improvement, in the last 172 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 493 - Training time: 1.34s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0030 - Valid MAE: 0.0025
+No improvement, in the last 173 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 494 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0023
+No improvement, in the last 174 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 495 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0027
+No improvement, in the last 175 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 496 - Training time: 1.36s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9954 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0032 - Valid MAE: 0.0051
+No improvement, in the last 176 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 497 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0030
+No improvement, in the last 177 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 498 - Training time: 1.45s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0032 - Valid MAE: 0.0026
+No improvement, in the last 178 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 499 - Training time: 1.46s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9979 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0032
+No improvement, in the last 179 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 500 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9969 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0022 - Valid MAE: 0.0039
+No improvement, in the last 180 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 501 - Training time: 1.09s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0027
+No improvement, in the last 181 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 502 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9997 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0026 - Valid MAE: 0.0023
+No improvement, in the last 182 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 503 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0027
+No improvement, in the last 183 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 504 - Training time: 0.85s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9948 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0033 - Valid MAE: 0.0054
+No improvement, in the last 184 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 505 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0024
+No improvement, in the last 185 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 506 - Training time: 1.13s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0030
+No improvement, in the last 186 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 507 - Training time: 1.13s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0030
+No improvement, in the last 187 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 508 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0020
+No improvement, in the last 188 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 509 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0022
+No improvement, in the last 189 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 510 - Training time: 1.50s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0026
+No improvement, in the last 190 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 511 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0024
+No improvement, in the last 191 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 512 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0020
+No improvement, in the last 192 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 513 - Training time: 1.04s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0023 - Valid MAE: 0.0018
+No improvement, in the last 193 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 514 - Training time: 1.17s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0030
+No improvement, in the last 194 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 515 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9989 - Valid R2: 0.9948 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0055 - Valid MAE: 0.0049
+No improvement, in the last 195 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 516 - Training time: 1.52s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0022
+No improvement, in the last 196 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 517 - Training time: 1.14s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0020
+No improvement, in the last 197 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 518 - Training time: 1.29s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0024
+No improvement, in the last 198 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 519 - Training time: 1.42s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9960 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0034 - Valid MAE: 0.0047
+No improvement, in the last 199 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 520 - Training time: 1.36s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0025
+No improvement, in the last 200 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 521 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9994 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0039 - Valid MAE: 0.0032
+No improvement, in the last 201 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 522 - Training time: 1.32s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0019 - Valid MAE: 0.0026
+No improvement, in the last 202 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 523 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0020
+No improvement, in the last 203 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 524 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9945 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0029 - Valid MAE: 0.0055
+Epoch   524: reducing learning rate of group 0 to 6.5536e-03.
+Changing to Last Best Model
+No improvement, in the last 204 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 525 - Training time: 1.33s - Train loss: 0.0002 - Valid loss: 0.0002 - Train R2: 0.9939 - Valid R2: 0.9612 - Train MSE: 0.0002 - Valid MSE: 0.0003 - Train MAE: 0.0115 - Valid MAE: 0.0138
+No improvement, in the last 205 epoch(s), on the valid loss (Best:0.0000, Current:0.0002)
+
+Epoch 526 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9989 - Valid R2: 0.9934 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0051 - Valid MAE: 0.0055
+No improvement, in the last 206 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 527 - Training time: 1.44s - Train loss: 0.0000 - Valid loss: 0.0001 - Train R2: 0.9995 - Valid R2: 0.9915 - Train MSE: 0.0000 - Valid MSE: 0.0001 - Train MAE: 0.0034 - Valid MAE: 0.0067
+No improvement, in the last 207 epoch(s), on the valid loss (Best:0.0000, Current:0.0001)
+
+Epoch 528 - Training time: 1.53s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9968 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0021 - Valid MAE: 0.0038
+No improvement, in the last 208 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 529 - Training time: 1.47s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9976 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0018 - Valid MAE: 0.0034
+No improvement, in the last 209 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 530 - Training time: 1.50s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9980 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0031
+No improvement, in the last 210 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 531 - Training time: 1.86s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9973 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0036
+No improvement, in the last 211 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 532 - Training time: 1.56s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0025
+No improvement, in the last 212 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 533 - Training time: 1.56s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9981 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0030
+No improvement, in the last 213 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 534 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0028
+No improvement, in the last 214 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 535 - Training time: 1.28s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9978 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0033
+No improvement, in the last 215 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 536 - Training time: 1.36s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9983 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0029
+No improvement, in the last 216 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 537 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0026
+No improvement, in the last 217 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 538 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0029
+No improvement, in the last 218 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 539 - Training time: 1.25s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0026
+No improvement, in the last 219 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 540 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0028
+No improvement, in the last 220 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 541 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0027
+No improvement, in the last 221 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 542 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9984 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0028
+No improvement, in the last 222 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 543 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0034
+No improvement, in the last 223 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 544 - Training time: 1.33s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0021
+No improvement, in the last 224 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 545 - Training time: 1.14s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0020
+No improvement, in the last 225 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 546 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9974 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0037
+No improvement, in the last 226 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 547 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9996 - Valid R2: 0.9986 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0032 - Valid MAE: 0.0022
+No improvement, in the last 227 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 548 - Training time: 1.18s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9993 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0017
+No improvement, in the last 228 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 549 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0016 - Valid MAE: 0.0021
+No improvement, in the last 229 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 550 - Training time: 1.30s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0020
+No improvement, in the last 230 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 551 - Training time: 0.92s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0011 - Valid MAE: 0.0024
+No improvement, in the last 231 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 552 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9977 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0034
+No improvement, in the last 232 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 553 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9993 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0017
+No improvement, in the last 233 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 554 - Training time: 1.35s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0021
+No improvement, in the last 234 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 555 - Training time: 1.19s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9982 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0030
+No improvement, in the last 235 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 556 - Training time: 1.27s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9993 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0016
+New Model Saved (New Best:0.0000)
+
+Epoch 557 - Training time: 1.37s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0014 - Valid MAE: 0.0017
+No improvement, in the last 1 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 558 - Training time: 1.21s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0013 - Valid MAE: 0.0018
+No improvement, in the last 2 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 559 - Training time: 1.26s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0017
+No improvement, in the last 3 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 560 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9991 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0020
+No improvement, in the last 4 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 561 - Training time: 1.22s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9992 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0017
+No improvement, in the last 5 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 562 - Training time: 1.23s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9985 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0012 - Valid MAE: 0.0028
+No improvement, in the last 6 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 563 - Training time: 1.20s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9989 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0019
+No improvement, in the last 7 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 564 - Training time: 1.24s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9990 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0015 - Valid MAE: 0.0019
+No improvement, in the last 8 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 565 - Training time: 1.43s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9999 - Valid R2: 0.9987 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0017 - Valid MAE: 0.0024
+No improvement, in the last 9 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
+Epoch 566 - Training time: 1.15s - Train loss: 0.0000 - Valid loss: 0.0000 - Train R2: 0.9998 - Valid R2: 0.9988 - Train MSE: 0.0000 - Valid MSE: 0.0000 - Train MAE: 0.0020 - Valid MAE: 0.0020
+No improvement, in the last 10 epoch(s), on the valid loss (Best:0.0000, Current:0.0000)
+
