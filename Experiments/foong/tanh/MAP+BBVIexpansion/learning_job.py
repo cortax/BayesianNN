@@ -11,7 +11,7 @@ rootdir = rootdir.split('BayesianNN')[0]+'BayesianNN/'
 print(rootdir)
 sys.path.append( rootdir )
 
-cwd = rootdir + 'Experiments/foong/tanh/BBVI/'
+cwd = rootdir + 'Experiments/foong/tanh/BBVI+BBVIexpansion/'
 print(cwd)
 
 from Inference import BBVI 
