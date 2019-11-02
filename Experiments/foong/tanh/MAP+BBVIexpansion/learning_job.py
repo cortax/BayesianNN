@@ -11,7 +11,7 @@ rootdir = rootdir.split('BayesianNN')[0]+'BayesianNN/'
 print(rootdir)
 sys.path.append( rootdir )
 
-cwd = rootdir + 'Experiments/foong/tanh/BBVI+BBVIexpansion/'
+cwd = rootdir + 'Experiments/foong/tanh/MAP+BBVI/'
 print(cwd)
 
 from Inference import BBVI 
@@ -19,20 +19,23 @@ import _pickle as pickle
 import torch
 import time 
 
-def train_model(layer_width, nb_layers, activation, seed):
+def train_model(layer_width, nb_layers, activation, seed, Net):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
+    
+    Net.set_device(device)
+    
     data = torch.load(rootdir + 'Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
     y_data = y_data.unsqueeze(-1)
+    
+    print(Net.compute_elbo(x_data, y_data, n_samples_ELBO=1000, sigma_noise=0.1, device=device).detach().cpu().numpy())
 
     optimizer = torch.optim.Adam
     optimizer_params = {'lr': 0.1}
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
     scheduler_params = {'patience': 5, 'factor': 0.8}
-
-    Net = BBVI.VariationalNetwork(input_size=1, output_size=1, layer_width=layer_width, nb_layers=nb_layers, activation=activation, device=device)
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
     Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=75, verbose=1)
@@ -66,8 +69,16 @@ if __name__ == "__main__":
     print(pathname)
 
     if not os.path.exists(pathname+filename): 
+        filehandler = open(rootdir + 'Experiments/foong/tanh/MAP/models/' + filename, 'rb')
+        netparam = pickle.load(filehandler)
+        Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
+                              output_size=netparam['output_size'],
+                              layer_width=netparam['layer_width'],
+                              nb_layers=netparam['nb_layers'])
+        Net.set_network(netparam)
+        
         start_time = time.time() 
-        Net, training_infos = train_model(W, L, activation, j)
+        Net, training_infos = train_model(W, L, activation, j, Net)
         training_time = time.time() - start_time 
 
         filehandler = open(pathname+filename, 'wb') 
