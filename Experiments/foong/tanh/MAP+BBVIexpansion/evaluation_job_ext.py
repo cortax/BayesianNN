@@ -11,6 +11,8 @@ from Inference import BBVI
 import _pickle as pickle
 import torch
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 def plot(model, model_name):
     device = model.device
@@ -38,6 +40,8 @@ def plot(model, model_name):
     INFOS = [ELL_train, ELL_val, ELL_test, ELBO_train, ELBO_val, ELBO_test]
     
     y_real = torch.cos(4.0 * (x_linspace + 0.2))
+
+    print('plotting...')
     
     fig = plt.figure() 
 #    plt.title(model_name)
@@ -90,13 +94,16 @@ if __name__ == "__main__":
 
     activation = torch.tanh
 
-    layer_size = [10,25,50,100]
-    nb_layer = [2,3,4]
-    nb_trial = 30
+    with open('job_parameters_array_ext', 'r') as f:
+            lines = f.read().splitlines()
+            
+    idx = int(sys.argv[1])
     
-#    layer_size = [100]
-#    nb_layer = [2]
-
+    args = lines[idx].split(';')
+    L = int(args[0])
+    W = int(args[1])
+    j = int(args[2])
+    
     data = torch.load(rootdir + '/Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
@@ -114,47 +121,52 @@ if __name__ == "__main__":
 
     x_linspace = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
 
-    for L in nb_layer:
-        for W in layer_size:
-#           for j in [20]:
-            for j in range(nb_trial):
-                Net_name = str(L) + 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
-                filename = cwd + '/models/' + Net_name
+    Net_name = str(L) + 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
+    filename = cwd + '/models/' + Net_name
 
-                try:
-                    filehandler = open(filename, 'rb')
-                except FileNotFoundError:
-                    continue
+    try:
+        filehandler = open(filename, 'rb')
+    except FileNotFoundError:
+        print('no model found')
+        sys.exit()
 
-                netparam = pickle.load(filehandler)
-                Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
-                                        output_size=netparam['output_size'],
-                                        layer_width=netparam['layer_width'],
-                                        nb_layers=netparam['nb_layers'])
-                Net.set_network(netparam)
-                Net.set_device(device)
+    print(cwd + '/plots/' + Net_name + '.png')
+    if os.path.exists(cwd + '/plots/' + Net_name + '.png'):
+        print('plot exists')
+        sys.exit()
 
-                data = torch.load(rootdir + '/Data/foong_data.pt')
-                x_data = data[0].to(device)
-                y_data = data[1].to(device)
-                y_data = y_data.unsqueeze(-1)
+    print('loading network')
+    netparam = pickle.load(filehandler)
+    Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
+                            output_size=netparam['output_size'],
+                            layer_width=netparam['layer_width'],
+                            nb_layers=netparam['nb_layers'])
+    Net.set_network(netparam)
+    Net.set_device(device)
 
-                data = torch.load(rootdir +'/Data/foong_data_validation.pt')
-                x_data_validation = data[0].to(device)
-                y_data_validation = data[1].to(device)
-                y_data_validation = y_data_validation.unsqueeze(-1)
+    data = torch.load(rootdir + '/Data/foong_data.pt')
+    x_data = data[0].to(device)
+    y_data = data[1].to(device)
+    y_data = y_data.unsqueeze(-1)
 
-                data = torch.load(rootdir +'/Data/foong_data_test.pt')
-                x_data_test = data[0].to(device)
-                y_data_test = data[1].to(device)
-                y_data_test = y_data_test.unsqueeze(-1)
+    data = torch.load(rootdir +'/Data/foong_data_validation.pt')
+    x_data_validation = data[0].to(device)
+    y_data_validation = data[1].to(device)
+    y_data_validation = y_data_validation.unsqueeze(-1)
 
-                x_linspace = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+    data = torch.load(rootdir +'/Data/foong_data_test.pt')
+    x_data_test = data[0].to(device)
+    y_data_test = data[1].to(device)
+    y_data_test = y_data_test.unsqueeze(-1)
+
+    x_linspace = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+    
+    filehandler.close()
+    
+    print('data loaded')
+    INFOS = plot(Net, Net_name)
+    update_log(Net, Net_name, INFOS)
+
                 
-                filehandler.close()
-                
-                INFOS = plot(Net, Net_name)
-                update_log(Net, Net_name, INFOS)
 
-                
 

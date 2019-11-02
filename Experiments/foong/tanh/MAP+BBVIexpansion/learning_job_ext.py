@@ -48,7 +48,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.dirname(cwd+'models/'), exist_ok=True) 
     os.makedirs(os.path.dirname(cwd+'logs/'), exist_ok=True) 
 
-    with open('job_parameters_array', 'r') as f:
+    with open('job_parameters_array_ext', 'r') as f:
         lines = f.read().splitlines()
         
     idx = int(sys.argv[1])
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         start_time = time.time() 
         Net, training_infos = train_model(W, L, activation, j)
         training_time = time.time() - start_time 
-
+        
         filehandler = open(pathname+filename, 'wb') 
         netparam = Net.get_network()
         pickle.dump(netparam, filehandler)
