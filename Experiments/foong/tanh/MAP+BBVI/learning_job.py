@@ -83,6 +83,7 @@ if __name__ == "__main__":
         training_time = time.time() - start_time 
 
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        print(rootdir + 'Data/foong_data.pt')
         data = torch.load(rootdir + 'Data/foong_data.pt')
         x_data = data[0].to(device)
         y_data = data[1].to(device)
@@ -94,6 +95,17 @@ if __name__ == "__main__":
         filehandler = open(pathname+filename, 'wb') 
         netparam = Net.get_network()
         pickle.dump(netparam, filehandler)
+        filehandler.close()
+        
+        filehandler = open(filename, 'rb')
+        netparam = pickle.load(filehandler)
+        Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
+                                output_size=netparam['output_size'],
+                                layer_width=netparam['layer_width'],
+                                nb_layers=netparam['nb_layers'])
+        Net.set_network(netparam)
+        Net.set_device(device)
+        print(Net.compute_elbo(x_data, y_data, n_samples_ELBO=1000, sigma_noise=0.1, device=device).detach().cpu().numpy())
         filehandler.close()
 
         log = open(cwd + 'logs/' + filename + '.txt', 'w+')
