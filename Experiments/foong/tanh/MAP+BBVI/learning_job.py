@@ -97,7 +97,7 @@ if __name__ == "__main__":
         pickle.dump(netparam, filehandler)
         filehandler.close()
         
-        filehandler = open(filename, 'rb')
+        filehandler = open(pathname+filename, 'rb')
         netparam = pickle.load(filehandler)
         Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
                                 output_size=netparam['output_size'],
