@@ -11,7 +11,7 @@ rootdir = rootdir.split('BayesianNN')[0]+'BayesianNN/'
 print(rootdir)
 sys.path.append( rootdir )
 
-cwd = rootdir + 'Experiments/foong/tanh/MAP+BBVIexpansion/'
+cwd = rootdir + 'Experiments/foong/tanh/MAP+BBVI/'
 print(cwd)
 
 from Inference import BBVI 
@@ -24,7 +24,7 @@ def train_model(layer_width, nb_layers, activation, seed, Net):
     print(device)
     
     Net.set_device(device)
-    Net.requires_grad_mus(False)
+    #Net.requires_grad_mus(False)
     
     data = torch.load(rootdir + 'Data/foong_data.pt')
     x_data = data[0].to(device)
@@ -81,6 +81,8 @@ if __name__ == "__main__":
         start_time = time.time() 
         Net, training_infos = train_model(W, L, activation, j, Net)
         training_time = time.time() - start_time 
+        
+        print(Net.compute_elbo(x_data, y_data, n_samples_ELBO=1000, sigma_noise=0.1, device=device).detach().cpu().numpy())
 
         filehandler = open(pathname+filename, 'wb') 
         netparam = Net.get_network()
