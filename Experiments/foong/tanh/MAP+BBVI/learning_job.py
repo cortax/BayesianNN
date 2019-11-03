@@ -36,7 +36,7 @@ def train_model(layer_width, nb_layers, activation, seed, Net):
     optimizer = torch.optim.Adam
     optimizer_params = {'lr': 0.1}
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
-    scheduler_params = {'patience': 2, 'factor': 0.8}
+    scheduler_params = {'patience': 2, 'factor': 0.8, 'threshold': 1e-3, 'threshold_mode', 'abs'}
 
     voptimizer = BBVI.VariationalOptimizer(model=Net, sigma_noise=0.1, optimizer=optimizer, optimizer_params=optimizer_params, scheduler=scheduler, scheduler_params=scheduler_params, min_lr=0.00001)
     Net = voptimizer.run((x_data,y_data), n_epoch=100000, n_iter=150, seed=seed, n_ELBO_samples=75, verbose=1)
