@@ -19,3 +19,7 @@ Experiments/foong/tanh/BBVI/logs/
 Experiments/foong/tanh/BBVI/plots/
 
 Experiments/foong/tanh/MAP/plots/
+
+Experiments/foong/tanh/MAP\+BBVI/logs/
+
+Experiments/foong/tanh/MAP\+BBVI/models/
