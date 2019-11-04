@@ -64,6 +64,9 @@ class MixtureVariationalNetwork(nn.Module):
         return torch.logsumexp(torch.stack(log_prior) + torch.log(self.pi).unsqueeze(0).t(), dim=0)
            
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, new_component=None, new_proportion=None):
+        if new_component is None:
+            return self._compute_elbo(x_data, y_data, n_samples_ELBO, sigma_noise)
+        
         # sample X^(c)
         (layered_w_samples_XC, layered_bias_samples_XC) = self.sample_parameters(n_samples_ELBO)
 
@@ -93,7 +96,22 @@ class MixtureVariationalNetwork(nn.Module):
                 torch.log(new_proportion) + qN_log_XN],dim=0),dim=0)
 
         L = (torch.tensor(1.0, device=self.device)-new_proportion) * (posterior_XC.mean() - qCN_log_XC.mean()) + new_proportion * (posterior_XN.mean() - qCN_log_XN.mean()) 
-        #L = new_proportion*(posterior_XN.mean() - qCN_log_XN.mean())
+
+        return -L
+    
+    def _compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise):
+        # sample X^(c)
+        (layered_w_samples_XC, layered_bias_samples_XC) = self.sample_parameters(n_samples_ELBO)
+
+        LP_XC = self.prior_log_pdf(layered_w_samples_XC, layered_bias_samples_XC)
+        y_pred_XC = self.forward(x_data)
+        LL_XC = self._log_norm(y_pred_XC, y_data, torch.tensor(sigma_noise).to(self.device))
+        posterior_XC = LL_XC.sum(dim=[1,2]) + LP_XC
+
+        qC_log_XC = self.q_log_pdf(layered_w_samples_XC, layered_bias_samples_XC)
+
+        L = (posterior_XC.mean() - qC_log_XC.mean()) 
+        
         return -L
     
     def requires_grad_rhos(self, v = False):
