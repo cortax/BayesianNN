@@ -272,10 +272,10 @@ class VariationalNetwork(nn.Module):
             self.registered_layers[i].q_bias_mu = torch.nn.Parameter(self.registered_layers[i].q_bias_mu.to(device))
             self.registered_layers[i].q_bias_rho = torch.nn.Parameter(self.registered_layers[i].q_bias_rho.to(device))
 
-            self.registered_layers[i].prior_weight_mu = torch.nn.Parameter(self.registered_layers[i].prior_weight_mu.to(device))
-            self.registered_layers[i].prior_weight_rho = torch.nn.Parameter(self.registered_layers[i].prior_weight_rho.to(device))
-            self.registered_layers[i].prior_bias_mu = torch.nn.Parameter(self.registered_layers[i].prior_bias_mu.to(device))
-            self.registered_layers[i].prior_bias_rho = torch.nn.Parameter(self.registered_layers[i].prior_bias_rho.to(device))
+            self.registered_layers[i].prior_weight_mu = torch.nn.Parameter(self.registered_layers[i].prior_weight_mu.to(device), requires_grad=False)
+            self.registered_layers[i].prior_weight_rho = torch.nn.Parameter(self.registered_layers[i].prior_weight_rho.to(device), requires_grad=False)
+            self.registered_layers[i].prior_bias_mu = torch.nn.Parameter(self.registered_layers[i].prior_bias_mu.to(device), requires_grad=False)
+            self.registered_layers[i].prior_bias_rho = torch.nn.Parameter(self.registered_layers[i].prior_bias_rho.to(device), requires_grad=False)
 
 
 class VariationalOptimizer():

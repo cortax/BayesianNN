@@ -52,7 +52,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.dirname(cwd+'models/'), exist_ok=True) 
     os.makedirs(os.path.dirname(cwd+'logs/'), exist_ok=True) 
 
-    with open('job_parameters_array', 'r') as f:
+    with open('job_parameters_array_ext', 'r') as f:
         lines = f.read().splitlines()
         
     idx = int(sys.argv[1])

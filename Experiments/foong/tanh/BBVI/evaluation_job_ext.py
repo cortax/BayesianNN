@@ -11,14 +11,17 @@ from Inference import BBVI
 import _pickle as pickle
 import torch
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 def plot(model, model_name):
-        
-    y_train = model.forward(x_data)    
-        
-    y_validation = model.forward(x_data_validation)
+    device = model.device
 
-    y_test = model.forward(x_data_test)
+    model.sample_parameters(1000)
+    y_train = model.forward(x_data).to(device) 
+        
+    y_validation = model.forward(x_data_validation).to(device)
+    y_test = model.forward(x_data_test).to(device)
     
     ELL_train = model._log_norm(y_train, y_data, torch.tensor(0.1).to(device))
     ELL_train = ELL_train.sum(dim=[1,2]).mean().detach().cpu().numpy()
@@ -37,6 +40,8 @@ def plot(model, model_name):
     INFOS = [ELL_train, ELL_val, ELL_test, ELBO_train, ELBO_val, ELBO_test]
     
     y_real = torch.cos(4.0 * (x_linspace + 0.2))
+
+    print('plotting...')
     
     fig = plt.figure() 
 #    plt.title(model_name)
@@ -61,6 +66,8 @@ def plot(model, model_name):
    
     plt.savefig(cwd + '/plots/' + model_name)
 
+    plt.close(fig)
+
     return INFOS
     
     
@@ -83,16 +90,20 @@ def update_log(model, model_name, INFOS):
 if __name__ == "__main__":
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = 'cpu'
 
     activation = torch.tanh
 
-    layer_size = [10,25,50,100]
-    nb_layer = [2,3,4]
-    nb_trial = 30
+    with open('job_parameters_array_ext', 'r') as f:
+            lines = f.read().splitlines()
+            
+    idx = int(sys.argv[1])
     
-#    layer_size = [100]
-#    nb_layer = [2]
-
+    args = lines[idx].split(';')
+    L = int(args[0])
+    W = int(args[1])
+    j = int(args[2])
+    
     data = torch.load(rootdir + '/Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
@@ -110,37 +121,52 @@ if __name__ == "__main__":
 
     x_linspace = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
 
-    for L in nb_layer:
-        for W in layer_size:
-#           for j in [20]:
-            for j in range(nb_trial):
-                Net_name = str(L) + 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
-                filename = cwd + '/models/' + Net_name
-                filehandler = open(filename, 'rb') 
-                Net = pickle.load(filehandler)
-                device = Net.linear1.q_weight_mu.device
+    Net_name = str(L) + 'Layers_' + str(W) + 'Neurons_(' + str(j) +')'
+    filename = cwd + '/models/' + Net_name
 
-                data = torch.load(rootdir + '/Data/foong_data.pt')
-                x_data = data[0].to(device)
-                y_data = data[1].to(device)
-                y_data = y_data.unsqueeze(-1)
+    try:
+        filehandler = open(filename, 'rb')
+    except FileNotFoundError:
+        print('no model found')
+        sys.exit()
 
-                data = torch.load(rootdir +'/Data/foong_data_validation.pt')
-                x_data_validation = data[0].to(device)
-                y_data_validation = data[1].to(device)
-                y_data_validation = y_data_validation.unsqueeze(-1)
+    print(cwd + '/plots/' + Net_name + '.png')
+    if os.path.exists(cwd + '/plots/' + Net_name + '.png'):
+        print('plot exists')
+        sys.exit()
 
-                data = torch.load(rootdir +'/Data/foong_data_test.pt')
-                x_data_test = data[0].to(device)
-                y_data_test = data[1].to(device)
-                y_data_test = y_data_test.unsqueeze(-1)
+    print('loading network')
+    netparam = pickle.load(filehandler)
+    Net = BBVI.VariationalNetwork(input_size=netparam['input_size'],
+                            output_size=netparam['output_size'],
+                            layer_width=netparam['layer_width'],
+                            nb_layers=netparam['nb_layers'])
+    Net.set_network(netparam)
+    Net.set_device(device)
 
-                x_linspace = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+    data = torch.load(rootdir + '/Data/foong_data.pt')
+    x_data = data[0].to(device)
+    y_data = data[1].to(device)
+    y_data = y_data.unsqueeze(-1)
+
+    data = torch.load(rootdir +'/Data/foong_data_validation.pt')
+    x_data_validation = data[0].to(device)
+    y_data_validation = data[1].to(device)
+    y_data_validation = y_data_validation.unsqueeze(-1)
+
+    data = torch.load(rootdir +'/Data/foong_data_test.pt')
+    x_data_test = data[0].to(device)
+    y_data_test = data[1].to(device)
+    y_data_test = y_data_test.unsqueeze(-1)
+
+    x_linspace = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+    
+    filehandler.close()
+    
+    print('data loaded')
+    INFOS = plot(Net, Net_name)
+    update_log(Net, Net_name, INFOS)
+
                 
-                filehandler.close()
-                
-                INFOS = plot(Net, Net_name)
-                update_log(Net, Net_name, INFOS)
 
-                
 
