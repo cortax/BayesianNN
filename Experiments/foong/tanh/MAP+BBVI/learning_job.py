@@ -34,7 +34,7 @@ def train_model(layer_width, nb_layers, activation, seed, Net):
     print(Net.compute_elbo(x_data, y_data, n_samples_ELBO=1000, sigma_noise=0.1, device=device).detach().cpu().numpy())
 
     optimizer = torch.optim.Adam
-    optimizer_params = {'lr': 0.1}
+    optimizer_params = {'lr': 0.001}
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
     scheduler_params = {'patience': 2, 'factor': 0.8, 'threshold': 1e-3, 'threshold_mode': 'abs'}
 
