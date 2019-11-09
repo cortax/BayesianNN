@@ -81,34 +81,6 @@ class ProbabilisticLinear(nn.Module):
         
         return (self.weight_sample, self.bias_sample)
 
-    def q_log_pdf(self, weight_sample, bias_sample):
-        M = weight_sample.size(0)
-        
-        sigma_weight = self._rho_to_sigma(self.q_weight_rho)
-        nw = torch.distributions.Normal(self.q_weight_mu.unsqueeze(0).repeat(M,1,1), sigma_weight.unsqueeze(0).repeat(M,1,1))
-        
-        sigma_bias = self._rho_to_sigma(self.q_bias_rho)
-        nb = torch.distributions.Normal(self.q_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
-        
-        W = nw.log_prob(weight_sample)
-        B = nb.log_prob(bias_sample)
-        
-        return W.sum(dim=[1,2]) + B.sum(dim=[1]) 
-    
-    def prior_log_pdf(self, weight_sample, bias_sample):
-        M = weight_sample.size(0)
-        
-        sigma_weight = self._rho_to_sigma(self.prior_weight_rho)
-        nw = torch.distributions.Normal(self.prior_weight_mu.unsqueeze(0).repeat(M,1,1), sigma_weight.unsqueeze(0).repeat(M,1,1))
-        
-        sigma_bias = self._rho_to_sigma(self.prior_bias_rho)
-        nb = torch.distributions.Normal(self.prior_bias_mu.unsqueeze(0).repeat(M,1), sigma_bias.unsqueeze(0).repeat(M,1))
-        
-        W = nw.log_prob(weight_sample)
-        B = nb.log_prob(bias_sample)
-        
-        return W.sum(dim=[1,2]) + B.sum(dim=[1]) 
-
     def requires_grad_rhos(self, v = False):
         self.q_weight_rho.requires_grad = v
         self.q_bias_rho.requires_grad = v
@@ -164,6 +136,14 @@ class VariationalNetwork(nn.Module):
         
     def _log_norm(self, x, mu, std):
         return -0.5 * torch.log(2*np.pi*std**2) -(0.5 * (1/(std**2))* (x-mu)**2)
+    
+    def _rho_to_sigma(self, rho):
+        sigma = torch.log(1 + torch.exp(rho))
+        return sigma
+
+    def _sigma_to_rho(self, sigma):
+        rho = torch.log(torch.exp(sigma) - 1)
+        return rho
               
     def forward(self, x):
         out = x
@@ -207,29 +187,37 @@ class VariationalNetwork(nn.Module):
         return (self.q_log_pdf(), self.prior_log_pdf())
 
     def q_log_pdf(self, layered_w_samples, layered_bias_samples):
-        list_LQ = []
-        list_LQ = [self.registered_layers[k].q_log_pdf(layered_w_samples[k], layered_bias_samples[k]) for k in range(len(self.registered_layers))]
-        stack_LQ = torch.stack(list_LQ)
-        return torch.sum(stack_LQ, dim=0)
+        mu = torch.cat([torch.cat((torch.flatten(self.registered_layers[k].q_weight_mu), self.registered_layers[k].q_bias_mu)) for k in range(len(self.registered_layers))])
+        rho = torch.cat([torch.cat((torch.flatten(self.registered_layers[k].q_weight_rho), self.registered_layers[k].q_bias_rho)) for k in range(len(self.registered_layers))])
+        sigma = self._rho_to_sigma(rho)
+        nw = torch.distributions.MultivariateNormal(mu, scale_tril=torch.diag(sigma))
+        w = torch.cat([torch.cat((torch.flatten(layered_w_samples[k], start_dim=1), layered_bias_samples[k]),dim=1) for k in range(len(self.registered_layers))], dim=1)
+        return nw.log_prob(w)
     
     def prior_log_pdf(self, layered_w_samples, layered_bias_samples):
-        list_LP = []
-        list_LP = [self.registered_layers[k].prior_log_pdf(layered_w_samples[k], layered_bias_samples[k]) for k in range(len(self.registered_layers))]
-        stack_LP = torch.stack(list_LP)
-        return torch.sum(stack_LP, dim=0)
+        mu = torch.cat([torch.cat((torch.flatten(self.registered_layers[k].prior_weight_mu), self.registered_layers[k].prior_bias_mu)) for k in range(len(self.registered_layers))])
+        rho = torch.cat([torch.cat((torch.flatten(self.registered_layers[k].prior_weight_rho), self.registered_layers[k].prior_bias_rho)) for k in range(len(self.registered_layers))])
+        sigma = self._rho_to_sigma(rho)
+        nw = torch.distributions.MultivariateNormal(mu, scale_tril=torch.diag(sigma))
+        w = torch.cat([torch.cat((torch.flatten(layered_w_samples[k], start_dim=1), layered_bias_samples[k]),dim=1) for k in range(len(self.registered_layers))], dim=1)
+        return nw.log_prob(w)
         
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, device):
         (layered_w_samples, layered_bias_samples) = self.sample_parameters(n_samples_ELBO)
 
-        LQ = self.q_log_pdf(layered_w_samples, layered_bias_samples).sum()
-        LP = self.prior_log_pdf(layered_w_samples, layered_bias_samples).sum()
+        LQ = self.q_log_pdf(layered_w_samples, layered_bias_samples).mean()
+        LP = self.prior_log_pdf(layered_w_samples, layered_bias_samples).mean()
 
         y_pred = self.forward(x_data)
-        LL = self._log_norm(y_pred, y_data, torch.tensor(sigma_noise).to(device))
-
-        L = (LQ - LP - LL.sum())
+        mu = torch.flatten(y_pred, end_dim=1)
+        sigma = torch.eye(mu.shape[1],device=device)*torch.tensor(sigma_noise, device=device)
+        nd = torch.distributions.MultivariateNormal(mu, scale_tril=sigma)
         
-        return torch.div(L, n_samples_ELBO)
+        LL = nd.log_prob(torch.flatten(y_data.repeat(y_pred.shape[0], 1, 1), end_dim=1))
+        
+        L = LQ - LP - torch.div(LL.sum(),n_samples_ELBO)
+        
+        return L
     
     def get_network(self):
         network = {}
