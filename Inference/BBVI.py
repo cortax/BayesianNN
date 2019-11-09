@@ -33,6 +33,11 @@ class ProbabilisticLinear(nn.Module):
         sigma = torch.tensor(1.0)
         rho = torch.log(torch.exp(sigma) - 1)
         
+        torch.nn.init.normal_(self.q_weight_mu, mean=mu, std=sigma/1000)
+        torch.nn.init.normal_(self.q_weight_rho, mean=mu, std=sigma/1000)
+        torch.nn.init.normal_(self.q_bias_mu, mean=mu, std=sigma/1000)
+        torch.nn.init.normal_(self.q_bias_rho, mean=mu, std=sigma/1000)
+        
         self.prior_weight_mu = nn.Parameter(torch.Tensor(out_features, in_features))
         self.prior_weight_rho = nn.Parameter(torch.Tensor(out_features, in_features))
         self.prior_bias_mu = nn.Parameter(torch.Tensor(out_features))
