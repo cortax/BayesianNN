@@ -33,10 +33,10 @@ class ProbabilisticLinear(nn.Module):
         sigma = torch.tensor(1.0)
         rho = torch.log(torch.exp(sigma) - 1)
         
-        torch.nn.init.normal_(self.q_weight_mu, mean=mu, std=sigma/1000)
-        torch.nn.init.normal_(self.q_weight_rho, mean=mu, std=sigma/1000)
-        torch.nn.init.normal_(self.q_bias_mu, mean=mu, std=sigma/1000)
-        torch.nn.init.normal_(self.q_bias_rho, mean=mu, std=sigma/1000)
+        torch.nn.init.normal_(self.q_weight_mu, mean=mu, std=sigma/out_features)
+        torch.nn.init.normal_(self.q_weight_rho, mean=mu, std=sigma/out_features)
+        torch.nn.init.normal_(self.q_bias_mu, mean=mu, std=sigma/out_features)
+        torch.nn.init.normal_(self.q_bias_rho, mean=mu, std=sigma/out_features)
         
         self.prior_weight_mu = nn.Parameter(torch.Tensor(out_features, in_features))
         self.prior_weight_rho = nn.Parameter(torch.Tensor(out_features, in_features))
@@ -160,10 +160,10 @@ class VariationalNetwork(nn.Module):
         for k in range(len(self.registered_layers)):
             self.registered_layers[k].requires_grad_mus(v)
             
-    def make_deterministic_rhos(self):
+    def make_deterministic_rhos(self, v=-10.0):
         for k in range(len(self.registered_layers)):
-            self.registered_layers[k].q_weight_rho = nn.Parameter(self.registered_layers[k].q_weight_rho.new_full(self.registered_layers[k].q_weight_rho.size(), -10.0))
-            self.registered_layers[k].q_bias_rho = nn.Parameter(self.registered_layers[k].q_bias_rho.new_full(self.registered_layers[k].q_bias_rho.size(), -10.0))
+            self.registered_layers[k].q_weight_rho = nn.Parameter(self.registered_layers[k].q_weight_rho.new_full(self.registered_layers[k].q_weight_rho.size(), v))
+            self.registered_layers[k].q_bias_rho = nn.Parameter(self.registered_layers[k].q_bias_rho.new_full(self.registered_layers[k].q_bias_rho.size(), v))
     
     def sample_parameters(self, M=1):
         layered_w_samples = []
@@ -205,19 +205,20 @@ class VariationalNetwork(nn.Module):
     def compute_elbo(self, x_data, y_data, n_samples_ELBO, sigma_noise, device):
         (layered_w_samples, layered_bias_samples) = self.sample_parameters(n_samples_ELBO)
 
-        LQ = self.q_log_pdf(layered_w_samples, layered_bias_samples).mean()
-        LP = self.prior_log_pdf(layered_w_samples, layered_bias_samples).mean()
-
+        LQ = self.q_log_pdf(layered_w_samples, layered_bias_samples)
+        LP = self.prior_log_pdf(layered_w_samples, layered_bias_samples)
+        MCKL = (LQ - LP).mean()
+        
         y_pred = self.forward(x_data)
         mu = torch.flatten(y_pred, end_dim=1)
-        sigma = torch.eye(mu.shape[1],device=device)*torch.tensor(sigma_noise, device=device)
+        sigma = torch.eye(y_data.shape[1],device=device)*torch.tensor(0.1, device=device)
         nd = torch.distributions.MultivariateNormal(mu, scale_tril=sigma)
-        
         LL = nd.log_prob(torch.flatten(y_data.repeat(y_pred.shape[0], 1, 1), end_dim=1))
+        eLL = LL.reshape(y_pred.shape[0:2]).sum(1).mean()
         
-        L = LQ - LP - torch.div(LL.sum(),n_samples_ELBO)
+        loss = MCKL - eLL
         
-        return L
+        return loss
     
     def get_network(self):
         network = {}
