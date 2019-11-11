@@ -180,7 +180,13 @@ class VariationalNetwork(nn.Module):
     
     def set_parameters(self, w_samples, b_samples):
         for k in range(len(self.registered_layers)):
+            self.registered_layers[k].set_parameters(w_samples[k], b_samples[k])
+            
+    def get_parameters(self):
+        for k in range(len(self.registered_layers)):
             self.registered_layers[k].set_parameters(w_samples[k], b_samples[k]) 
+        
+        return w_samples, b_samples
     
     def KL_log_pdf(self, w_samples, b_samples):
         self.set_parameters(w_samples, b_samples)
@@ -211,7 +217,7 @@ class VariationalNetwork(nn.Module):
         
         y_pred = self.forward(x_data)
         mu = torch.flatten(y_pred, end_dim=1)
-        sigma = torch.eye(y_data.shape[1],device=device)*torch.tensor(0.1, device=device)
+        sigma = torch.eye(y_data.shape[1],device=device)*torch.tensor(sigma_noise, device=device)
         nd = torch.distributions.MultivariateNormal(mu, scale_tril=sigma)
         LL = nd.log_prob(torch.flatten(y_data.repeat(y_pred.shape[0], 1, 1), end_dim=1))
         eLL = LL.reshape(y_pred.shape[0:2]).sum(1).mean()
@@ -336,6 +342,70 @@ class VariationalOptimizer():
                     return self.model
         self.last_epoch = n_epoch    
         return self.model
+    
+    
+class MCMCsimulator():
+    def __init__(self, model):
+        self.model = model
+        self.model.sample_parameters(2);
+    
+       
+    def MetropolisHastings(self, x_data, y_data, nb_iter, sigma_proposal = 0.001, plot=False):
+        acceptance = []
+        samples = []
+        proba = []
+        
+        if plot:
+            liveloss = PlotLosses()
+        
+        with torch.no_grad():
+            for t in range(nb_iter):
+                logs = {}
+                #proposal 
+                for layer in self.model.registered_layers:
+                    layer.weight_sample[1,:,:].normal_(mean=0, std=sigma_proposal)
+                    layer.weight_sample[1,:,:].add_(layer.weight_sample[0,:,:])
+
+                    layer.bias_sample[1,:].normal_(mean=0, std=sigma_proposal)
+                    layer.bias_sample[1,:].add_(layer.bias_sample[0,:])
+
+                #proba
+                mu = torch.cat([torch.cat((torch.flatten(self.model.registered_layers[k].prior_weight_mu), self.model.registered_layers[k].prior_bias_mu)) for k in range(len(self.model.registered_layers))])
+                rho = torch.cat([torch.cat((torch.flatten(self.model.registered_layers[k].prior_weight_rho), self.model.registered_layers[k].prior_bias_rho)) for k in range(len(self.model.registered_layers))])
+                sigma = self.model._rho_to_sigma(rho)
+                nw = torch.distributions.MultivariateNormal(mu, scale_tril=torch.diag(sigma))
+                w0 = torch.cat([torch.cat((torch.flatten(self.model.registered_layers[k].weight_sample[0]), self.model.registered_layers[k].bias_sample[0])) for k in range(len(self.model.registered_layers))])
+                w1 = torch.cat([torch.cat((torch.flatten(self.model.registered_layers[k].weight_sample[1]), self.model.registered_layers[k].bias_sample[1])) for k in range(len(self.model.registered_layers))])
+                LP0 = nw.log_prob(w0)
+                LP1 = nw.log_prob(w1)
+
+                y_pred = self.model.forward(x_data)
+                LL0 = self.model._log_norm(y_pred[0], y_data, torch.tensor(0.1)).sum()
+                LL1 = self.model._log_norm(y_pred[1], y_data, torch.tensor(0.1)).sum()
+
+
+                A = (LL1 + LP1) - (LL0 + LP0)
+                if torch.distributions.uniform.Uniform(0.0,1.0).sample().log() < A.cpu():
+                    acceptance.append(1)
+                    samples.append(w1.detach().clone().cpu())
+                    proba.append(LL1 + LP1) 
+                    logs['log proba'] = (LL1 + LP1).detach().clone().cpu().numpy()
+                    
+                    for layer in self.model.registered_layers:
+                        layer.weight_sample[0,:,:] = layer.weight_sample[1,:,:].detach()
+                        layer.bias_sample[0,:] = layer.bias_sample[1,:].detach()
+                else:
+                    acceptance.append(0)
+                    samples.append(w0.detach().clone().cpu())
+                    proba.append(LL0 + LP0)
+                    logs['log proba'] = (LL0 + LP0).detach().clone().cpu().numpy()
+                
+                if plot:
+                    liveloss.update(logs)
+                    liveloss.draw()
+
+        return samples, acceptance, proba
+        
     
 def plot_BBVI(model, data, data_val, device, savePath=None, xpName=None, networkName=None, saveName=None):
     
