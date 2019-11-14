@@ -33,10 +33,10 @@ class ProbabilisticLinear(nn.Module):
         sigma = torch.tensor(1.0)
         rho = torch.log(torch.exp(sigma) - 1)
         
-        torch.nn.init.normal_(self.q_weight_mu, mean=mu, std=sigma/out_features)
-        torch.nn.init.normal_(self.q_weight_rho, mean=mu, std=sigma/out_features)
-        torch.nn.init.normal_(self.q_bias_mu, mean=mu, std=sigma/out_features)
-        torch.nn.init.normal_(self.q_bias_rho, mean=mu, std=sigma/out_features)
+        torch.nn.init.normal_(self.q_weight_mu, mean=mu, std=sigma)
+        torch.nn.init.normal_(self.q_weight_rho, mean=mu, std=sigma)
+        torch.nn.init.normal_(self.q_bias_mu, mean=mu, std=sigma)
+        torch.nn.init.normal_(self.q_bias_rho, mean=mu, std=sigma)
         
         self.prior_weight_mu = nn.Parameter(torch.Tensor(out_features, in_features))
         self.prior_weight_rho = nn.Parameter(torch.Tensor(out_features, in_features))
@@ -174,24 +174,14 @@ class VariationalNetwork(nn.Module):
                 layered_w_samples.append(L[k][0])
                 layered_bias_samples.append(L[k][1])
         return (layered_w_samples, layered_bias_samples)
+    
+    def _likelihood(self, theta):
+       
+
         
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
     
-    def set_parameters(self, w_samples, b_samples):
-        for k in range(len(self.registered_layers)):
-            self.registered_layers[k].set_parameters(w_samples[k], b_samples[k])
-            
-    def get_parameters(self):
-        for k in range(len(self.registered_layers)):
-            self.registered_layers[k].set_parameters(w_samples[k], b_samples[k]) 
-        
-        return w_samples, b_samples
-    
-    def KL_log_pdf(self, w_samples, b_samples):
-        self.set_parameters(w_samples, b_samples)
-        return (self.q_log_pdf(), self.prior_log_pdf())
-
     def q_log_pdf(self, layered_w_samples, layered_bias_samples):
         mu = torch.cat([torch.cat((torch.flatten(self.registered_layers[k].q_weight_mu), self.registered_layers[k].q_bias_mu)) for k in range(len(self.registered_layers))])
         rho = torch.cat([torch.cat((torch.flatten(self.registered_layers[k].q_weight_rho), self.registered_layers[k].q_bias_rho)) for k in range(len(self.registered_layers))])
@@ -239,10 +229,10 @@ class VariationalNetwork(nn.Module):
 
         for L in self.registered_layers:
             d = {}
-            d['q_weight_mu'] = L.q_weight_mu.to('cpu')
-            d['q_weight_rho'] = L.q_weight_rho.to('cpu')
-            d['q_bias_mu'] = L.q_bias_mu.to('cpu')
-            d['q_bias_rho'] = L.q_bias_rho.to('cpu')
+            d['q_weight_mu'] = L.q_weight_mu.detach().clone().to('cpu')
+            d['q_weight_rho'] = L.q_weight_rho.detach().clone().to('cpu')
+            d['q_bias_mu'] = L.q_bias_mu.detach().clone().to('cpu')
+            d['q_bias_rho'] = L.q_bias_rho.detach().clone().to('cpu')
             registered_layers.append(d)
         network['registered_layers'] = registered_layers
         
@@ -346,11 +336,20 @@ class VariationalOptimizer():
     
 class MCMCsimulator():
     def __init__(self, model):
-        self.model = model
-        self.model.sample_parameters(2);
-    
+        pass
        
-    def MetropolisHastings(self, x_data, y_data, nb_iter, sigma_proposal = 0.001, plot=False):
+    def MetropolisHastings(self, model, x_data, y_data, nb_iter, sigma_proposal = 0.001, plot=False):
+        netparam = model.get_param()
+        self.current_model =  BBVI.VariationalNetwork(input_size=netparam['input_size'],
+                              output_size=netparam['output_size'],
+                              layer_width=netparam['layer_width'],
+                              nb_layers=netparam['nb_layers'])
+
+        self.proposed_model = BBVI.VariationalNetwork(input_size=netparam['input_size'],
+                              output_size=netparam['output_size'],
+                              layer_width=netparam['layer_width'],
+                              nb_layers=netparam['nb_layers'])
+
         acceptance = []
         samples = []
         proba = []
@@ -396,7 +395,7 @@ class MCMCsimulator():
                         layer.bias_sample[0,:] = layer.bias_sample[1,:].detach()
                 else:
                     acceptance.append(0)
-                    samples.append(w0.detach().clone().cpu())
+                    samples.append(self.model.get_network())
                     proba.append(LL0 + LP0)
                     logs['log proba'] = (LL0 + LP0).detach().clone().cpu().numpy()
                 
