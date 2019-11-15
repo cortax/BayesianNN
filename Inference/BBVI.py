@@ -174,11 +174,7 @@ class VariationalNetwork(nn.Module):
                 layered_w_samples.append(L[k][0])
                 layered_bias_samples.append(L[k][1])
         return (layered_w_samples, layered_bias_samples)
-    
-    def _likelihood(self, theta):
-       
-
-        
+     
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
     
