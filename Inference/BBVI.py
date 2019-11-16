@@ -175,9 +175,17 @@ class VariationalNetwork(nn.Module):
                 layered_bias_samples.append(L[k][1])
         return (layered_w_samples, layered_bias_samples)
     
-    def _likelihood(self, theta):
-       
+    def set_parameters(self, v):
+        for k in range(len(self.registered_layers)):
+            s = self.registered_layers[k].prior_weight_mu.shape
+            n = np.prod(list(s))
+            self.registered_layers[k].weight_sample = torch.reshape(v[:,:n], [v.shape[0]] + list(s))
+            v = v[:,n:]
 
+            s = self.registered_layers[k].prior_bias_mu.shape
+            n = np.prod(list(s))
+            self.registered_layers[k].bias_sample = torch.reshape(v[:,:n], [v.shape[0]] + list(s))
+            v = v[:,n:]
         
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
