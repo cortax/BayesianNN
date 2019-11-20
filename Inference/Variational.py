@@ -1,6 +1,6 @@
 from torch import nn
 import torch
-
+from livelossplot import PlotLosses
 
 class MeanFieldVariationalDistribution(nn.Module):
     def __init__(self, nb_dim, mu=0.0, sigma=1.0, device='cpu'):
@@ -58,3 +58,49 @@ class MeanFieldVariationalDistribution(nn.Module):
     def log_prob(self, z):
         S = torch.diag(self.sigma)
         return torch.distributions.multivariate_normal.MultivariateNormal(self.mu, scale_tril=S).log_prob(z).unsqueeze(-1)
+    
+    
+class VariationalOptimizer():
+    def __init__(self, learning_rate, patience, factor, device='cpu', min_lr=0.00001):
+        self.device = device
+        self.min_lr = min_lr
+        self.learning_rate = learning_rate
+        self.patience = patience
+        self.factor = factor
+            
+    def run(self, q, logposterior, n_epoch=10000, n_ELBO_samples=1, plot=False):
+        
+        optimizer = torch.optim.Adam(q.parameters(), lr=self.learning_rate)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience, factor=self.factor)
+        
+        if plot:
+            liveloss = PlotLosses()
+            
+        for t in range(n_epoch):
+            logs = {}
+            optimizer.zero_grad()
+
+            z = q.sample(n_ELBO_samples)
+            LQ = q.log_prob(z)
+            LP = logposterior(z)
+            L = (LQ - LP).sum()/n_ELBO_samples
+
+            L.backward()
+
+            learning_rate = optimizer.param_groups[0]['lr']
+
+            scheduler.step(L.detach().clone().cpu().numpy())
+            logs['ELBO'] = L.detach().clone().cpu().numpy()
+            logs['learning rate'] = learning_rate
+            liveloss.update(logs)
+
+            if plot and t % 10 == 0:
+                liveloss.draw()
+
+            optimizer.step()
+
+            if learning_rate < 0.0001:
+                return q
+        return q
+        
+    
