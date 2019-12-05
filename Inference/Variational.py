@@ -55,6 +55,10 @@ class MeanFieldVariationalDistribution(nn.Module):
         rho = torch.log(torch.exp(sigma) - 1)
         return rho
     
+    def requires_grad_(self, b):
+        self.mu.requires_grad_(b)
+        self.rho.requires_grad_(b)
+    
     def log_prob(self, z):
         S = torch.diag(self.sigma)
         return torch.distributions.multivariate_normal.MultivariateNormal(self.mu, scale_tril=S).log_prob(z).unsqueeze(-1)
