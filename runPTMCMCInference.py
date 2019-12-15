@@ -15,7 +15,7 @@ from Inference.ParallelTempering import *
 #device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 device = 'cpu'
 
-data = torch.load('data/foong_data.pt')
+data = torch.load('Data/foong_data.pt')
 x_data = data[0].to(device)
 y_data = data[1].to(device)
 y_data = y_data.unsqueeze(-1)
