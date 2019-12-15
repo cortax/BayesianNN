@@ -10,15 +10,12 @@ class MeanFieldVariationalAE(nn.Module):
         self.lat_dim = lat_dim
         self.weights_dim = weights_dim
         self.mfvar = MeanFieldVariationalDistribution(lat_dim,mu,sigma)
+        self.layerIn=nn.Linear(lat_dim, H)
+        self.layerOut=nn.Linear(H,weights_dim)
         self.decoder=nn.Sequential(
-                       nn.Linear(lat_dim, H),
-#                       nn.ReLU(True),
-#                       nn.Linear(H, H),
+                       self.layerIn,
                        activation,
-#                       nn.Linear(H,H),
-#                       activation,
-#                       nn.Sigmoid(),
-                       nn.Linear(H,weights_dim)
+                       self.layerOut
                        )
         
           
