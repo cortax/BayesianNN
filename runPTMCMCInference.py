@@ -59,11 +59,18 @@ import pickle
 state = pickle.load( open( "MAPS.pt", "rb" ) )
 sampler.initChains([state[i][0] for i in range(len(state))])
 
-#sampler.initChains()
+# sampler.initChains()
 
 for s in range(10):
     print(s)
-    x, ladderAcceptanceRate, swapAcceptanceRate = sampler.run(1000)
-    pickle_out = open("PTMCMC_checkpoint.pt","wb")
-    pickle.dump(x, pickle_out)
+    x, ladderAcceptanceRate, swapAcceptanceRate, logProba = sampler.run(10)
+    pickle_out = open("PTMCMC_checkpoint_" + str(s) + ".pt","wb")
+    pickle.dump((x, ladderAcceptanceRate, swapAcceptanceRate, logProba), pickle_out)
     pickle_out.close()
+    
+    sampler = PTMCMCSampler(logtarget, param_count, baseMHproposalNoise, temperatureNoiseReductionFactor, temperatures, device)
+    sampler.initChains([x[i][-1] for i in range(len(x))])
+
+
+
+

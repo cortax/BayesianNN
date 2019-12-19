@@ -72,19 +72,15 @@ class PTMCMCSampler():
                         self.state[j][-1] = self.state[j+1][-1]
                         self.state[j+1][-1] = tmp
 
-                        #tmp = ChainTrack[j][-1]
-                        #ChainTrack[j][-1] = ChainTrack[j+1][-1]
-                        #ChainTrack[j+1][-1] = tmp
-
                         self._swapAcceptanceCount[j] = self._swapAcceptanceCount[j]+1
             
             x = self.state
+            logProba = self.logProbaMatrix
             ladderAcceptanceRate = torch.tensor(self._ladderAcceptanceCount).float()/N
             swapAcceptanceRate = torch.tensor(self._swapAcceptanceCount).float()/N
-            return x, ladderAcceptanceRate, swapAcceptanceRate
+            return x, ladderAcceptanceRate, swapAcceptanceRate, logProba
                       
-                      
-                      
+            
     def _MAP(self, device=None):
         if device is None:
             device = self.device
@@ -115,5 +111,5 @@ class PTMCMCSampler():
 
 
                       
-                      
+
                       
