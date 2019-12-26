@@ -27,7 +27,7 @@ f = @(x) gampdf(x, 2, 2).^2;
 plot(x, f(x) ./ integral(f, 0, 20));
     
 X = [];
-for k = 1:100000
+for k = 1:10000
     s = gamrnd(2,2, [100,1]);
     [i,j] = find(min(pdist(s)) == pdist2(s,s));
     %X(end+1) = s(i(randi(2)));
