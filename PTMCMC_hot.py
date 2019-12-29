@@ -12,22 +12,28 @@ from Inference.Variational import MeanFieldVariationalDistribution
 from Tools.NNtools import *
 from Inference.ParallelTempering import *
 import pickle
+import argparse
 
+class MLP(nn.Module):
+    def __init__(self, nblayers, layerwidth):
+        super(MLP, self).__init__()
+        L = [1] + [layerwidth]*nblayers + [1]
+        self.layers = nn.ModuleList()
+        for k in range(len(L)-1):
+            self.layers.append(nn.Linear(L[k], L[k+1]))
 
-def main(tag, nb_chunk, chunk_size):
+    def forward(self, x):
+        for layer in self.layers:
+            x = torch.tanh(layer(x))
+        return x  
 
-    #device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    device = 'cpu'
-
+def main(tag, nb_chunk, chunk_size, nblayers, layerwidth, device):
     data = torch.load('Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
     y_data = y_data.unsqueeze(-1)
 
-    model = nn.Sequential( nn.Linear(1, 20),
-                        nn.Tanh(), 
-                        nn.Linear(20, 1),
-                        ).to(device)
+    model = MLP(nblayers, layerwidth).to(device)
     param_count = get_param(model).shape[0]
     flip_parameters_to_tensors(model)
 
@@ -59,17 +65,18 @@ def main(tag, nb_chunk, chunk_size):
 
     sampler = PTMCMCSampler(logtarget, param_count, baseMHproposalNoise, temperatureNoiseReductionFactor, temperatures, device)
 
-    #state = pickle.load( open( "MAPS.pt", "rb" ) )
-    #sampler.initChains([state[i][0] for i in range(len(state))])
     sampler.initChains()
     
+    dirname = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/PTMCMC_hot/"
+    os.makedirs(dirname, exist_ok=True)
+
     for s in range(nb_chunk):
         print(s)
-        if os.path.exists("Results/PTMCMC_hot/PTMCMC_checkpoint_xp_" + tag + "_chunk_" + str(s) + ".pt"):
-            (x, _, _, _) = pickle.load( open("./Results/PTMCMC_hot/PTMCMC_checkpoint_xp_" + tag + "_chunk_" + str(s) + ".pt", "rb" ) )
+        if os.path.exists(dirname+"PTMCMC_checkpoint_xp_" + str(tag) + "_chunk_" + str(s) + ".pt"):
+            (x, _, _, _) = pickle.load( open(dirname+"PTMCMC_checkpoint_xp_" + str(tag) + "_chunk_" + str(s) + ".pt", "rb" ) )
         else:
             x, ladderAcceptanceRate, swapAcceptanceRate, logProba = sampler.run(chunk_size)
-            pickle_out = open("Results/PTMCMC_hot/PTMCMC_checkpoint_xp_" + tag + "_chunk_" + str(s) + ".pt","wb")
+            pickle_out = open(dirname+"PTMCMC_checkpoint_xp_" + str(tag) + "_chunk_" + str(s) + ".pt","wb")
             pickle.dump((x, ladderAcceptanceRate, swapAcceptanceRate, logProba), pickle_out)
             pickle_out.close()
         
@@ -78,5 +85,26 @@ def main(tag, nb_chunk, chunk_size):
 
 
 if __name__== "__main__":
-    main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--nbchunk", type=int,
+                        help="number of saving checkpoints")
+    parser.add_argument("--chunksize", type=int,
+                        help="length of runs")
+    parser.add_argument("--layerwidth", type=int,
+                        help="number of neurones per layer")
+    parser.add_argument("--nblayers", type=int,
+                        help="number of layers")
+    parser.add_argument("--tag", type=int,
+                        help="identifier for the learning run")
+    parser.add_argument("--device", type=str,
+                        help="force device to be used")
+    args = parser.parse_args()
+    print(args)
+
+    if args.device is None:
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = args.device
+
+    main(args.tag, args.nbchunk, args.chunksize, args.nblayers, args.layerwidth, device)
 
