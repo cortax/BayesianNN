@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import os
 import math
 import torch
 from torch import nn
@@ -12,26 +13,30 @@ from Inference.Variational import MeanFieldVariationalDistribution
 from Inference.VariationalBoosting import MeanFieldVariationalMixtureDistribution
 from Tools.NNtools import *
 import pickle
+import argparse
 
+class MLP(nn.Module):
+    def __init__(self, nblayers, layerwidth):
+        super(MLP, self).__init__()
+        L = [1] + [layerwidth]*nblayers + [1]
+        self.layers = nn.ModuleList()
+        for k in range(len(L)-1):
+            self.layers.append(nn.Linear(L[k], L[k+1]))
 
+    def forward(self, x):
+        for layer in self.layers:
+            x = torch.tanh(layer(x))
+        return x    
 
-def main(tag, nb_maps):
-    
-    #device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    device = 'cpu'
-    
+def main(tag, nbMAP, nblayers, layerwidth, device):
     data = torch.load('Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
     y_data = y_data.unsqueeze(-1)
 
-    model = nn.Sequential( nn.Linear(1, 20),
-                        nn.Tanh(), 
-                        nn.Linear(20, 1),
-                        ).to(device)
+    model = MLP(nblayers, layerwidth).to(device)
     param_count = get_param(model).shape[0]
     flip_parameters_to_tensors(model)
-
 
     prior = MeanFieldVariationalDistribution(param_count, sigma=1.0, device=device)
     prior.mu.requires_grad = False
@@ -51,17 +56,15 @@ def main(tag, nb_maps):
         return logprior(theta) + loglikelihood(theta, model, x, y, sigma_noise)
 
     logtarget = lambda theta : logposterior(theta, model, x_data, y_data, 0.1 )
-    
-    
     MAPS = []
     
-    for _ in range(nb_maps):
+    for _ in range(nbMAP):
         std = torch.distributions.Gamma(torch.tensor([1.0]), torch.tensor([1.0])).sample()[0].float()
         theta = torch.nn.Parameter( torch.empty([1,param_count],device=device).normal_(std=std), requires_grad=True)
 
         optimizer = torch.optim.Adam([theta], lr=0.1)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=25, factor=0.9)
-        for t in range(100000):
+        for t in range(1000000):
             optimizer.zero_grad()
 
             L = -torch.mean(logtarget(theta))
@@ -72,14 +75,36 @@ def main(tag, nb_maps):
             scheduler.step(L.detach().clone().cpu().numpy())
             optimizer.step()
 
-            if learning_rate < 0.001:
+            if learning_rate < 0.0005:
                 break
         
         MAPS.append([theta.detach().clone()])
         
-        pickle_out = open("Results/MAP/MAPS_checkpoint_xp_" + tag + ".pt","wb")
+        filename = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/MAP/MAP_batch_" + str(tag) + ".pt"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+        pickle_out = open(filename,"wb")
         pickle.dump(MAPS, pickle_out)
         pickle_out.close()
-    
+
 if __name__== "__main__":
-    main(sys.argv[1], int(sys.argv[2]))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--layerwidth", type=int,
+                        help="number of neurones per layer")
+    parser.add_argument("--nblayers", type=int,
+                        help="number of layers")
+    parser.add_argument("--tag", type=int,
+                        help="identifier for the learning run")
+    parser.add_argument("--nbMAP", type=int,
+                        help="number of MAPs to compute")
+    parser.add_argument("--device", type=str,
+                        help="force device to be used")
+    args = parser.parse_args()
+    print(args)
+
+    if args.device is None:
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = args.device
+
+    main(args.tag, args.nbMAP, args.nblayers, args.layerwidth, device)
