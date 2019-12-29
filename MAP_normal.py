@@ -1,23 +1,25 @@
-import sys
-import os
-from os.path import dirname
-
 import numpy as np
+import sys
 import math
 import torch
 from torch import nn
 from torch import functional as F
 import scipy.stats as stats
+import matplotlib
+import matplotlib.pyplot as plt
+from livelossplot import PlotLosses
 from Inference.Variational import MeanFieldVariationalDistribution
+from Inference.VariationalBoosting import MeanFieldVariationalMixtureDistribution
 from Tools.NNtools import *
-from Inference.ParallelTempering import *
+import pickle
 
 
-def main(tag, nb_chunk, chunk_size):
 
+def main(tag, nb_maps):
+    
     #device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     device = 'cpu'
-
+    
     data = torch.load('Data/foong_data.pt')
     x_data = data[0].to(device)
     y_data = data[1].to(device)
@@ -48,33 +50,36 @@ def main(tag, nb_chunk, chunk_size):
     def logposterior(theta, model, x, y, sigma_noise):
         return logprior(theta) + loglikelihood(theta, model, x, y, sigma_noise)
 
-    #N = 100000
-    temperatures = [0.5, 1, 1.5, 2, 3, 5, 10, 20, 40, 120, 500]
-    stateInit = [prior.sample() for i in range(len(temperatures))]
-    baseMHproposalNoise = 0.003
-    temperatureNoiseReductionFactor = 0.5
-
     logtarget = lambda theta : logposterior(theta, model, x_data, y_data, 0.1 )
+    
+    
+    MAPS = []
+    
+    for _ in range(nb_maps):
+        std = torch.distributions.Gamma(torch.tensor([1.0]), torch.tensor([1.0])).sample()[0].float()
+        theta = torch.nn.Parameter( torch.empty([1,param_count],device=device).normal_(std=std), requires_grad=True)
 
-    sampler = PTMCMCSampler(logtarget, param_count, baseMHproposalNoise, temperatureNoiseReductionFactor, temperatures, device)
+        optimizer = torch.optim.Adam([theta], lr=0.1)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=25, factor=0.9)
+        for t in range(100000):
+            optimizer.zero_grad()
 
-    import pickle
-    state = pickle.load( open( "MAPS.pt", "rb" ) )
-    sampler.initChains([state[i][0] for i in range(len(state))])
+            L = -torch.mean(logtarget(theta))
+            L.backward()
 
-    # sampler.initChains()
+            learning_rate = optimizer.param_groups[0]['lr']
 
-    for s in range(nb_chunk):
-        print(s)
-        x, ladderAcceptanceRate, swapAcceptanceRate, logProba = sampler.run(chunk_size)
-        pickle_out = open("PTMCMC_checkpoint_xp_" + tag + "_chunk_" + str(s) + ".pt","wb")
-        pickle.dump((x, ladderAcceptanceRate, swapAcceptanceRate, logProba), pickle_out)
-        pickle_out.close()
+            scheduler.step(L.detach().clone().cpu().numpy())
+            optimizer.step()
+
+            if learning_rate < 0.001:
+                break
         
-        sampler = PTMCMCSampler(logtarget, param_count, baseMHproposalNoise, temperatureNoiseReductionFactor, temperatures, device)
-        sampler.initChains([x[i][-1] for i in range(len(x))])
-
-
+        MAPS.append([theta.detach().clone()])
+        
+        pickle_out = open("Results/MAP/MAPS_checkpoint_xp_" + tag + ".pt","wb")
+        pickle.dump(MAPS, pickle_out)
+        pickle_out.close()
+    
 if __name__== "__main__":
-    main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]))
-
+    main(sys.argv[1], int(sys.argv[2]))
