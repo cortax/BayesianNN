@@ -23,9 +23,10 @@ class MLP(nn.Module):
             self.layers.append(nn.Linear(L[k], L[k+1]))
 
     def forward(self, x):
-        for layer in self.layers:
-            x = torch.tanh(layer(x))
-        return x  
+        for j in range(len(self.layers)-1):
+            x = torch.tanh(self.layers[j](x))
+        x = self.layers[-1](x)
+        return x      
 
 def main(tag, nb_chunk, chunk_size, nblayers, layerwidth, device):
     data = torch.load('Data/foong_data.pt')
