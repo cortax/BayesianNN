@@ -62,8 +62,8 @@ class MeanFieldVariationalDistribution(nn.Module):
     def log_prob(self, z):
         S = torch.diag(self.sigma)
         return torch.distributions.multivariate_normal.MultivariateNormal(self.mu, scale_tril=S).log_prob(z).unsqueeze(-1)
-
-
+    
+    
 class VariationalOptimizer():
     def __init__(self, learning_rate, patience, factor, device='cpu', min_lr=0.00001):
         self.device = device
@@ -106,5 +106,5 @@ class VariationalOptimizer():
             if learning_rate < 0.0001:
                 return q
         return q
-
+        
     
