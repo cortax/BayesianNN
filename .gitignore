@@ -27,3 +27,5 @@ Experiments/foong/tanh/MAP\+BBVI/models/
 Experiments/foong/tanh/MAP\+BBVI/plots/
 
 PTMCMC_checkpoint.pt
+
+*.ipynb
