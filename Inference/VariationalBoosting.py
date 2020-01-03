@@ -30,12 +30,11 @@ class MeanFieldVariationalMixtureDistribution(nn.Module):
             
     def log_prob(self, x):
         #return torch.logsumexp(torch.stack([torch.log(self.proportions[c]) + self.components[c].log_prob(x) for c in range(len(self.proportions))],dim=1),dim=1)
-        MU = torch.stack([c.mu for c in self.components])
+        MU = torch.cat([c.mu for c in self.components], dim=0)
         SIGMA = torch.stack([c.sigma for c in self.components])
         P = -0.5*torch.log(2*np.pi*SIGMA**2) - ( 0.5*(MU-x)**2)/(SIGMA**2) 
         return torch.logsumexp(torch.log(self.proportions) + P.sum(dim=1), dim=0)
         
-    
     def log_prob_augmented(self, x, q_new, unbounded_prop_new):
         prop_new = torch.sigmoid(unbounded_prop_new).to(self.device)
         A = torch.log(1-prop_new) + self.log_prob(x)
