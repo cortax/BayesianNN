@@ -33,7 +33,7 @@ class MeanFieldVariationalMixtureDistribution(nn.Module):
         MU = torch.stack([c.mu for c in self.components])
         SIGMA = torch.stack([c.sigma for c in self.components])
         P = -0.5*torch.log(2*np.pi*SIGMA**2) - ( 0.5*(MU-x)**2)/(SIGMA**2) 
-        return torch.logsumexp(torch.log(q.proportions) + P.sum(dim=1), dim=0)
+        return torch.logsumexp(torch.log(self.proportions) + P.sum(dim=1), dim=0)
         
     
     def log_prob_augmented(self, x, q_new, unbounded_prop_new):
@@ -41,8 +41,8 @@ class MeanFieldVariationalMixtureDistribution(nn.Module):
         A = torch.log(1-prop_new) + self.log_prob(x)
         B = torch.log(prop_new) + q_new.log_prob(x)
         return torch.logsumexp(torch.stack([A,B]),dim=0)
-    
-    
+
+
 class VariationalBoostingOptimizer():
     def __init__(self, mixture, sigma_noise, optimizer, optimizer_params, scheduler=None, scheduler_params=None, min_lr=None):
         self.mixture = mixture
@@ -136,4 +136,4 @@ class VariationalBoostingOptimizer():
                 new_proportion = torch.sigmoid(new_unscaled_proportion)
                 self.mixture.add_component(new_component, new_proportion)
         return self.mixture    
-    
+
