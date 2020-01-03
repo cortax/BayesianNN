@@ -60,19 +60,47 @@ def main(tag, nbBBVI, nblayers, layerwidth, device):
     logtarget = lambda theta : logposterior(theta, model, x_data, y_data, 0.1 )
     BBVI = []
 
-    dirname = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/BBVI_vanilla/"
-    os.makedirs(dirname, exist_ok=True)
+    #dirname = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/PTMCMC_hot/"
+    #os.makedirs(dirname, exist_ok=True)
 
     for _ in range(nbBBVI):
         std = torch.distributions.Gamma(torch.tensor([1.0]), torch.tensor([1.0])).sample()[0].float()
         q = MeanFieldVariationalDistribution(param_count, sigma=0.0000001, device=device)
         q.mu = nn.Parameter( torch.empty([1,param_count],device=device).normal_(std=std), requires_grad=True)
-        q.rho.requires_grad = True
+        q.rho.requires_grad = False
         q.mu.requires_grad = True
         
+        n_samples_ELBO = 10
+        optimizer = torch.optim.Adam(q.parameters(), lr=0.01)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=200, factor=0.9)
+
+        for _ in range(1000000):
+            optimizer.zero_grad()
+
+            listDIV = []
+            for i in range(n_samples_ELBO):
+                z = q.sample(1)
+                LQ = q.log_prob(z)
+                LP = logposterior(z, model, x_data, y_data, sigma_noise=0.1)
+                listDIV.append((LQ - LP))
+
+            L = torch.stack(listDIV).mean()
+            L.backward()
+
+            learning_rate = optimizer.param_groups[0]['lr']
+
+            scheduler.step(L.detach().clone().cpu().numpy())
+            optimizer.step()
+
+            if learning_rate < 0.00001:
+                break
+
         n_samples_ELBO = 100
         optimizer = torch.optim.Adam(q.parameters(), lr=0.01)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=100, factor=0.9)
+        
+        q.mu.detach_().requires_grad_(False)
+        q.rho.detach_().requires_grad_(True)
 
         for _ in range(1000000):
             optimizer.zero_grad()
@@ -96,7 +124,7 @@ def main(tag, nbBBVI, nblayers, layerwidth, device):
                 break
 
         BBVI.append(q)
-        filename = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/BBVI_vanilla/BBVI_batch_" + str(tag) + ".pt"
+        filename = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/BBVI_expansion/BBVI_batch_" + str(tag) + ".pt"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
         pickle_out = open(filename,"wb")
