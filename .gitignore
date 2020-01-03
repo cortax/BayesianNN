@@ -3,29 +3,6 @@
 
 \.ipynb_checkpoints/
 
+
+
 *.pyc
-Untitled\.ipynb
-
-test\.ipynb
-
-Experiments/foong/tanh/MAP/models/
-
-Experiments/foong/tanh/MAP/logs/
-
-Experiments/foong/tanh/BBVI/models/
-
-Experiments/foong/tanh/BBVI/logs/
-
-Experiments/foong/tanh/BBVI/plots/
-
-Experiments/foong/tanh/MAP/plots/
-
-Experiments/foong/tanh/MAP\+BBVI/logs/
-
-Experiments/foong/tanh/MAP\+BBVI/models/
-
-Experiments/foong/tanh/MAP\+BBVI/plots/
-
-PTMCMC_checkpoint.pt
-
-*.ipynb
