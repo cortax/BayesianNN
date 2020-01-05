@@ -19,6 +19,8 @@ class MeanFieldVariationalAE(nn.Module):
                        activation,
                        self.layerMid,
                        nn.ReLU(),
+                       self.layerMid,
+                       nn.ReLU(),
                        self.layerOut
                        )
         else:
