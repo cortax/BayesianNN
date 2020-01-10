@@ -12,7 +12,6 @@ class VariationalGenerativeNetwork(nn.Module):
         
         self.mfvar = MeanFieldVariationalDistribution(lat_dim,mu,sigma)
         self.nntransform = nntransform
-        
           
     def sample(self, n=1):
         return self.nntransform(self.mfvar.sample(n))
