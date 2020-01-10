@@ -13,6 +13,7 @@ plt.style.use('ggplot')
 
 class MeanFieldVariationalMixtureDistribution(nn.Module):
     def __init__(self, proportions, components, device='cpu'):
+        super(MeanFieldVariationalMixtureDistribution, self).__init__()
         self.proportions = proportions.to(device)
         self.components = components
         self.requires_grad_(False)
