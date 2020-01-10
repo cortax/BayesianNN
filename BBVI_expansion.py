@@ -60,9 +60,6 @@ def main(tag, nbBBVI, nblayers, layerwidth, device):
     logtarget = lambda theta : logposterior(theta, model, x_data, y_data, 0.1 )
     BBVI = []
 
-    #dirname = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/PTMCMC_hot/"
-    #os.makedirs(dirname, exist_ok=True)
-
     for _ in range(nbBBVI):
         std = torch.distributions.Gamma(torch.tensor([1.0]), torch.tensor([1.0])).sample()[0].float()
         q = MeanFieldVariationalDistribution(param_count, sigma=0.0000001, device=device)
@@ -124,7 +121,7 @@ def main(tag, nbBBVI, nblayers, layerwidth, device):
                 break
 
         BBVI.append(q)
-        filename = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/BBVI_expansion/BBVI_batch_" + str(tag) + ".pt"
+        filename = "Results/"+'L'+str(nblayers)+'W'+str(layerwidth)+"/BBVI_expansion_boosting/BBVI_batch_" + str(tag) + ".pt"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
         pickle_out = open(filename,"wb")
