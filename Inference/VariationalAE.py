@@ -26,4 +26,4 @@ class MeanFieldVariationalAE(nn.Module):
         return self.decoder(lat)
 
 
-
+    

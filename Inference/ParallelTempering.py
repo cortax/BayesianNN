@@ -78,7 +78,8 @@ class PTMCMCSampler():
             logProba = self.logProbaMatrix
             ladderAcceptanceRate = torch.tensor(self._ladderAcceptanceCount).float()/N
             swapAcceptanceRate = torch.tensor(self._swapAcceptanceCount).float()/N
-            return x, ladderAcceptanceRate, swapAcceptanceRate, logProba                    
+            return x, ladderAcceptanceRate, swapAcceptanceRate, logProba
+                      
             
     def _MAP(self, device=None):
         if device is None:
