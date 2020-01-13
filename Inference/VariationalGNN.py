@@ -37,9 +37,11 @@ class GNN(nn.Module):
     def get_H(self, nb_samples):
         theta=self.forward(nb_samples)
         H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
+        #H=(theta.std(0)*(torch.sensor(4)/(nb_samples*(self.output_dim+2)).pow(1/(self.output_dim+4))).pow(2)
         while H.sum() == 0:
             theta=self.forward(nb_samples)
-            H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
+           H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
+           #H=(theta.std(0)*(torch.sensor(4)/(nb_samples*(self.output_dim+2)).pow(1/(self.output_dim+4))).pow(2)
         return theta, H.detach()
     
     def KDE(self, theta_, nb_samples_KDE=500):
@@ -71,7 +73,7 @@ class GNNens(nn.Module):
         super(GNNens, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
-        self.log_prop=nn.Parameter(torch.zeros(nb_comp), requires_grad=False)
+        self.log_prop=nn.Parameter(torch.zeros(nb_comp), requires_grad=True)
         self.components= nn.ModuleList([GNN(lat_dim, nb_neur, output_dim, sigma, layers, activation) for i in range(nb_comp)])
         
 
@@ -92,30 +94,15 @@ class GNNens(nn.Module):
             H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
         return theta, H
     
-    def EDK(self, nb_samples_KDE=10 ,nb_samples_ED=10):
-        theta,H =self.get_H(nb_samples_KDE)
+    def KDE(self,theta, H, theta_):
         def kernel(theta1,theta2):
             mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diag(H))
             return mvn.log_prob(theta2)
-        LQ=torch.Tensor(self.nb_comp,nb_samples_KDE,nb_samples_ED)
-        for c in range(self.nb_comp):
-            theta_=self.components[c](nb_samples_ED)   
-            for i in range(nb_samples_KDE):
-                LQ[c,i]=kernel(theta[i],theta_) 
-        LQ_=LQ.logsumexp(1).mean(1)-torch.log(torch.tensor(float(nb_samples_KDE)))
-        return torch.dot(self.proportions,LQ_)
-    
-    def EDKs(self, nb_samples_KDE=10 ,nb_samples_ED=10):
-        theta,H =self.get_H(nb_samples_KDE)
-        def kernel(theta1,theta2):
-            mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diag(H))
-            return mvn.log_prob(theta2)
-        LQ=torch.Tensor(nb_samples_KDE,nb_samples_ED)
-        theta_=self.forward(nb_samples_ED)   
-        for i in range(nb_samples_KDE):
+        LQ=torch.Tensor(theta.shape[0],theta_.shape[0]) 
+        for i in range(theta.shape[0]):
             LQ[i]=kernel(theta[i],theta_) 
-        return LQ.logsumexp(0).mean(0)-torch.log(torch.tensor(float(nb_samples_KDE)))
-
+        return (LQ.logsumexp(0)-torch.log(torch.tensor(float(theta.shape[0])))).unsqueeze(1)
+    
 
     def LP(self, function, nb_samples=100):
         LP=torch.Tensor(nb_samples,self.nb_comp)
