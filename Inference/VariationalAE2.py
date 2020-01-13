@@ -95,7 +95,7 @@ class GNNens(nn.Module):
         for i in range(nb_samples_KDE):
             LQ[i]=kernel(theta[i],theta_) 
         return LQ.logsumexp(0).mean(0)-torch.log(torch.tensor(float(nb_samples_KDE)))
-    
+
 
 #    def KDE(self, theta_, nb_samples=10):  
 #        theta,H=self.get_H(nb_samples)
@@ -107,7 +107,7 @@ class GNNens(nn.Module):
 #            LQ[i]=kernel(theta[i],theta_) 
 #        return LQ.logsumexp(0)-torch.log(torch.tensor(nb_samples,dtype=float))
 
-        
+
 #    def ED(self, nb_samples=10):
 #        theta=self.forward(nb_samples)
 #        #Scott's rule for choosing kernel 
