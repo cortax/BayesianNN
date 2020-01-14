@@ -36,13 +36,19 @@ class GNN(nn.Module):
                 )
     def get_H(self, nb_samples):
         theta=self.forward(nb_samples)
-        H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
-        #H=(theta.std(0)*(torch.sensor(4)/(nb_samples*(self.output_dim+2)).pow(1/(self.output_dim+4))).pow(2)
-        while H.sum() == 0:
+        c=torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(1/(self.output_dim+4))
+        #H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
+        H=(theta.std(0)/c).pow(2)
+        i=0
+        while H.sum() == 0 and i<10:
             theta=self.forward(nb_samples)
-           H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
-           #H=(theta.std(0)*(torch.sensor(4)/(nb_samples*(self.output_dim+2)).pow(1/(self.output_dim+4))).pow(2)
-        return theta, H.detach()
+           #H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
+            H=(theta.std(0)*c).pow(2)
+            i+=1
+        if H.sum() == 0:
+            print('Kernel Density Estimation Error')
+        else: 
+            return theta, H.detach()
     
     def KDE(self, theta_, nb_samples_KDE=500):
         theta,H =self.get_H(nb_samples_KDE)
