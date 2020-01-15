@@ -34,24 +34,24 @@ class GNN(nn.Module):
                 activation(),
                 nn.Linear(nb_neur,output_dim)
                 )
-    def get_H(self, nb_samples):
+    def get_H(self, nb_samples,prec=1.):
         theta=self.forward(nb_samples)
-        c=torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(1/(self.output_dim+4))
+        c=prec*torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(1/(self.output_dim+4))
         #H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
         H=(theta.std(0)/c).pow(2)
         i=0
         while H.sum() == 0 and i<10:
             theta=self.forward(nb_samples)
            #H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
-            H=(theta.std(0)*c).pow(2)
+            H=(theta.std(0)/c).pow(2)
             i+=1
         if H.sum() == 0:
             print('Kernel Density Estimation Error')
         else: 
             return theta, H.detach()
     
-    def KDE(self, theta_, nb_samples_KDE=500):
-        theta,H =self.get_H(nb_samples_KDE)
+    def KDE(self, theta_, nb_samples_KDE=500,prec=1.):
+        theta,H =self.get_H(nb_samples_KDE,prec)
         def kernel(theta1,theta2):
             mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diag(H))
             return mvn.log_prob(theta2)
@@ -91,14 +91,20 @@ class GNNens(nn.Module):
     def proportions(self):
         return self.get_prop(self.log_prop)
 
-        #Scott's rule for choosing kernel
-    def get_H(self, nb_samples):
+    def get_H(self, nb_samples,prec=1.):
         theta=self.forward(nb_samples)
-        H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
-        while H.sum() == 0:
+        c=prec*torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(1/(self.output_dim+4))
+        #H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
+        H=(theta.std(0)/c).pow(2)
+        i=0
+        while H.sum() == 0 and i<10:
             theta=self.forward(nb_samples)
-            H=(theta.std(0)/torch.tensor(nb_samples).pow(1/(self.output_dim+4))).pow(2)
-        return theta, H
+            H=(theta.std(0)/c).pow(2)
+            i+=1
+        if H.sum() == 0:
+            print('Kernel Density Estimation Error')
+        else: 
+            return theta, H
     
     def KDE(self,theta, H, theta_):
         def kernel(theta1,theta2):
