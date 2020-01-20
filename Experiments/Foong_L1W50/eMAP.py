@@ -12,9 +12,10 @@ import argparse
 
 def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, gamma_alpha=1.0, gamma_beta=1.0, seed=-1, device='cpu'):
     seeding(seed)
-
-    mlflow.set_experiment(exp.experiment_name +'_eMAP')
-    expdata = mlflow.get_experiment_by_name(exp.experiment_name)
+    
+    xpname = exp.experiment_name +' eMAP'
+    mlflow.set_experiment(xpname)
+    expdata = mlflow.get_experiment_by_name(xpname)
 
     with mlflow.start_run(run_name='eMAP', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
