@@ -43,21 +43,26 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
         
-        for t in range(max_iter-1):
+        for t in range(max_iter):
             optimizer.zero_grad()
 
             L = -torch.mean(logtarget(theta))
             L.backward()
-            mlflow.log_metric("training log posterior", float(L.detach().cpu()), step=t)
 
             lr = optimizer.param_groups[0]['lr']
-            mlflow.log_metric("learning rate", lr, step=t)
+
+            if t % 100 == 0:
+                mlflow.log_metric("training log posterior", float(L.detach().cpu()), step=t)
+                mlflow.log_metric("learning rate", lr, step=t)
 
             scheduler.step(L.detach().clone().cpu().numpy())
             optimizer.step()
 
             if lr < min_lr:
                 break
+
+        mlflow.log_metric("training log posterior", float(L.detach().cpu()), step=t)
+        mlflow.log_metric("learning rate", lr, step=t)
 
         with torch.no_grad():
             val_post = logposterior(theta, model, x_validation, y_validation, 0.1 )
