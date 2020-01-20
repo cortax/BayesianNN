@@ -41,8 +41,6 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
         
-        print(max_iter)
-        
         for t in range(max_iter-1):
             optimizer.zero_grad()
 
