@@ -41,3 +41,13 @@ def set_all_parameters(module, theta):
     for name in module_name:
         count += set_all_parameters(module._modules[name], theta)
     return count
+
+    def seeding(manualSeed):
+        np.random.seed(manualSeed)
+        torch.manual_seed(manualSeed)
+        torch.cuda.manual_seed(manualSeed)
+        torch.cuda.manual_seed_all(manualSeed)
+
+        torch.backends.cudnn.enabled = False 
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True

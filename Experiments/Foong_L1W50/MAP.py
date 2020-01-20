@@ -9,12 +9,16 @@ import mlflow
 import Experiments.Foong_L1W50.setup as exp
 import argparse
 
-def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, gamma_alpha=1.0, gamma_beta=1.0, device='cpu'):
+
+def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, gamma_alpha=1.0, gamma_beta=1.0, seed=-1, device='cpu'):
+    seeding(seed)
+
     mlflow.set_experiment(exp.experiment_name)
     expdata = mlflow.get_experiment_by_name(exp.experiment_name)
 
     with mlflow.start_run(run_name='MAP', experiment_id=expdata.experiment_id):
-        mlflow.set_tag('device', device)    
+        mlflow.set_tag('device', device) 
+        mlflow.set_tag('seed', seed)    
         logposterior = exp.get_logposterior_fn(device)
         model = exp.get_model(device)
         x_train, y_train = exp.get_training_data(device)
@@ -137,14 +141,22 @@ if __name__== "__main__":
                         help="parameter controling std~Gamma(alpha,beta) feeding theta~initialization(std)")
     parser.add_argument("--gamma_beta", type=float, default=1.0,
                         help="parameter controling std~Gamma(alpha,beta) feeding theta~initialization(std)")
+    parser.add_argument("--seed", type=int, default=None,
+                        help="scheduler patience")
     parser.add_argument("--device", type=str, default=None,
                         help="force device to be used")
     args = parser.parse_args()
+
     print(args)
+
+    if args.seed is None:
+        seed = np.random.randint(0,2**31)
+    else:
+        seed = args.seed
 
     if args.device is None:
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     else:
         device = args.device
 
-    main(args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.gamma_alpha, args.gamma_beta, device=device)
+    main(args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.gamma_alpha, args.gamma_beta, seed=seed, device=device)
