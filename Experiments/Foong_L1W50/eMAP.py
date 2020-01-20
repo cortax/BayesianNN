@@ -13,7 +13,7 @@ import argparse
 def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, gamma_alpha=1.0, gamma_beta=1.0, seed=-1, device='cpu'):
     seeding(seed)
 
-    mlflow.set_experiment(exp.experiment_name)
+    mlflow.set_experiment(exp.experiment_name +' eMAP')
     expdata = mlflow.get_experiment_by_name(exp.experiment_name)
 
     with mlflow.start_run(run_name='eMAP', experiment_id=expdata.experiment_id):
@@ -88,7 +88,7 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
                 
         with torch.no_grad():
             logposterior_ensemble = exp.get_logposterior_ensemble_fn(device)
-            
+
             train_post = logposterior_ensemble(ensemble, model, x_validation, y_validation, 0.1)
             mlflow.log_metric("training log posterior ensemble", -float(train_post.detach().cpu())/y_train.shape[0])
 

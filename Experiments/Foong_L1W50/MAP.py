@@ -13,12 +13,12 @@ import argparse
 def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, gamma_alpha=1.0, gamma_beta=1.0, seed=-1, device='cpu'):
     seeding(seed)
 
-    mlflow.set_experiment(exp.experiment_name)
+    mlflow.set_experiment(exp.experiment_name + ' MAP')
     expdata = mlflow.get_experiment_by_name(exp.experiment_name)
 
     with mlflow.start_run(run_name='MAP', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
-        mlflow.set_tag('seed', seed)    
+        mlflow.set_tag('seed', seed)
         logposterior = exp.get_logposterior_fn(device)
         model = exp.get_model(device)
         x_train, y_train = exp.get_training_data(device)
