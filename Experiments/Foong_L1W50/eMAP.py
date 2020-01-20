@@ -52,10 +52,8 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
 
                     L = -torch.mean(logtarget(theta))
                     L.backward()
-                    mlflow.log_metric("training log posterior", float(L.detach().cpu()), step=t)
 
                     lr = optimizer.param_groups[0]['lr']
-                    mlflow.log_metric("learning rate", lr, step=t)
 
                     scheduler.step(L.detach().clone().cpu().numpy())
                     optimizer.step()
