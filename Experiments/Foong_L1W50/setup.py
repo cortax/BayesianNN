@@ -75,12 +75,12 @@ def get_logposterior_fn(device):
         return logprior(theta) + loglikelihood(theta, model, x, y, sigma_noise)
     return logposterior
 
-def get_logposterior_ensemble_fn(device):
-    def logposterior_ensemble(ensemble, model, x, y, sigma_noise):
+def get_logposteriorpredictive_fn(device):
+    def logposteriorpredictive(ensemble, model, x, y, sigma_noise):
         complogproba = []
         for theta in ensemble:
             set_all_parameters(model, theta)
             y_pred = model(x)
             complogproba.append(-torch.tensor(float(len(ensemble))).log() + _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device)))
         return torch.logsumexp(torch.stack(complogproba), dim=0).sum().unsqueeze(-1)
-    return logposterior_ensemble
+    return logposteriorpredictive

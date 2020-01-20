@@ -10,7 +10,7 @@ import Experiments.Foong_L1W50.setup as exp
 import argparse
 
 
-def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, gamma_alpha=1.0, gamma_beta=1.0, seed=-1, device='cpu'):
+def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, init_std=1.0, seed=-1, device='cpu'):
     seeding(seed)
     
     xpname = exp.experiment_name +' eMAP'
@@ -27,9 +27,8 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
         x_test, y_test = exp.get_test_data(device)
         logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
 
-        mlflow.log_param('gamma_alpha', gamma_alpha)
-        mlflow.log_param('gamma_beta', gamma_beta)
-
+        
+        mlflow.log_param('ensemble_size', ensemble_size)
         mlflow.log_param('learning_rate', learning_rate)
 
         mlflow.log_param('patience', patience)
@@ -41,8 +40,8 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
         ensemble = []
         for k in range(ensemble_size):
             with mlflow.start_run(run_name='component', nested=True):
-                std = torch.distributions.Gamma(torch.tensor([gamma_alpha]), torch.tensor([gamma_beta])).sample()[0].float()
-                mlflow.set_tag('init_std', std.detach().clone().cpu().numpy()) 
+                mlflow.log_param('init_std', init_std) 
+                std = torch.tensor(init_std)
                 theta = torch.nn.Parameter( torch.empty([1,exp.param_count],device=device).normal_(std=std), requires_grad=True)
                 optimizer = torch.optim.Adam([theta], lr=learning_rate)
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
@@ -87,14 +86,14 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
         with torch.no_grad():
             logposterior_ensemble = exp.get_logposterior_ensemble_fn(device)
 
-            train_post = logposterior_ensemble(ensemble, model, x_validation, y_validation, 0.1)
-            mlflow.log_metric("training log posterior ensemble", -float(train_post.detach().cpu())/y_train.shape[0])
+            train_post = logposterior_ensemble(ensemble, model, x_train, y_train, 0.1)
+            mlflow.log_metric("training log posterior ensemble", -float(train_post.detach().cpu()))
 
             val_post = logposterior_ensemble(ensemble, model, x_validation, y_validation, 0.1)
-            mlflow.log_metric("validation log posterior ensemble", -float(val_post.detach().cpu())/y_validation.shape[0])
+            mlflow.log_metric("validation log posterior ensemble", -float(val_post.detach().cpu()))
 
             test_post = logposterior_ensemble(ensemble, model, x_test, y_test, 0.1)
-            mlflow.log_metric("test log posterior ensemble", -float(test_post.detach().cpu())/y_test.shape[0])
+            mlflow.log_metric("test log posterior ensemble", -float(test_post.detach().cpu()))
 
             tempdir = tempfile.TemporaryDirectory()
 
@@ -172,10 +171,8 @@ if __name__== "__main__":
                         help="scheduler patience")
     parser.add_argument("--lr_decay", type=float, default=0.9,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
-    parser.add_argument("--gamma_alpha", type=float, default=1.0,
-                        help="parameter controling std~Gamma(alpha,beta) feeding theta~initialization(std)")
-    parser.add_argument("--gamma_beta", type=float, default=1.0,
-                        help="parameter controling std~Gamma(alpha,beta) feeding theta~initialization(std)")
+    parser.add_argument("--init_std", type=float, default=1.0,
+                        help="parameter controling initialization of theta")
     parser.add_argument("--seed", type=int, default=None,
                         help="scheduler patience")
     parser.add_argument("--device", type=str, default=None,
@@ -194,4 +191,4 @@ if __name__== "__main__":
     else:
         device = args.device
 
-    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.gamma_alpha, args.gamma_beta, seed=seed, device=device)
+    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.init_std, seed=seed, device=device)

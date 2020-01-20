@@ -10,7 +10,7 @@ import Experiments.Foong_L1W50.setup as exp
 import argparse
 
 
-def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, gamma_alpha=1.0, gamma_beta=1.0, seed=-1, device='cpu'):
+def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, init_std=1.0, seed=-1, device='cpu', verbose=False):
     seeding(seed)
 
     xpname = exp.experiment_name + ' MAP'
@@ -27,11 +27,9 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         x_test, y_test = exp.get_test_data(device)
         logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
         
-        mlflow.log_param('gamma_alpha', gamma_alpha)
-        mlflow.log_param('gamma_beta', gamma_beta)
-        std = torch.distributions.Gamma(torch.tensor([gamma_alpha]), torch.tensor([gamma_beta])).sample()[0].float()
+        mlflow.log_param('init_std', init_std) 
+        std = torch.tensor(init_std)
         theta = torch.nn.Parameter( torch.empty([1,exp.param_count],device=device).normal_(std=std), requires_grad=True)
-        mlflow.set_tag('init_std', std.detach().clone().cpu().numpy()) 
         
         mlflow.log_param('learning_rate', learning_rate)
         optimizer = torch.optim.Adam([theta], lr=learning_rate)
@@ -42,7 +40,7 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
-        
+
         for t in range(max_iter):
             optimizer.zero_grad()
 
@@ -51,6 +49,11 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
 
             lr = optimizer.param_groups[0]['lr']
             scheduler.step(L.detach().clone().cpu().numpy())
+
+            if verbose:
+                stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
+                print(stats)
+
             if lr < min_lr:
                 break
 
@@ -58,13 +61,13 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
 
         with torch.no_grad():
             train_post = logposterior(theta, model, x_train, y_train, 0.1 )
-            mlflow.log_metric("training log posterior", -float(train_post.detach().cpu())/y_train.shape[0])
+            mlflow.log_metric("training log posterior", -float(train_post.detach().cpu()))
 
             val_post = logposterior(theta, model, x_validation, y_validation, 0.1 )
-            mlflow.log_metric("validation log posterior", -float(val_post.detach().cpu())/y_validation.shape[0])
+            mlflow.log_metric("validation log posterior", -float(val_post.detach().cpu()))
 
             test_post = logposterior(theta, model, x_test, y_test, 0.1 )
-            mlflow.log_metric("test log posterior", -float(test_post.detach().cpu())/y_test.shape[0])
+            mlflow.log_metric("test log posterior", -float(test_post.detach().cpu()))
 
             tempdir = tempfile.TemporaryDirectory()
 
@@ -137,13 +140,13 @@ if __name__== "__main__":
                         help="scheduler patience")
     parser.add_argument("--lr_decay", type=float, default=0.9,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
-    parser.add_argument("--gamma_alpha", type=float, default=1.0,
-                        help="parameter controling std~Gamma(alpha,beta) feeding theta~initialization(std)")
-    parser.add_argument("--gamma_beta", type=float, default=1.0,
-                        help="parameter controling std~Gamma(alpha,beta) feeding theta~initialization(std)")
+    parser.add_argument("--init_std", type=float, default=1.0,
+                        help="parameter controling initialization of theta")
     parser.add_argument("--seed", type=int, default=None,
                         help="scheduler patience")
     parser.add_argument("--device", type=str, default=None,
+                        help="force device to be used")
+    parser.add_argument("--verbose", type=bool, default=False,
                         help="force device to be used")
     args = parser.parse_args()
 
@@ -159,4 +162,4 @@ if __name__== "__main__":
     else:
         device = args.device
 
-    main(args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.gamma_alpha, args.gamma_beta, seed=seed, device=device)
+    main(args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.init_std, seed=seed, device=device, verbose=args.verbose)
