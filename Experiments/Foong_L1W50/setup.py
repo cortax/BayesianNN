@@ -23,11 +23,25 @@ class MLP(nn.Module):
         return x    
 
 def get_training_data(device):
-    training_data = torch.load('Data/foong_data.pt')
+    training_data = torch.load('Experiments/Foong_L1W50/Data/foong_data.pt')
     x_train = training_data[0].to(device)
     y_train = training_data[1].to(device)
     y_train = y_train.unsqueeze(-1)
     return x_train, y_train
+
+def get_validation_data(device):
+    validation_data = torch.load('Experiments/Foong_L1W50/Data/foong_data_validation.pt')
+    x_validation = validation_data[0].to(device)
+    y_validation = validation_data[1].to(device)
+    y_validation = y_validation.unsqueeze(-1)
+    return x_validation, y_validation
+
+def get_test_data(device):
+    test_data = torch.load('Experiments/Foong_L1W50/Data/foong_data_test.pt')
+    x_test = test_data[0].to(device)
+    y_test = test_data[1].to(device)
+    y_test = y_test.unsqueeze(-1)
+    return x_test, y_test
 
 def get_model(device):
     model = MLP(nblayers, layerwidth).to(device)
