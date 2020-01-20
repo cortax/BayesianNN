@@ -51,7 +51,6 @@ def get_model(device):
 def _log_norm(x, mu, std):
     return -0.5 * torch.log(2*np.pi*std**2) -(0.5 * (1/(std**2))* (x-mu)**2)
 
-
 def get_logprior_fn(device):
     S = torch.eye(param_count).to(device)
     mu = torch.zeros(param_count).to(device)
@@ -76,3 +75,12 @@ def get_logposterior_fn(device):
         return logprior(theta) + loglikelihood(theta, model, x, y, sigma_noise)
     return logposterior
 
+def get_logposterior_ensemble_fn(device):
+    def logposterior_ensemble(ensemble, model, x, y, sigma_noise):
+        complogproba = []
+        for theta in ensemble:
+            set_all_parameters(model, theta)
+            y_pred = model(x)
+            complogproba.append(-torch.tensor(float(len(ensemble))).log() + _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device)))
+        return torch.logsumexp(torch.stack(complogproba), dim=0).sum().unsqueeze(-1)
+    return logposterior_ensemble

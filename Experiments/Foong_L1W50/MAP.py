@@ -30,6 +30,7 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         mlflow.log_param('gamma_beta', gamma_beta)
         std = torch.distributions.Gamma(torch.tensor([gamma_alpha]), torch.tensor([gamma_beta])).sample()[0].float()
         theta = torch.nn.Parameter( torch.empty([1,exp.param_count],device=device).normal_(std=std), requires_grad=True)
+        mlflow.set_tag('init_std', std.detach().clone().cpu().numpy()) 
         
         mlflow.log_param('learning_rate', learning_rate)
         optimizer = torch.optim.Adam([theta], lr=learning_rate)
