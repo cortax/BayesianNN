@@ -50,12 +50,11 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             L.backward()
 
             lr = optimizer.param_groups[0]['lr']
-
             scheduler.step(L.detach().clone().cpu().numpy())
-            optimizer.step()
-
             if lr < min_lr:
                 break
+
+            optimizer.step()
 
         with torch.no_grad():
             train_post = logposterior(theta, model, x_train, y_train, 0.1 )

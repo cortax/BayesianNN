@@ -54,12 +54,11 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
                     L.backward()
 
                     lr = optimizer.param_groups[0]['lr']
-
                     scheduler.step(L.detach().clone().cpu().numpy())
-                    optimizer.step()
-
                     if lr < min_lr:
                         break
+
+                    optimizer.step()
                         
                 with torch.no_grad():  
                     tempdir = tempfile.TemporaryDirectory()
