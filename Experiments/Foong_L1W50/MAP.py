@@ -66,7 +66,7 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         with torch.no_grad():
             tempdir = tempfile.TemporaryDirectory()
 
-            mlflow.log_metric("training loss", L.detach().clone().cpu().numpy())
+            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
             
             pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')

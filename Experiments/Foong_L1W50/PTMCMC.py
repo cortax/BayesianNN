@@ -8,16 +8,18 @@ import tempfile
 import mlflow
 import Experiments.Foong_L1W50.setup as exp
 import argparse
+import pandas as pd
 
 
-def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, init_std=1.0, seed=-1, device='cpu'):
+def main(numiter=1000, burnin=0, thinning=1, temperatures=[1.0], maintempindex=0, baseMHproposalNoise=0.01, temperatureNoiseReductionFactor=0.5, \
+         init_std=0.01, optimize=0, seed=seed, device=device):
     seeding(seed)
     
-    xpname = exp.experiment_name +' eMAP'
+    xpname = exp.experiment_name +' PTMCMC'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
 
-    with mlflow.start_run(run_name='eMAP', experiment_id=expdata.experiment_id):
+    with mlflow.start_run(run_name='PTMCMC', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
         mlflow.set_tag('seed', seed)    
         logposterior = exp.get_logposterior_fn(device)
@@ -27,15 +29,18 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
         x_test, y_test = exp.get_test_data(device)
         logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
 
-        
-        mlflow.log_param('ensemble_size', ensemble_size)
-        mlflow.log_param('learning_rate', learning_rate)
+        sampler = PTMCMCSampler(logtarget, exp.param_count, baseMHproposalNoise, temperatureNoiseReductionFactor, temperatures, device)
 
-        mlflow.log_param('patience', patience)
-        mlflow.log_param('lr_decay', lr_decay)
+        sampler.initChains(nbiter=optimize, init_std=init_std)
 
-        mlflow.log_param('max_iter', max_iter)
-        mlflow.log_param('min_lr', min_lr)
+        mlflow.log_param('numiter', numiter)
+        mlflow.log_param('burnin', burnin)
+
+        mlflow.log_param('thinning', thinning)
+        mlflow.log_param('temperatures', temperatures)
+
+        mlflow.log_param('optimize', optimize)
+        mlflow.log_param('init_std', init_std)
 
         ensemble = []
         for k in range(ensemble_size):
@@ -46,11 +51,14 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
                 optimizer = torch.optim.Adam([theta], lr=learning_rate)
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
 
+                training_loss = []
                 for t in range(max_iter-1):
                     optimizer.zero_grad()
 
                     L = -torch.mean(logtarget(theta))
                     L.backward()
+
+                    training_loss.append(L.detach().clone().cpu().numpy())
 
                     lr = optimizer.param_groups[0]['lr']
                     scheduler.step(L.detach().clone().cpu().numpy())
@@ -61,6 +69,19 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
                         
                 with torch.no_grad():  
                     tempdir = tempfile.TemporaryDirectory()
+
+                    mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
+
+                    pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
+                    mlflow.log_artifact(tempdir.name+'/training_loss.csv')
+
+                    logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
+                    train_post = logposteriorpredictive([theta], model, x_train, y_train, 0.1)/len(y_train)
+                    mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
+                    val_post = logposteriorpredictive([theta], model, x_validation, y_validation, 0.1)/len(y_validation)
+                    mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
+                    test_post = logposteriorpredictive([theta], model, x_test, y_test, 0.1)/len(y_test)
+                    mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
                     x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
                     fig, ax = plt.subplots()
@@ -84,18 +105,15 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
                     ensemble.append(theta.detach().clone())
                 
         with torch.no_grad():
-            logposterior_ensemble = exp.get_logposterior_ensemble_fn(device)
-
-            train_post = logposterior_ensemble(ensemble, model, x_validation, y_validation, 0.1)
-            mlflow.log_metric("training log posterior ensemble", -float(train_post.detach().cpu()))
-
-            val_post = logposterior_ensemble(ensemble, model, x_validation, y_validation, 0.1)
-            mlflow.log_metric("validation log posterior ensemble", -float(val_post.detach().cpu()))
-
-            test_post = logposterior_ensemble(ensemble, model, x_test, y_test, 0.1)
-            mlflow.log_metric("test log posterior ensemble", -float(test_post.detach().cpu()))
-
             tempdir = tempfile.TemporaryDirectory()
+
+            logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
+            train_post = logposteriorpredictive(ensemble, model, x_train, y_train, 0.1)/len(y_train)
+            mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
+            val_post = logposteriorpredictive(ensemble, model, x_validation, y_validation, 0.1)/len(y_validation)
+            mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
+            test_post = logposteriorpredictive(ensemble, model, x_test, y_test, 0.1)/len(y_test)
+            mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
             x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
             fig, ax = plt.subplots()
@@ -159,22 +177,27 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
 
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ensemble_size", type=int, default=1,
-                        help="number of model to train in the ensemble")
-    parser.add_argument("--max_iter", type=int, default=100000,
-                        help="maximum number of learning iterations")
-    parser.add_argument("--learning_rate", type=float, default=0.01,
-                        help="initial learning rate of the optimizer")
-    parser.add_argument("--min_lr", type=float, default=0.0005,
-                        help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=100,
-                        help="scheduler patience")
-    parser.add_argument("--lr_decay", type=float, default=0.9,
-                        help="scheduler multiplicative factor decreasing learning rate when patience reached")
+
+    parser.add_argument("--numiter", type=int, default=1000,
+                        help="number of iterations in the Markov chain")
+    parser.add_argument("--burnin", type=int, default=0,
+                        help="number of initial samples to skip in the Markov chain")
+    parser.add_argument("--thinning", type=int, default=1,
+                        help="subsampling factor of the Markov chain")
+    parser.add_argument("--temperatures", type=str, default=None,
+                        help="temperature ladder in the form [t0, t1, t2, t3]")
+    parser.add_argument("--maintempindex", type=int, default=None,
+                        help="index of the temperature to use to make the chain (ex: 0 for t0)")
+    parser.add_argument("--baseMHproposalNoise", type=float, default=0.01,
+                        help="standard-deviation of the isotropic proposal")
+    parser.add_argument("--temperatureNoiseReductionFactor", type=float, default=0.5,
+                        help="factor adapting the noise to the corresponding temperature")
     parser.add_argument("--init_std", type=float, default=1.0,
                         help="parameter controling initialization of theta")
+    parser.add_argument("--optimize", type=int, default=0,
+                        help="number of optimization iterations to initialize the state")
     parser.add_argument("--seed", type=int, default=None,
-                        help="scheduler patience")
+                        help="value insuring reproducibility")
     parser.add_argument("--device", type=str, default=None,
                         help="force device to be used")
     args = parser.parse_args()
@@ -191,4 +214,5 @@ if __name__== "__main__":
     else:
         device = args.device
 
-    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.init_std, seed=seed, device=device)
+    main(args.numiter, args.burnin, args.thinning, args.temperatures, args.maintempindex, args.baseMHproposalNoise, \
+         args.temperatureNoiseReductionFactor, args.init_std, args.optimize, seed=seed, device=device)
