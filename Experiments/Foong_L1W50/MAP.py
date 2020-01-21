@@ -8,6 +8,7 @@ import tempfile
 import mlflow
 import Experiments.Foong_L1W50.setup as exp
 import argparse
+import pandas as pd
 
 
 def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, init_std=1.0, seed=-1, device='cpu', verbose=False):
@@ -41,11 +42,14 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
 
+        training_loss = []
         for t in range(max_iter):
             optimizer.zero_grad()
 
             L = -torch.mean(logtarget(theta))
             L.backward()
+
+            training_loss.append(L.detach().clone().cpu().numpy())
 
             lr = optimizer.param_groups[0]['lr']
             scheduler.step(L.detach().clone().cpu().numpy())
@@ -60,16 +64,20 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             optimizer.step()
 
         with torch.no_grad():
-            train_post = logposterior(theta, model, x_train, y_train, 0.1 )
-            mlflow.log_metric("training log posterior", -float(train_post.detach().cpu()))
-
-            val_post = logposterior(theta, model, x_validation, y_validation, 0.1 )
-            mlflow.log_metric("validation log posterior", -float(val_post.detach().cpu()))
-
-            test_post = logposterior(theta, model, x_test, y_test, 0.1 )
-            mlflow.log_metric("test log posterior", -float(test_post.detach().cpu()))
-
             tempdir = tempfile.TemporaryDirectory()
+
+            mlflow.log_metric("training loss", L.detach().clone().cpu().numpy())
+            
+            pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
+            mlflow.log_artifact(tempdir.name+'/training_loss.csv')
+
+            logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
+            train_post = logposteriorpredictive([theta], model, x_train, y_train, 0.1)/len(y_train)
+            mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
+            val_post = logposteriorpredictive([theta], model, x_validation, y_validation, 0.1)/len(y_validation)
+            mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
+            test_post = logposteriorpredictive([theta], model, x_test, y_test, 0.1)/len(y_test)
+            mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
             x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
             fig, ax = plt.subplots()
