@@ -37,7 +37,7 @@ class HyNetEns(nn.Module):
         super(HyNetEns, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
-        self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b) for i in range(nb_comp)])   
+        self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b).to(device) for i in range(nb_comp)])   
 
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
     def get_H(self, nb_samples):
@@ -255,7 +255,7 @@ if __name__== "__main__":
 
  
     if args.device is None:
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     else:
         device = args.device
 main()
