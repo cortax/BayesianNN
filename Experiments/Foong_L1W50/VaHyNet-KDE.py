@@ -84,7 +84,7 @@ class HyNetEns(nn.Module):
         return (LQ.logsumexp((1,2)).clamp(torch.finfo().min,float('inf'))-torch.log(torch.tensor(float(self.nb_comp*theta.shape[1])))).unsqueeze(1)
     '''
         
-def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,KDE_prec=10.,n_samples_KDE=10000,n_samples_ED=50, n_samples_LP=50, max_iter=5, learning_rate=0.001, min_lr=0.000001, patience=100, lr_decay=0.9,  device='cpu', verbose=False):
+def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,KDE_prec=10.,n_samples_KDE=10000,n_samples_ED=50, n_samples_LP=50, max_iter=1100000, learning_rate=0.001, min_lr=0.00001, patience=100, lr_decay=0.9,  device='cpu', verbose=False):
     
     xpname = exp.experiment_name + 'HyNet-KDE'
     mlflow.set_experiment(xpname)
@@ -135,10 +135,14 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             L.backward()
 
             training_loss.append(L.detach().clone().cpu().numpy())
-            mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()))
-            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
+
             
             lr = optimizer.param_groups[0]['lr']
+
+            mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()))
+            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
+            mlflow.log_metric("learning rate", float(lr))
+            
             scheduler.step(L.detach().clone().cpu().numpy())
 
             if verbose:
