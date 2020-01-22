@@ -11,25 +11,7 @@ import argparse
 import pandas as pd
 
 
-class Parallel_Net(nn.Module):
-            def __init__(self, nb_neur,activation):
-                super(Parallel_Net, self).__init__()
-                self.nb_neur = nb_neur 
-                self.activation=activation
-                self.requires_grad_(False)
-                self.param_count=3*nb_neur+1
 
-            def forward(self,theta,x):
-                nb_theta=theta.shape[0]
-                theta=theta.split([self.nb_neur,self.nb_neur,self.nb_neur,1],dim=1)
-                nb_x=x.shape[0]
-                input_x=x.view(nb_x,1,1)
-                m1=torch.matmul(theta[0].view(nb_theta,1,self.nb_neur,1),input_x)
-                m2=m1.add(theta[1].reshape(nb_theta,1,self.nb_neur,1))
-                m3=self.activation(m2)
-                m4=torch.matmul(theta[2].view(nb_theta,1,1,self.nb_neur),m3)
-                m5=m4.add(theta[3].reshape(nb_theta,1,1,1))
-                return m5.squeeze(-1)
 
 class HNet(nn.Module):
             def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.4, init_b=0.001):
@@ -102,7 +84,7 @@ class HyNetEns(nn.Module):
         return (LQ.logsumexp((1,2)).clamp(torch.finfo().min,float('inf'))-torch.log(torch.tensor(float(self.nb_comp*theta.shape[1])))).unsqueeze(1)
     '''
         
-def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.4,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=100, n_samples_LP=100, max_iter=100000, learning_rate=0.005, min_lr=0.000001, patience=100, lr_decay=0.9,  device='cpu', verbose=False):
+def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.4,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=100, n_samples_LP=100, max_iter=100000, learning_rate=0.005, min_lr=0.000001, patience=100, lr_decay=0.9,  device='cpu', verbose=False):
     
     xpname = exp.experiment_name + 'HyNet-KDE'
     mlflow.set_experiment(xpname)
@@ -110,24 +92,18 @@ def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,act
 
     with mlflow.start_run(run_name='HyNet-KDE', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
-        logposterior = exp.get_logposterior_fn(device)
-        model = Parallel_Net(nb_neurons_pn,activation_pn).to(device) #new!
+        logposterior = exp.get_logposterior_parallel_fn(device)#new!
+        model = exp.gte_parallel_model(nb_neurons_pn).to(device) #new!
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
         logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
-        mlflow.log_param('Net_nb_neurons', nb_neurons_pn)
-        
-        param_count=3*nb_neurons_pn+1
-        mlflow.log_param('param_count', param_count)
-        mlflow.log_param('HyperNet_lat_dim', lat_dim)
-        mlflow.log_param('HyperNet_nb_neurons', param_count)
-        
-        
-            
-        mlflow.log_param('ensemble_size', ensemble_size)
 
-        Hyper_Nets=HyNetEns(ensemble_size,lat_dim, param_count,activation,init_w,init_b).to(device)
+        mlflow.log_param('ensemble_size', ensemble_size)
+        mlflow.log_param('HyperNet_lat_dim', lat_dim)
+        mlflow.log_param('HyperNet_nb_neurons', exp.param_count)
+
+        Hyper_Nets=HyNetEns(ensemble_size,lat_dim, exp.param_count,activation,init_w,init_b).to(device)
         
         mlflow.log_param('learning_rate', learning_rate)
         optimizer = torch.optim.Adam(Hyper_Nets.parameters(), lr=learning_rate)
