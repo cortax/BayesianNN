@@ -259,7 +259,7 @@ if __name__== "__main__":
                         help="force device to be used")
     args = parser.parse_args()
 
-    print(args)
+    
 
  
     if args.device is None:
@@ -267,5 +267,7 @@ if __name__== "__main__":
     else:
         device = args.device   
     
-    main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.KDE_prec, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
+    print(args)
+    
+    main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.KDE_prec, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
     
