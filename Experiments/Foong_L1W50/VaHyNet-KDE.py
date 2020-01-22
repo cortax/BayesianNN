@@ -173,12 +173,13 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            plt.rcParams['agg.path.chunksize'] = 10000000000000000
+            
             theta = Hyper_Nets(100)
             for i in range(100):
                 y_test = model(theta[i].unsqueeze(0),x_test)
                 plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).cpu().numpy(), alpha=0.05, linewidth=1, color='green')
                 #    plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
+            fig.rcParams['agg.path.chunksize'] = 10000000000000000
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
             plt.close()
