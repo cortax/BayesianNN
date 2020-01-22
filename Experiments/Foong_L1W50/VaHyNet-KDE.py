@@ -175,8 +175,8 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.scatter(x_train.cpu(), y_train.cpu())
             theta = Hyper_Nets(1000)
             plt.rcParams['agg.path.chunksize'] = 1000
-            for _ in range(1000)
-                y_test = model(theta[c,i].unsqueeze(0),x_test)
+            for i in range(1000):
+                y_test = model(theta[i].unsqueeze(0),x_test)
                 plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')           
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
@@ -192,8 +192,8 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.scatter(x_validation.cpu(), y_validation.cpu())
             theta = Hyper_Nets(1000)
             plt.rcParams['agg.path.chunksize'] = 1000
-            for _ in range(1000)
-                y_test = model(theta[c,i].unsqueeze(0),x_test)
+            for i in range(1000):
+                y_test = model(theta[i].unsqueeze(0),x_test)
                 plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
             fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/validation.png')
@@ -209,8 +209,8 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.scatter(x_test.cpu(), y_test.cpu())
             plt.rcParams['agg.path.chunksize'] = 1000
             theta = Hyper_Nets(1000)
-            for _ in range(1000)
-                y_test = model(theta[c,i].unsqueeze(0),x_test)
+            for i in range(1000)
+                y_test = model(theta[i].unsqueeze(0),x_test)
                 plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
             fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/test.png')
