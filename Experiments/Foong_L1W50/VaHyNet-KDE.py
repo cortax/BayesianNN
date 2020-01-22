@@ -84,7 +84,7 @@ class HyNetEns(nn.Module):
         return (LQ.logsumexp((1,2)).clamp(torch.finfo().min,float('inf'))-torch.log(torch.tensor(float(self.nb_comp*theta.shape[1])))).unsqueeze(1)
     '''
         
-def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=50, learning_rate=0.001, min_lr=0.000001, patience=100, lr_decay=0.9,  device='cpu', verbose=True):
+def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10, learning_rate=0.001, min_lr=0.000001, patience=100, lr_decay=0.9,  device='cpu', verbose=True):
     
     xpname = exp.experiment_name + 'HyNet-KDE'
     mlflow.set_experiment(xpname)
@@ -172,12 +172,11 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            theta = Hyper_Nets.sample(100).detach()
-            for c in range(Hyper_Nets.nb_comp):
-                for i in range(100):
-                    y_test = model(theta[c,i].unsqueeze(0),x_test)
-                #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
-                    plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
+            theta = Hyper_Nets(1000)
+            for i in range(1000):
+                y_test = model(theta[c,i].unsqueeze(0),x_test)
+                plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).cpu().numpy(), alpha=0.05, linewidth=1, color='green')
+                #    plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
             plt.close()
