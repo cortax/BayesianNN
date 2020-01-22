@@ -84,7 +84,9 @@ class HyNetEns(nn.Module):
         return (LQ.logsumexp((1,2)).clamp(torch.finfo().min,float('inf'))-torch.log(torch.tensor(float(self.nb_comp*theta.shape[1])))).unsqueeze(1)
     '''
         
-def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cpu', verbose=True):
+def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cuda:1', verbose=True):
+    
+    activation=nn.ReLU()
     
     xpname = exp.experiment_name + 'HyNet-KDE'
     mlflow.set_experiment(xpname)
@@ -226,7 +228,13 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.2,init_b=.001,KD
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ensemble_size", type=int, default=1,
-                        help="number of model to train in the ensemble")
+                        help="number of hypernets to train in the ensemble")
+    parser.add_argument("--lat_dim", type=int, default=5,
+                        help="number of latent dimensions of the hypernets")
+    parser.add_argument("--init_w", type=float, default=0.1,
+                        help="std for weight initialization of output layers")
+    parser.add_argument("--init_b", type=float, default=0.0001,
+                        help="std for bias initialization of output layers")
     parser.add_argument("--max_iter", type=int, default=100000,
                         help="maximum number of learning iterations")
     parser.add_argument("--learning_rate", type=float, default=0.01,
@@ -252,4 +260,5 @@ if __name__== "__main__":
         device = args.device
 main()
 
+#main(args.ensemble_size,args.lat_dim,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cpu', verbose=True)
 #    main(20,nn.Tanh(), 1,5,1.,1000,100,100,args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
