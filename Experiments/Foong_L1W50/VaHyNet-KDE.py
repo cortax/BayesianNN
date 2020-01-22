@@ -84,7 +84,7 @@ class HyNetEns(nn.Module):
         return (LQ.logsumexp((1,2)).clamp(torch.finfo().min,float('inf'))-torch.log(torch.tensor(float(self.nb_comp*theta.shape[1])))).unsqueeze(1)
     '''
         
-def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,KDE_prec=4.,n_samples_KDE=10000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cpu', verbose=True):
+def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cpu', verbose=True):
     
     xpname = exp.experiment_name + 'HyNet-KDE'
     mlflow.set_experiment(xpname)
