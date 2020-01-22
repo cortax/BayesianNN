@@ -42,9 +42,9 @@ class HyNetEns(nn.Module):
         self.components= nn.ModuleList([HNet() for i in range(nb_comp)])   
 
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
-    def get_H(self, nb_samples, prec=KDE_prec):
+    def get_H(self, nb_samples):
         theta=self.forward(nb_samples)
-        c=torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(2/(self.output_dim+4))*prec       
+        c=torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(2/(self.output_dim+4))       
         H_=theta.var(0)/c
         #H_=theta.var(0).min(1).values/c*torch.ones(self.output_dim) #to try!
         return theta, H_.clamp(torch.finfo().eps,float('inf'))
@@ -151,7 +151,7 @@ def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,KDE
             optimizer.zero_grad()
 
             theta,H=Hyper_Nets.get_H(n_samples_KDE,KDE_prec)
-            ED=-Hyper_Nets.KDE(Hyper_Nets(n_samples_ED),theta,H).mean()
+            ED=-Hyper_Nets.KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
             LP=logposterior(Hyper_Nets(n_samples_LP)).mean()
             L =-ED-LP
 
