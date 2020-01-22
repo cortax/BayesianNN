@@ -134,14 +134,15 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
 
             L.backward()
 
-            training_loss.append(L.detach().clone().cpu().numpy())
+            #training_loss.append(L.detach().clone().cpu().numpy())
 
             
             lr = optimizer.param_groups[0]['lr']
 
-            mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()))
-            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
-            mlflow.log_metric("learning rate", float(lr))
+            if t % 50 ==0:
+                mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()))
+                mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
+                mlflow.log_metric("learning rate", float(lr))
             
             scheduler.step(L.detach().clone().cpu().numpy())
 
