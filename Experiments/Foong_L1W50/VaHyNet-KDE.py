@@ -51,7 +51,7 @@ class HNet(nn.Module):
                 return self.hnet(epsilon)           
 
 class HyNetEns(nn.Module):
-    def __init__(self,nb_comp,lat_dim, output_dim, init_w,init_b):
+    def __init__(self,nb_comp,lat_dim, output_dim, activation, init_w,init_b):
         super(HyNetEns, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
@@ -127,7 +127,7 @@ def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,act
             
         mlflow.log_param('ensemble_size', ensemble_size)
 
-        Hyper_Nets=HyNetEns(ensemble_size,lat_dim, param_count,init_w=.4,init_b=.001).to(device)
+        Hyper_Nets=HyNetEns(ensemble_size,lat_dim, param_count,activation,init_w,init_b).to(device)
         
         mlflow.log_param('learning_rate', learning_rate)
         optimizer = torch.optim.Adam(Hyper_Nets.parameters(), lr=learning_rate)
