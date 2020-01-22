@@ -95,7 +95,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
 
-        mlflow.log_param('n_samples_KNN', n_samples_KDE)
+        mlflow.log_param('n_samples_KNN', n_samples_KNN)
         mlflow.log_param('n_samples_ED', n_samples_ED)
         mlflow.log_param('n_samples_LP', n_samples_LP)
         
