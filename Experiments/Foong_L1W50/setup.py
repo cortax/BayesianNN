@@ -24,7 +24,7 @@ class MLP(nn.Module):
     
 class parallel_MLP(nn.Module):
             def __init__(self, layerwidth):
-                super(Parallel_Net, self).__init__()
+                super(parallel_MLP, self).__init__()
                 self.nb_neur = layerwidth
                 self.activation=nn.Tanh()
                 self.requires_grad_(False)
