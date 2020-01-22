@@ -129,7 +129,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
         for t in range(max_iter):
             optimizer.zero_grad()
 
-            theta,H=Hyper_Nets.get_H(n_samples_KDE)
+            theta,H=Hyper_Nets.get_H(n_samples_KDE).to(device)
             ED=-Hyper_Nets.KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
             LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
             L =-ED-LP
