@@ -265,6 +265,7 @@ if __name__== "__main__":
     if args.device is None:
         device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     else:
-        device = args.device
-
-        main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b,args.KDE_prec,args.n_samples_KDE,args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
+        device = args.device   
+    
+    main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.KDE_prec, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
+    
