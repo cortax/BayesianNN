@@ -165,7 +165,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
             
             
-            x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).to(device)
+            x_lin =  torch.arange(-2.,2.0,0.01).unsqueeze(1).to(device)
             fig, ax = plt.subplots()
             fig.set_size_inches(11.7, 8.27)
             plt.xlim(-2, 2) 
@@ -173,7 +173,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            plt.rcParams['agg.path.chunksize'] = 1000000000
+            plt.rcParams['agg.path.chunksize'] = 100000000000000
             theta = Hyper_Nets(1000)
             for i in range(1000):
                 y_test = model(theta[i].unsqueeze(0),x_test)
