@@ -67,11 +67,11 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
     
     activation=nn.ReLU()
     
-    xpname = exp.experiment_name + 'HyNet-KDE'
+    xpname = exp.experiment_name + 'HyNet-KNN'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
 
-    with mlflow.start_run(run_name='HyNet-KDE', experiment_id=expdata.experiment_id):
+    with mlflow.start_run(run_name='HyNet-KNN', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
         logposterior = exp.get_logposterior_parallel_fn(device)#new!
         model = exp.get_parallel_model(device) #new!
