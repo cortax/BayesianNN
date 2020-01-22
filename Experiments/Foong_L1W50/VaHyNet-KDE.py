@@ -176,7 +176,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             theta = Hyper_Nets.sample(50)
             plt.rcParams['agg.path.chunksize'] = 1000
             for c in range(Hyper_Nets.nb_comp):
-                for i in range(50):
+                for i in range(100):
                     y_test = model(theta[c,i].unsqueeze(0),x_test)
                 #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
                     plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))           
@@ -193,6 +193,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.title('Validation set')
             plt.scatter(x_validation.cpu(), y_validation.cpu())
             theta = Hyper_Nets.sample(100)
+            plt.rcParams['agg.path.chunksize'] = 1000
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(100):
                     y_test = model(theta[c,i].unsqueeze(0),x_test)
@@ -211,6 +212,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.title('Test set')
             plt.scatter(x_test.cpu(), y_test.cpu())
             theta = Hyper_Nets.sample(100).detach()
+            plt.rcParams['agg.path.chunksize'] = 1000
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(100):
                     y_test = model(theta[c,i].unsqueeze(0),x_test)
