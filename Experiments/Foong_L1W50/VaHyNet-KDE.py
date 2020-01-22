@@ -33,7 +33,7 @@ class Parallel_Net(nn.Module):
 
 
 class HNet(nn.Module):
-            def __init__(self, lat_dim=5,nb_neur=param_count,output_dim=param_count,  activation=nn.ReLU()):
+            def __init__(self, lat_dim,nb_neur,output_dim,  activation=nn.ReLU()):
                 super(HNet, self).__init__()
                 self.lat_dim = lat_dim
                 self.output_dim=output_dim
