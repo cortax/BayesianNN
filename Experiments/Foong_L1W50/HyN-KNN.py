@@ -39,12 +39,12 @@ class HyNetEns(nn.Module):
         self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b) for i in range(nb_comp)]).to(device)   
 
     def KNNE(self,nb_samples,k=1):  
-        d=self.output_dim
+        d=torch.tensor(self.output_dim, device=device)
         theta=self.forward(nb_samples)
         D=torch.cdist(theta,theta)
         a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf'))
-        lcd = (d/2.0*torch.log(torch.tensor(math.pi))).to(device) - torch.lgamma(torch.tensor(1.0 + d/2.0, device=device)).to(device)
-        return torch.digamma(torch.tensor(nb_samples).float()).double() - torch.digamma(torch.tensor(k).float()).double() + lcd + d/nb_samples*torch.sum(torch.log(a))
+        lcd = (d/2.0*torch.log(torch.tensor(math.pi, device=device))) - torch.lgamma(torch.tensor(1.0 + d/2.0, device=device))
+        return torch.digamma(torch.tensor(float(nb_samples),device=device)) - torch.digamma(torch.tensor(k, device=device).float()).double() + lcd + d/nb_samples*torch.sum(torch.log(a))
 
     def KNNEp(self,nb_samples_KNN,nb_samples=1,k=1):
         x=self(nb_samples)
