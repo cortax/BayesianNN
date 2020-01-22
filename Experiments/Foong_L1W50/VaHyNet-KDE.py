@@ -258,8 +258,6 @@ if __name__== "__main__":
                         help="scheduler patience")
     parser.add_argument("--lr_decay", type=float, default=0.9,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
-    parser.add_argument("--init_std", type=float, default=1.0,
-                        help="parameter controling initialization of theta")
     parser.add_argument("--device", type=str, default=None,
                         help="force device to be used")
     parser.add_argument("--verbose", type=bool, default=False,
