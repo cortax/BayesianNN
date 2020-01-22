@@ -173,11 +173,12 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            theta = Hyper_Nets.sample(2)
+            theta = Hyper_Nets.sample(100)
             plt.rcParams['agg.path.chunksize'] = 1000
-            y_test = model(theta[0,0],x_test)
-            plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
-            #plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))           
+            for c in range(Hyper_Nets.nb_comp):
+                for i in range(100):
+                    y_test = model(theta[c,i].unsqueeze(0),x_test)
+                    plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))              
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
             plt.close()
@@ -214,7 +215,6 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(100):
                     y_test = model(theta[c,i].unsqueeze(0),x_test)
-                #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
                     plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
             fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/test.png')
