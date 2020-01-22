@@ -274,4 +274,4 @@ if __name__== "__main__":
     else:
         device = args.device
 
-    main(nb_neurons_pn=20,activation_pn=nn.Tanh(),args.ensemble_size, lat_dim=5,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=100, n_samples_LP=100, max_iter=100000,args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
+    main(20,nn.Tanh(),args.ensemble_size, 5,1.,1000,n_samples_ED=100, n_samples_LP=100,args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
