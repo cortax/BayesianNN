@@ -29,7 +29,7 @@ class HNet(nn.Module):
 
     
             def forward(self, n=1):
-                epsilon = torch.randn(size=(n,self.lat_dim))
+                epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
                 return self.hnet(epsilon)           
 
 class HyNetEns(nn.Module):
