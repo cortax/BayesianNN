@@ -166,11 +166,11 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
 
             logposteriorpredictive = exp.get_logposteriorpredictive_parallel_fn(device)
-            train_post = logposteriorpredictive(Hyper_Nets(10000), model, x_train, y_train, 0.1)/len(y_train)
+            train_post = logposteriorpredictive(Hyper_Nets(10000).detach().cpu(), model, x_train, y_train, 0.1)/len(y_train)
             mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive(Hyper_Nets(10000), model, x_validation, y_validation, 0.1)/len(y_validation)
+            val_post = logposteriorpredictive(Hyper_Nets(10000).detach().cpu(), model, x_validation, y_validation, 0.1)/len(y_validation)
             mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive(Hyper_Nets(10000), model, x_test, y_test, 0.1)/len(y_test)
+            test_post = logposteriorpredictive(Hyper_Nets(10000).detach().cpu(), model, x_test, y_test, 0.1)/len(y_test)
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
             
             
@@ -182,7 +182,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            theta = Hyper_Nets.sample(1000)
+            theta = Hyper_Nets.sample(1000).detach().cpu()
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(1000):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin)
@@ -199,10 +199,10 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Validation set')
             plt.scatter(x_validation.cpu(), y_validation.cpu())
-            theta = Hyper_Nets.sample(1000)
+            theta = Hyper_Nets.sample(1000).detach().cpu()
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(1000):
-                    y_pred = model(theta[c,i].unsqueeze(0),x_lin)
+                    y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
                     plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))             
             fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/validation.png')
@@ -216,7 +216,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Test set')
             plt.scatter(x_test.cpu(), y_test.cpu())
-            theta = Hyper_Nets.sample(1000)
+            theta = Hyper_Nets.sample(1000).detach().cpu()
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(1000):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin)
