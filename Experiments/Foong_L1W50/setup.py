@@ -28,7 +28,7 @@ class parallel_MLP(nn.Module):
                 self.nb_neur = layerwidth
                 self.activation=nn.Tanh()
                 self.requires_grad_(False)
-                self.param_count=3*nb_neur+1
+                self.param_count=3*layerwidth+1
 
             def forward(self,theta,x):
                 nb_theta=theta.shape[0]
