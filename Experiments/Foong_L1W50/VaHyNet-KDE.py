@@ -173,7 +173,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            theta = Hyper_Nets.sample(50)
+            theta = Hyper_Nets.sample(100)
             plt.rcParams['agg.path.chunksize'] = 1000
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(100):
