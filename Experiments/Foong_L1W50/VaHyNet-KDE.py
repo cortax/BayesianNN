@@ -176,7 +176,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             theta = Hyper_Nets.sample(1000)
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(1000):
-                    y_pred = Net(theta[c,i].unsqueeze(0),x_lin)
+                    y_pred = model(theta[c,i].unsqueeze(0),x_lin)
                     plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))            
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
@@ -193,7 +193,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             theta = Hyper_Nets.sample(1000)
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(1000):
-                    y_pred = Net(theta[c,i].unsqueeze(0),x_lin)
+                    y_pred = model(theta[c,i].unsqueeze(0),x_lin)
                     plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))             
             fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/validation.png')
@@ -210,7 +210,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             theta = Hyper_Nets.sample(1000)
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(1000):
-                    y_pred = Net(theta[c,i].unsqueeze(0),x_lin)
+                    y_pred = model(theta[c,i].unsqueeze(0),x_lin)
                     plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))             
             fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/test.png')
