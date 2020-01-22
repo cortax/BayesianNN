@@ -22,7 +22,7 @@ class HNet(nn.Module):
                         nn.Linear(lat_dim,nb_neur),
                         activation,
                         nn.Linear(nb_neur,output_dim)
-                        )
+                        ).to(device)
                 
                 torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
                 torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
@@ -37,15 +37,15 @@ class HyNetEns(nn.Module):
         super(HyNetEns, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
-        self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b).to(device) for i in range(nb_comp)])   
+        self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b) for i in range(nb_comp)]).to(device)   
 
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
     def get_H(self, nb_samples):
-        theta=self.forward(nb_samples)
+        theta=self.forward(nb_samples).to(device)
         c=torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(2/(self.output_dim+4))       
         H_=theta.var(0)/c
         #H_=theta.var(0).min(1).values/c*torch.ones(self.output_dim) #to try!
-        return theta, H_.clamp(torch.finfo().eps,float('inf'))
+        return theta, H_.clamp(torch.finfo().eps,float('inf')).to(device)
 
     def KDE(self, theta_,theta, H):
         def kernel(theta1,theta2):
