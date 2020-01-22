@@ -32,14 +32,29 @@ class Parallel_Net(nn.Module):
                 return m5.squeeze(-1)
 
 
-            
+class HNet(nn.Module):
+            def __init__(self, lat_dim=5,nb_neur=param_count,output_dim=param_count,  activation=nn.ReLU()):
+                super(HNet, self).__init__()
+                self.lat_dim = lat_dim
+                self.output_dim=output_dim
+                self.hnet=nn.Sequential(
+                        nn.Linear(lat_dim,nb_neur),
+                        activation,
+                        nn.Linear(nb_neur,output_dim)
+                        )
+                self.hnet[2].apply(init_weightsOut)
+
+    
+            def forward(self, n=1):
+                epsilon = torch.randn(size=(n,self.lat_dim))
+                return self.hnet(epsilon)           
 
 class HyNetEns(nn.Module):
-    def __init__(self,nb_comp, output_dim):
+    def __init__(self,nb_comp,lat_dim, output_dim):
         super(HyNetEns, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
-        self.components= nn.ModuleList([HNet() for i in range(nb_comp)])   
+        self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim) for i in range(nb_comp)])   
 
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
     def get_H(self, nb_samples):
@@ -106,27 +121,12 @@ def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,KDE
         mlflow.log_param('param_count', param_count)
         mlflow.log_param('HyperNet_lat_dim', lat_dim)
         mlflow.log_param('HyperNet_nb_neurons', param_count)
-        class HNet(nn.Module):
-            def __init__(self, lat_dim=5,nb_neur=param_count,output_dim=param_count,  activation=nn.ReLU()):
-                super(HNet, self).__init__()
-                self.lat_dim = lat_dim
-                self.output_dim=output_dim
-                self.hnet=nn.Sequential(
-                        nn.Linear(lat_dim,nb_neur),
-                        activation,
-                        nn.Linear(nb_neur,output_dim)
-                        )
-                self.hnet[2].apply(init_weightsOut)
-
-    
-            def forward(self, n=1):
-                epsilon = torch.randn(size=(n,self.lat_dim))
-                return self.hnet(epsilon)
-
         
+        
+            
         mlflow.log_param('ensemble_size', ensemble_size)
 
-        Hyper_Nets=HyNetEns(ensemble_size, param_count)
+        Hyper_Nets=HyNetEns(ensemble_size,lat_dim, param_count).to(device)
         
         mlflow.log_param('learning_rate', learning_rate)
         optimizer = torch.optim.Adam(Hyper_Nets.parameters(), lr=learning_rate)
