@@ -175,7 +175,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             
             
             x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()
-            nb_samples_plot=200
+            nb_samples_plot=10
             theta = Hyper_Nets.sample(nb_samples_plot).cpu()
             
             fig, ax = plt.subplots()
@@ -185,7 +185,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            for c in range(Hyper_Nets.nb_comp):
+            for c in range(ensemble_size):
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
                     plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c))            
