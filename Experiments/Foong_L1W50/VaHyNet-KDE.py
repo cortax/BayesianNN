@@ -31,9 +31,8 @@ class Parallel_Net(nn.Module):
                 m5=m4.add(theta[3].reshape(nb_theta,1,1,1))
                 return m5.squeeze(-1)
 
-
 class HNet(nn.Module):
-            def __init__(self, lat_dim,nb_neur,output_dim,  activation=nn.ReLU()):
+            def __init__(self, lat_dim,nb_neur,output_dim,  activation=nn.ReLU(),init_w=.4,init_b=0.001):
                 super(HNet, self).__init__()
                 self.lat_dim = lat_dim
                 self.output_dim=output_dim
@@ -42,7 +41,9 @@ class HNet(nn.Module):
                         activation,
                         nn.Linear(nb_neur,output_dim)
                         )
-                self.hnet[2].apply(init_weightsOut)
+                
+                torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
+                torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
 
     
             def forward(self, n=1):
@@ -50,11 +51,11 @@ class HNet(nn.Module):
                 return self.hnet(epsilon)           
 
 class HyNetEns(nn.Module):
-    def __init__(self,nb_comp,lat_dim, output_dim):
+    def __init__(self,nb_comp,lat_dim, output_dim, init_w,init_b):
         super(HyNetEns, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
-        self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim) for i in range(nb_comp)])   
+        self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,init_w,init_b) for i in range(nb_comp)])   
 
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
     def get_H(self, nb_samples):
@@ -101,7 +102,7 @@ class HyNetEns(nn.Module):
         return (LQ.logsumexp((1,2)).clamp(torch.finfo().min,float('inf'))-torch.log(torch.tensor(float(self.nb_comp*theta.shape[1])))).unsqueeze(1)
     '''
         
-def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=100, n_samples_LP=100, max_iter=100000, learning_rate=0.005, min_lr=0.000001, patience=100, lr_decay=0.9,  device='cpu', verbose=False):
+def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,init_w=.4,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=100, n_samples_LP=100, max_iter=100000, learning_rate=0.005, min_lr=0.000001, patience=100, lr_decay=0.9,  device='cpu', verbose=False):
     
     xpname = exp.experiment_name + 'HyNet-KDE'
     mlflow.set_experiment(xpname)
@@ -126,7 +127,7 @@ def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,KDE
             
         mlflow.log_param('ensemble_size', ensemble_size)
 
-        Hyper_Nets=HyNetEns(ensemble_size,lat_dim, param_count).to(device)
+        Hyper_Nets=HyNetEns(ensemble_size,lat_dim, param_count,init_w=.4,init_b=.001).to(device)
         
         mlflow.log_param('learning_rate', learning_rate)
         optimizer = torch.optim.Adam(Hyper_Nets.parameters(), lr=learning_rate)
