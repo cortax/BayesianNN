@@ -185,6 +185,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
+            print(theta)
             for c in range(ensemble_size):
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
