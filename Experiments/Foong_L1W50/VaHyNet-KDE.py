@@ -107,7 +107,7 @@ def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,KDE
         mlflow.log_param('HyperNet_lat_dim', lat_dim)
         mlflow.log_param('HyperNet_nb_neurons', param_count)
         class HNet(nn.Module):
-            def __init__(self, lat_dim=5,nb_neur=nb_neurons,output_dim=param_count,  activation=nn.ReLU()):
+            def __init__(self, lat_dim=5,nb_neur=param_count,output_dim=param_count,  activation=nn.ReLU()):
                 super(HNet, self).__init__()
                 self.lat_dim = lat_dim
                 self.output_dim=output_dim
@@ -271,5 +271,6 @@ if __name__== "__main__":
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     else:
         device = args.device
+main()
 
-    main(20,nn.Tanh(), 1,5,1.,1000,100,100,args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
+#    main(20,nn.Tanh(), 1,5,1.,1000,100,100,args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
