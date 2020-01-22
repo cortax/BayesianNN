@@ -54,7 +54,7 @@ class HyNetEns(nn.Module):
         LQ=torch.Tensor(theta_.shape[0],theta.shape[0]) 
         for i in range(theta_.shape[0]):
             LQ[i]=kernel(theta_[i],theta) 
-        return (LQ.logsumexp(1)-torch.log(torch.tensor(float(theta.shape[0]),device))).unsqueeze(1)   
+        return (LQ.logsumexp(1)-torch.log(torch.tensor(float(theta.shape[0]),device=device))).unsqueeze(1)   
 
     def sample(self, n=1):
         return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
