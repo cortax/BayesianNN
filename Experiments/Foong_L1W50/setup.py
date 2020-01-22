@@ -98,7 +98,7 @@ def get_loglikelihood_parallel_fn(device):
         y_pred = model(theta,x)
         L = _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device))
         return torch.sum(L,1)
-    return loglikelihood
+    return loglikelihood_parallel
 
 # added parallelized versions
 def get_logposterior_parallel_fn(device):
@@ -106,7 +106,9 @@ def get_logposterior_parallel_fn(device):
     loglikelihood_parallel = get_loglikelihood_parallel_fn(device)
     def logposterior_parallel(theta, model, x, y, sigma_noise):
         return logprior(theta).add(loglikelihood_parallel(theta, model, x, y, sigma_noise))
+    return logposterior_parallel
 
+    
 def get_logposterior_fn(device):
     logprior = get_logprior_fn(device)
     loglikelihood = get_loglikelihood_fn(device)
