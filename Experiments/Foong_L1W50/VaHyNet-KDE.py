@@ -234,7 +234,15 @@ if __name__== "__main__":
     parser.add_argument("--init_w", type=float, default=0.1,
                         help="std for weight initialization of output layers")
     parser.add_argument("--init_b", type=float, default=0.0001,
-                        help="std for bias initialization of output layers")
+                        help="std for bias initialization of output layers")    
+    parser.add_argument("--KDE_prec", type=float, default=1.,
+                        help="factor reducing Silverman's bandwidth")
+    parser.add_argument("--n_samples_KDE", type=int, default=1000,
+                        help="number of sampls for KDE")
+    parser.add_argument("--n_samples_ED", type=int, default=5,
+                        help="number of samples for MC estimation of differential entropy")
+    parser.add_argument("--n_samples_LP", type=int, default=5,
+                        help="number of samples for MC estimation of expected logposterior")
     parser.add_argument("--max_iter", type=int, default=100000,
                         help="maximum number of learning iterations")
     parser.add_argument("--learning_rate", type=float, default=0.01,
@@ -258,7 +266,5 @@ if __name__== "__main__":
         device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     else:
         device = args.device
-main()
 
-#main(args.ensemble_size,args.lat_dim,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cpu', verbose=True)
-#    main(20,nn.Tanh(), 1,5,1.,1000,100,100,args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
+        main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b,args.KDE_prec,args.n_samples_KDE,args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=args.device, verbose=args.verbose)
