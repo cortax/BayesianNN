@@ -116,6 +116,15 @@ def get_logposterior_fn(device):
         return logprior(theta) + loglikelihood(theta, model, x, y, sigma_noise)
     return logposterior
 
+def get_logposteriorpredictive_parallel_fn(device):
+    def logposteriorpredictive(theta, model, x, y, sigma_noise):
+        y_pred = model(theta,x)
+        L = _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device))
+        loglikelihood=torch.sum(L,1)
+        likelihood_mean=torch.logsumexp(loglikelihood, dim=0)-torch.tensor(float(theta.shape[0])).log()
+        return likelihood_mean.unsqueeze(-1)
+    return logposteriorpredictive
+
 def get_logposteriorpredictive_fn(device):
     def logposteriorpredictive(ensemble, model, x, y, sigma_noise):
         complogproba = []

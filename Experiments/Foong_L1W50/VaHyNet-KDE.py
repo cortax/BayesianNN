@@ -156,12 +156,12 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.4,init_b=.001,KD
             pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
 
-            logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
-            train_post = logposteriorpredictive([theta], model, x_train, y_train, 0.1)/len(y_train)
+            logposteriorpredictive = exp.get_logposteriorpredictive_parallel_fn(device)
+            train_post = logposteriorpredictive(Hyper_Nets(10000), model, x_train, y_train, 0.1)/len(y_train)
             mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive([theta], model, x_validation, y_validation, 0.1)/len(y_validation)
+            val_post = logposteriorpredictive(Hyper_Nets(10000), model, x_validation, y_validation, 0.1)/len(y_validation)
             mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive([theta], model, x_test, y_test, 0.1)/len(y_test)
+            test_post = logposteriorpredictive(Hyper_Nets(10000), model, x_test, y_test, 0.1)/len(y_test)
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
             x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
@@ -172,13 +172,12 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.4,init_b=.001,KD
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            set_all_parameters(model, theta)
-            y_pred = model(x_lin)
-            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
-            res = 20
-            for r in range(res):
-                mass = 1.0-(r+1)/res
-                plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*0.1*((r+1)/res), y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*0.1*((r+1)/res), alpha=0.2*mass, color='lightblue')
+            theta = Hyper_Nets.sample(1000).detach()
+            for c in range(Hyper_Nets.nb_comp):
+                for i in range(1000):
+                    y_test = model(theta[c,i].unsqueeze(0),x_test)
+                #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
+                    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
             plt.close()
@@ -191,13 +190,11 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.4,init_b=.001,KD
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Validation set')
             plt.scatter(x_validation.cpu(), y_validation.cpu())
-            set_all_parameters(model, theta)
-            y_pred = model(x_lin)
-            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
-            res = 20
-            for r in range(res):
-                mass = 1.0-(r+1)/res
-                plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*0.1*((r+1)/res), y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*0.1*((r+1)/res), alpha=0.2*mass, color='lightblue')
+            for c in range(Hyper_Nets.nb_comp):
+                for i in range(1000):
+                    y_test = model(theta[c,i].unsqueeze(0),x_test)
+                #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
+                    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
             fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/validation.png')
             plt.close()
@@ -210,13 +207,11 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.4,init_b=.001,KD
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Test set')
             plt.scatter(x_test.cpu(), y_test.cpu())
-            set_all_parameters(model, theta)
-            y_pred = model(x_lin)
-            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
-            res = 20
-            for r in range(res):
-                mass = 1.0-(r+1)/res
-                plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*0.1*((r+1)/res), y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*0.1*((r+1)/res), alpha=0.2*mass, color='lightblue')
+            for c in range(Hyper_Nets.nb_comp):
+                for i in range(1000):
+                    y_test = model(theta[c,i].unsqueeze(0),x_test)
+                #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
+                    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
             fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/test.png')
             plt.close()
