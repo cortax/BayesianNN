@@ -164,7 +164,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             test_post = logposteriorpredictive(Hyper_Nets(10000), model, x_test, y_test, 0.1)/len(y_test)
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
-            x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+            x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).to(device)
             fig, ax = plt.subplots()
             fig.set_size_inches(11.7, 8.27)
             plt.xlim(-2, 2) 
@@ -172,12 +172,12 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            theta = Hyper_Nets.sample(500).detach()
+            theta = Hyper_Nets.sample(100).detach()
             for c in range(Hyper_Nets.nb_comp):
-                for i in range(500):
+                for i in range(100):
                     y_test = model(theta[c,i].unsqueeze(0),x_test)
                 #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
-                    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
+                    plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
             plt.close()
@@ -190,11 +190,12 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Validation set')
             plt.scatter(x_validation.cpu(), y_validation.cpu())
+            theta = Hyper_Nets.sample(100).detach()
             for c in range(Hyper_Nets.nb_comp):
-                for i in range(500):
+                for i in range(100):
                     y_test = model(theta[c,i].unsqueeze(0),x_test)
                 #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
-                    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))            
+                    plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))           
             fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/validation.png')
             plt.close()
@@ -207,11 +208,12 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.15,init_b=.001,K
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Test set')
             plt.scatter(x_test.cpu(), y_test.cpu())
+            theta = Hyper_Nets.sample(100).detach()
             for c in range(Hyper_Nets.nb_comp):
-                for i in range(500):
+                for i in range(100):
                     y_test = model(theta[c,i].unsqueeze(0),x_test)
                 #    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='green')
-                    plt.plot(x_test.detach().cpu().numpy(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
+                    plt.plot(x_test.cpu(), y_test.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))
             fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/test.png')
             plt.close()
