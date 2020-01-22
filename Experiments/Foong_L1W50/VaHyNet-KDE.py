@@ -164,18 +164,18 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             
             pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
-
+            nb_samples_postpred=int(np.ceil(10000/ensemble_size))
             logposteriorpredictive = exp.get_logposteriorpredictive_parallel_fn('cpu')
-            train_post = logposteriorpredictive(Hyper_Nets(10000).cpu(), model, x_train.cpu(), y_train.cpu(), 0.1)/len(y_train.cpu())
+            train_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).cpu(), model, x_train.cpu(), y_train.cpu(), 0.1)/len(y_train.cpu())
             mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive(Hyper_Nets(10000).detach().cpu(), model, x_validation.cpu(), y_validation.cpu(), 0.1)/len(y_validation.cpu())
+            val_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_validation.cpu(), y_validation.cpu(), 0.1)/len(y_validation.cpu())
             mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive(Hyper_Nets(10000).detach().cpu(), model, x_test.cpu(), y_test.cpu(), 0.1)/len(y_test.cpu())
+            test_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_test.cpu(), y_test.cpu(), 0.1)/len(y_test.cpu())
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
             
             
             x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()
-            nb_samples_plot=10
+            nb_samples_plot=500
             theta = Hyper_Nets.sample(nb_samples_plot).cpu()
             
             fig, ax = plt.subplots()
