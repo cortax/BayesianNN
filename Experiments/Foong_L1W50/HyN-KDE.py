@@ -97,6 +97,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
+        x_test_ib, y_test_ib= exp.get_test_ib_data(device)
         logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
 
         mlflow.log_param('ensemble_size', ensemble_size)
@@ -170,6 +171,8 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
             test_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_test.cpu(), y_test.cpu(), 0.1)/len(y_test.cpu())
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
+            test_ib_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_test_ib.cpu(), y_test_ib.cpu(), 0.1)/len(y_test_ib.cpu())
+            mlflow.log_metric("test in between log posterior predictive", -float(test_ib_post.detach().cpu()))
             
             
             x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()

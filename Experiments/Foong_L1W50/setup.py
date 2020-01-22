@@ -63,6 +63,13 @@ def get_test_data(device):
     y_test = y_test.unsqueeze(-1)
     return x_test, y_test
 
+def get_test_ib_data(device):
+    test_data = torch.load('Experiments/Foong_L1W50/Data/foong_data_test_in_between.pt')
+    x_test = test_data[0].to(device)
+    y_test = test_data[1].to(device)
+    y_test = y_test.unsqueeze(-1)
+    return x_test, y_test
+
 def get_model(device):
     model = MLP(nblayers, layerwidth).to(device)
     flip_parameters_to_tensors(model)
