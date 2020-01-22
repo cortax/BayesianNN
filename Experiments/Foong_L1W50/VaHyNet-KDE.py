@@ -153,7 +153,7 @@ def main(nb_neurons_pn=20,activation_pn=nn.Tanh(), ensemble_size=1,lat_dim=5,act
 
             theta,H=Hyper_Nets.get_H(n_samples_KDE)
             ED=-Hyper_Nets.KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
-            LP=logposterior(Hyper_Nets(n_samples_LP)).mean()
+            LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
             L =-ED-LP
 
             L.backward()
