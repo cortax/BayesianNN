@@ -11,8 +11,6 @@ import argparse
 import pandas as pd
 
 
-
-
 class HNet(nn.Module):
             def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.4, init_b=0.001):
                 super(HNet, self).__init__()
@@ -188,7 +186,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             for c in range(ensemble_size):
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
-                    plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c))            
+                    plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2))            
             fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
             plt.close()
@@ -203,7 +201,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
-                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))             
+                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
             fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/validation.png')
             plt.close()
@@ -218,7 +216,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             for c in range(Hyper_Nets.nb_comp):
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
-                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))             
+                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
             fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/test.png')
             plt.close()
@@ -234,7 +232,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
                     plt.scatter(x_test.cpu(), y_test.cpu())                  
                     for i in range(nb_samples_plot):
                         y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
-                        plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c))             
+                        plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
                     fig.savefig(tempdir.name+'/test'+str(c+1)+'.png', dpi=4*fig.dpi)
                     mlflow.log_artifact(tempdir.name+'/test'+str(c+1)+'.png')
                     plt.close()
