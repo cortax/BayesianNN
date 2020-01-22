@@ -93,7 +93,7 @@ def main(ensemble_size=1,lat_dim=5,activation=nn.ReLU(),init_w=.4,init_b=.001,KD
     with mlflow.start_run(run_name='HyNet-KDE', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
         logposterior = exp.get_logposterior_parallel_fn(device)#new!
-        model = exp.get_parallel_model(nb_neurons_pn).to(device) #new!
+        model = exp.get_parallel_model(device) #new!
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
