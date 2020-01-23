@@ -38,21 +38,25 @@ class HyNetEns(nn.Module):
         self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b) for i in range(nb_comp)]).to(device)   
 
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
-    def get_H(self, nb_samples):
-        theta=self.forward(nb_samples)
-        c=torch.tensor(((nb_samples*(self.output_dim+2))/4)).pow(2/(self.output_dim+4)).to(device)    
-        H_=theta.var(0)/c
-        #H_=theta.var(0).min(1).values/c*torch.ones(self.output_dim) #to try!
+    def get_H(self, nb_samples, prec=KDE_prec):
+        theta=self.sample(nb_samples)
+        c_=(nb_samples*(self.output_dim+2))/4
+        c=torch.as_tensor(c_).pow(2/(self.output_dim+4))*prec       
+        H_=theta.var(1)/c
+        #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
         return theta, H_.clamp(torch.finfo().eps,float('inf'))
 
-    def KDE(self, theta_,theta, H):
-        def kernel(theta1,theta2):
+    def KDE(self, theta_,theta, H_):
+        def kernel(theta1,theta2,H):
             mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diag(H))
             return mvn.log_prob(theta2)
-        LQ=torch.Tensor(theta_.shape[0],theta.shape[0]).to(device)
-        for i in range(theta_.shape[0]):
-            LQ[i]=kernel(theta_[i],theta) 
-        return (LQ.logsumexp(1)-torch.log(torch.tensor(float(theta.shape[0]),device=device))).unsqueeze(1)   
+        LQ=torch.Tensor(theta_.shape[0],self.nb_comp,theta.shape[1]) 
+        for c in range(self.nb_comp):
+            for i in range(theta_.shape[0]):
+                LQ[i,c]=kernel(theta_[i],theta[c],H_[c])
+        N_=self.nb_comp*theta.shape[1]
+        N=torch.as_tensor(float(N_))
+        return (LQ.logsumexp(2).logsumexp(1)-torch.log(N)).unsqueeze(1)
 
     def sample(self, n=1):
         return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
