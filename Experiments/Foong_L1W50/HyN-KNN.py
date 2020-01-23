@@ -45,7 +45,8 @@ class HyNetEns(nn.Module):
         d=torch.as_tensor(float(self.output_dim),device=device)
         K=torch.as_tensor(float(k),device=device)
         N=torch.as_tensor(float(nb_samples),device=device)
-        lcd = d/2.0*torch.as_tensor(math.pi,device=device).log() - torch.lgamma(1. + d/2.0)
+        pi=torch.as_tensor(math.pi,device=device)
+        lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
         return torch.digamma(N) - torch.digamma(K) + lcd + d/N*torch.sum(torch.log(a))
     
  
