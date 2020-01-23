@@ -41,12 +41,12 @@ class HyNetEns(nn.Module):
     def KNNE(self,nb_samples,k=1):  
         theta=self.forward(nb_samples)
         D=torch.cdist(theta,theta).to(device)
-        a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf'))
+        a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf')).to(device)
         d=torch.as_tensor(float(self.output_dim),device=device)
         K=torch.as_tensor(float(k),device=device)
         N=torch.as_tensor(float(nb_samples),device=device)
         lcd = d/2.0*torch.as_tensor(math.pi,device=device).log() - torch.lgamma(1. + d/2.0)
-        return torch.digamma(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+        return torch.digamma(N) - torch.digamma(K) + lcd + d/N*torch.sum(torch.log(a))
     
  
     def sample(self, n=1):
