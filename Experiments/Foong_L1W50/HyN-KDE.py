@@ -125,7 +125,8 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
         mlflow.log_param('n_samples_ED', n_samples_ED)
         mlflow.log_param('n_samples_LP', n_samples_LP)
         
-        tempdir = tempfile.TemporaryDirectory()
+        
+        tempdir = tempfile.TemporaryDirectory(str(mlflow.active_run().info.run_id))
         
         
         training_loss = []
@@ -181,6 +182,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
         with torch.no_grad():
             
+            torch.save(Hyper_Nets,tempdir.name+/'hypernets.pt')
 
 #            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
             

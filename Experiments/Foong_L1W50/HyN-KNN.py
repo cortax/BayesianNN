@@ -133,7 +133,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
 
         with torch.no_grad():
             tempdir = tempfile.TemporaryDirectory()
-
+            torch.save(Hyper_Nets,tempdir.name+/'hypernets.pt')
 #            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
             
             pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
