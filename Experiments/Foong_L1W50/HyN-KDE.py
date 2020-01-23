@@ -38,10 +38,10 @@ class HyNetEns(nn.Module):
         self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b) for i in range(nb_comp)]).to(device)   
 
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
-    def get_H(self, nb_samples, prec=KDE_prec):
+    def get_H(self, nb_samples):
         theta=self.sample(nb_samples)
         c_=(nb_samples*(self.output_dim+2))/4
-        c=torch.as_tensor(c_).pow(2/(self.output_dim+4))*prec       
+        c=torch.as_tensor(c_).pow(2/(self.output_dim+4))       
         H_=theta.var(1)/c
         #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
         return theta, H_.clamp(torch.finfo().eps,float('inf'))
