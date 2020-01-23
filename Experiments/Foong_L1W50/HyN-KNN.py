@@ -43,7 +43,7 @@ class HyNetEns(nn.Module):
         theta=self.forward(nb_samples)
         D=torch.cdist(theta,theta)
         a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf'))
-        lcd = (d/2.0*torch.log(torch.tensor(math.pi, device=device))) - torch.lgamma(torch.tensor(1.0 + d/2.0, device=device))
+        lcd = (d/2.0*torch.log(torch.tensor(math.pi, device=device))) - torch.lgamma(torch.tensor(1.0,device=device)+ d/2.0)
         return torch.digamma(torch.tensor(float(nb_samples),device=device)) - torch.digamma(torch.tensor(k, device=device).float()).double() + lcd + d/nb_samples*torch.sum(torch.log(a))
 
     def KNNEp(self,nb_samples_KNN,nb_samples=1,k=1):
