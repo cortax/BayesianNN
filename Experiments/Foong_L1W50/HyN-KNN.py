@@ -42,10 +42,10 @@ class HyNetEns(nn.Module):
         theta=self.forward(nb_samples)
         D=torch.cdist(theta,theta)
         a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf'))
-        d=torch.as_tensor(float(self.output_dim)).to(device)
-        K=torch.as_tensor(float(k)).to(device)
-        N=torch.as_tensor(float(nb_samples)).to(device)
-        lcd = d/2.0*torch.as_tensor(math.pi).to(device).log() - torch.lgamma(1. + d/2.0)
+        d=torch.as_tensor(float(self.output_dim),device=device)
+        K=torch.as_tensor(float(k),device=device)
+        N=torch.as_tensor(float(nb_samples),device=device)
+        lcd = d/2.0*torch.as_tensor(math.pi,device=device).log() - torch.lgamma(1. + d/2.0)
         return torch.digamma(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
     
  
