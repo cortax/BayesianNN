@@ -128,7 +128,8 @@ def get_logposteriorpredictive_parallel_fn(device):
         y_pred = model(theta,x)
         L = _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device))
         loglikelihood=torch.sum(L,1)
-        likelihood_mean=loglikelihood.logsumexp(0)-torch.tensor(float(theta.shape[0])).log()
+        N=torch.as_tensor(float(theta.shape[0]),device=device)
+        likelihood_mean=loglikelihood.logsumexp(0)-torch.log(N)
         return likelihood_mean
     return logposteriorpredictive
 
