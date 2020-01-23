@@ -48,15 +48,7 @@ class HyNetEns(nn.Module):
         lcd = (d/2.0*torch.log(torch.as_tensor(math.pi))) - torch.lgamma(1. + d/2.0)
         return torch.digamma(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
     
-    def KNNEp(self,nb_samples_KNN,nb_samples=1,k=1):
-        x=self(nb_samples)
-        samples=self(nb_samples_KNN)
-        d=self.output_dim
-        D=torch.cdist(x,samples)
-        a = D.min()
-        lcd = (d/2.0*torch.log(torch.tensor(math.pi))) - torch.lgamma(torch.tensor(1.0 + d/2.0))
-        return - torch.digamma(torch.tensor(k).float()).double() + lcd + d*torch.log(a)  
-
+ 
     def sample(self, n=1):
         return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
 
