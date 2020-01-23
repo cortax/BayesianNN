@@ -226,7 +226,7 @@ if __name__== "__main__":
     parser.add_argument("--init_b", type=float, default=0.0001,
                         help="std for bias initialization of output layers")    
     parser.add_argument("--n_samples_KNN", type=int, default=1000,
-                        help="number of sampls for KDE")
+                        help="number of samples for KNN (nearest neighbour entropy estimate)")
     parser.add_argument("--n_samples_ED", type=int, default=5,
                         help="number of samples for MC estimation of differential entropy")
     parser.add_argument("--n_samples_LP", type=int, default=5,

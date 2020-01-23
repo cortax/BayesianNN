@@ -257,7 +257,7 @@ if __name__== "__main__":
     parser.add_argument("--KDE_prec", type=float, default=1.,
                         help="factor reducing Silverman's bandwidth")
     parser.add_argument("--n_samples_KDE", type=int, default=1000,
-                        help="number of sampls for KDE")
+                        help="number of samples for KDE")
     parser.add_argument("--n_samples_ED", type=int, default=5,
                         help="number of samples for MC estimation of differential entropy")
     parser.add_argument("--n_samples_LP", type=int, default=5,
