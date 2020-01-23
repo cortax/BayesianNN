@@ -50,7 +50,7 @@ class HyNetEns(nn.Module):
         def kernel(theta1,theta2,H):
             mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diag(H))
             return mvn.log_prob(theta2)
-        LQ=torch.Tensor(theta_.shape[0],self.nb_comp,theta.shape[1]) 
+        LQ=torch.Tensor(theta_.shape[0],self.nb_comp,theta.shape[1]).to(device) 
         for c in range(self.nb_comp):
             for i in range(theta_.shape[0]):
                 LQ[i,c]=kernel(theta_[i],theta[c],H_[c])
