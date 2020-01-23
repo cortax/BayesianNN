@@ -41,7 +41,7 @@ class HyNetEns(nn.Module):
     def get_H(self, nb_samples):
         theta=self.sample(nb_samples)
         c_=(nb_samples*(self.output_dim+2))/4
-        c=torch.as_tensor(c_).pow(2/(self.output_dim+4))       
+        c=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
         H_=theta.var(1)/c
         #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
         return theta, H_.clamp(torch.finfo().eps,float('inf'))
@@ -55,7 +55,7 @@ class HyNetEns(nn.Module):
             for i in range(theta_.shape[0]):
                 LQ[i,c]=kernel(theta_[i],theta[c],H_[c])
         N_=self.nb_comp*theta.shape[1]
-        N=torch.as_tensor(float(N_))
+        N=torch.as_tensor(float(N_)).to(device)
         return (LQ.logsumexp(2).logsumexp(1)-torch.log(N)).unsqueeze(1)
 
     def sample(self, n=1):
