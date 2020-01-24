@@ -72,15 +72,14 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
 
-            nb_samples_postpred=1000
             logposteriorpredictive = exp.get_logposteriorpredictive_parallel_fn('cpu')
-            train_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).cpu(), model, x_train.cpu(), y_train.cpu(), 0.1)
+            train_post = logposteriorpredictive(theta.unsqueeze(0).cpu(), model, x_train.cpu(), y_train.cpu(), 0.1)
             mlflow.log_metric("training log posterior predictive", float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_validation.cpu(), y_validation.cpu(), 0.1)
+            val_post = logposteriorpredictive(theta.unsqueeze(0).detach().cpu(), model, x_validation.cpu(), y_validation.cpu(), 0.1)
             mlflow.log_metric("validation log posterior predictive", float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_test.cpu(), y_test.cpu(), 0.1)
+            test_post = logposteriorpredictive(theta.unsqueeze(0).detach().cpu(), model, x_test.cpu(), y_test.cpu(), 0.1)
             mlflow.log_metric("test log posterior predictive", float(test_post.detach().cpu()))
-            test_ib_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_test_ib.cpu(), y_test_ib.cpu(), 0.1)
+            test_ib_post = logposteriorpredictive(theta.unsqueeze(0).detach().cpu(), model, x_test_ib.cpu(), y_test_ib.cpu(), 0.1)
             mlflow.log_metric("test in between log posterior predictive", float(test_ib_post.detach().cpu()))
 
             x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
