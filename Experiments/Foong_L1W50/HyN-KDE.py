@@ -62,7 +62,10 @@ class HyNetEns(nn.Module):
 
     
     def forward(self, n=1):
-        return torch.cat([self.components[c](n) for c in range(self.nb_comp)],dim=0)
+        d = torch.distributions.multinomial.Multinomial(n, torch.ones(self.nb_comp))
+        m = d.sample()
+        return torch.cat([self.components[c](int(m[c])) for c in range(len(self.components))])
+
 
     
     '''
@@ -180,7 +183,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             optimizer.step()
 
                
-        ensemble=Hyper_Nets(1000).tolist()
+        ensemble = [Hyper_Nets() for _ in range(1000)]
         exp.log_model_evaluation(ensemble,device)
 
 
