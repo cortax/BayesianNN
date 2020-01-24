@@ -72,7 +72,7 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
 
-            nb_samples_postpred=int(np.ceil(10000/ensemble_size))
+            nb_samples_postpred=1000
             logposteriorpredictive = exp.get_logposteriorpredictive_parallel_fn('cpu')
             train_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).cpu(), model, x_train.cpu(), y_train.cpu(), 0.1)
             mlflow.log_metric("training log posterior predictive", float(train_post.detach().cpu()))
