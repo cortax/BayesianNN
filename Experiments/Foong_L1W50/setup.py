@@ -249,7 +249,7 @@ def log_model_evaluation_parallel(ensemble, device):
         x_validation, y_validation = get_validation_data(device)
         x_test, y_test = get_test_data(device)
 
-        ensemble_t=ensemble.to_tensor()
+        ensemble_t=torch.cat(ensemble, dim=0)
         logposteriorpredictive = get_logposteriorpredictive_parallel_fn(device)
         train_post = logposteriorpredictive(ensemble_t, model, x_train, y_train, 0.1)
         mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
