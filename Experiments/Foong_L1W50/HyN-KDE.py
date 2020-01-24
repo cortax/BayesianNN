@@ -205,8 +205,8 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
                     plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2)) 
-            fig.savefig(tempdir.name+'/training_.png', dpi=5*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/training_.png')
+            fig.savefig(tempdir.name+'/training_pc.png', dpi=5*fig.dpi)
+            mlflow.log_artifact(tempdir.name+'/training_pc.png')
             plt.close()
             
             if ensemble_size>1:
