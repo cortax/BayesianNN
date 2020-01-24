@@ -189,11 +189,9 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
             mlflow.log_artifact(tempdir.name+'/hypernets.pt')
 
-#            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
             
-           
             x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()
-            nb_samples_plot=1000
+            nb_samples_plot=5000
             theta = Hyper_Nets.sample(nb_samples_plot).cpu()
             
             fig, ax = plt.subplots()
@@ -202,13 +200,13 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.ylim(-4, 4)
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
+            plt.scatter(x_train.cpu(), y_train.cpu())
             for c in range(ensemble_size):
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
                     plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2)) 
-            plt.scatter(x_train.cpu(), y_train.cpu())
-            fig.savefig(tempdir.name+'/training.png', dpi=5*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/training.png')
+            fig.savefig(tempdir.name+'/training_.png', dpi=5*fig.dpi)
+            mlflow.log_artifact(tempdir.name+'/training_.png')
             plt.close()
             
             if ensemble_size>1:
@@ -223,8 +221,8 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
                         y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
                         plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
                     plt.scatter(x_train.cpu(), y_train.cpu())
-                    fig.savefig(tempdir.name+'/training'+str(c)+'.png', dpi=5*fig.dpi)
-                    mlflow.log_artifact(tempdir.name+'/training'+str(c)+'.png')
+                    fig.savefig(tempdir.name+'/training_'+str(c)+'.png', dpi=5*fig.dpi)
+                    mlflow.log_artifact(tempdir.name+'/training_'+str(c)+'.png')
                     plt.close()
 
                     

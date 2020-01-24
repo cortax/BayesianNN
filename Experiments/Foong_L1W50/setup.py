@@ -188,7 +188,7 @@ def log_model_evaluation(ensemble, device):
                                  y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
                                  alpha=0.2 * mass, color='lightblue', zorder=50)
         plt.scatter(x_train.cpu(), y_train.cpu(), c='red', zorder=100)
-        fig.savefig(tempdir.name + '/training.png')
+        fig.savefig(tempdir.name + '/training.png',dpi=4 * fig.dpi)
         mlflow.log_artifact(tempdir.name + '/training.png')
         plt.close()
 
