@@ -182,7 +182,8 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
             optimizer.step()
 
-               
+        torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
+        mlflow.log_artifact(tempdir.name+'/hypernets.pt')       
         ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(500)]
         exp.log_model_evaluation(ensemble,'cpu')
 
