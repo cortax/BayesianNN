@@ -19,11 +19,11 @@ class PTMCMCSampler():
         self.baseMHproposalNoise = baseMHproposalNoise
         self.temperatureNoiseReductionFactor = temperatureNoiseReductionFactor
 
-    def initChains(self, stateInit=None):
+    def initChains(self, nbiter=1000, std_init=1.0, stateInit=None):
         if stateInit is not None:
             self.state = [[stateInit[i]] for i in range(self.nb_chains)]
         else:
-            self.state = [[self._MAP()] for i in range(self.nb_chains)]
+            self.state = [[self._MAP(nbiter, std_init)] for i in range(self.nb_chains)]
     
         self.logProbaMatrix = [ [self.logposterior(self.state[j][-1])] for j in range(self.nb_chains)]
         self._swapAcceptanceCount = [0 for i in range(self.nb_chains-1)]
@@ -80,15 +80,14 @@ class PTMCMCSampler():
             swapAcceptanceRate = torch.tensor(self._swapAcceptanceCount).float()/N
             return x, ladderAcceptanceRate, swapAcceptanceRate, logProba                    
             
-    def _MAP(self, device=None):
+    def _MAP(self, nbiter, std_init, device=None):
         if device is None:
             device = self.device
-            
-        theta = torch.nn.Parameter( torch.empty([1,self.theta_dim],device=device).normal_(std=1.0), requires_grad=True)
+        theta = torch.nn.Parameter( torch.empty([1,self.theta_dim],device=device).normal_(std=std_init), requires_grad=True)
 
-        optimizer = torch.optim.Adam([theta], lr=0.1)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, factor=0.8)
-        for t in range(100000):
+        optimizer = torch.optim.Adam([theta], lr=0.01)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=50, factor=0.5)
+        for t in range(nbiter):
             optimizer.zero_grad()
 
             L = -torch.mean(self.logposterior(theta))
@@ -99,7 +98,7 @@ class PTMCMCSampler():
             scheduler.step(L.detach().clone().cpu().numpy())
             optimizer.step()
 
-            if learning_rate < 0.001:
+            if learning_rate < 0.0001:
                 break
         return theta.detach().clone()               
 
