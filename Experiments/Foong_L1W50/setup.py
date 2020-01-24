@@ -21,6 +21,26 @@ class MLP(nn.Module):
             x = torch.tanh(self.layers[j](x))
         x = self.layers[-1](x)
         return x    
+    
+class parallel_MLP(nn.Module):
+            def __init__(self, layerwidth):
+                super(parallel_MLP, self).__init__()
+                self.nb_neur = layerwidth
+                self.activation=nn.Tanh()
+                self.requires_grad_(False)
+                self.param_count=3*layerwidth+1
+
+            def forward(self,theta,x):
+                nb_theta=theta.shape[0]
+                theta=theta.split([self.nb_neur,self.nb_neur,self.nb_neur,1],dim=1)
+                nb_x=x.shape[0]
+                input_x=x.view(nb_x,1,1)
+                m1=torch.matmul(theta[0].view(nb_theta,1,self.nb_neur,1),input_x)
+                m2=m1.add(theta[1].reshape(nb_theta,1,self.nb_neur,1))
+                m3=self.activation(m2)
+                m4=torch.matmul(theta[2].view(nb_theta,1,1,self.nb_neur),m3)
+                m5=m4.add(theta[3].reshape(nb_theta,1,1,1))
+                return m5.squeeze(-1)    
 
 def get_training_data(device):
     training_data = torch.load('Experiments/Foong_L1W50/Data/foong_data.pt')
@@ -43,9 +63,20 @@ def get_test_data(device):
     y_test = y_test.unsqueeze(-1)
     return x_test, y_test
 
+def get_test_ib_data(device):
+    test_data = torch.load('Experiments/Foong_L1W50/Data/foong_data_test_in_between.pt')
+    x_test = test_data[0].to(device)
+    y_test = test_data[1].to(device)
+    y_test = y_test.unsqueeze(-1)
+    return x_test, y_test
+
 def get_model(device):
     model = MLP(nblayers, layerwidth).to(device)
     flip_parameters_to_tensors(model)
+    return model
+
+def get_parallel_model(device):
+    model = parallel_MLP(layerwidth).to(device)
     return model
 
 def _log_norm(x, mu, std):
@@ -68,12 +99,39 @@ def get_loglikelihood_fn(device):
         return torch.sum(L).unsqueeze(-1)
     return loglikelihood
 
+# added parallelized versions
+def get_loglikelihood_parallel_fn(device):
+    def loglikelihood_parallel(theta, model, x, y, sigma_noise):
+        y_pred = model(theta,x)
+        L = _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device))
+        return torch.sum(L,1)
+    return loglikelihood_parallel
+
+# added parallelized versions
+def get_logposterior_parallel_fn(device):
+    logprior = get_logprior_fn(device)
+    loglikelihood_parallel = get_loglikelihood_parallel_fn(device)
+    def logposterior_parallel(theta, model, x, y, sigma_noise):
+        return logprior(theta).add(loglikelihood_parallel(theta, model, x, y, sigma_noise))
+    return logposterior_parallel
+
+    
 def get_logposterior_fn(device):
     logprior = get_logprior_fn(device)
     loglikelihood = get_loglikelihood_fn(device)
     def logposterior(theta, model, x, y, sigma_noise):
         return logprior(theta) + loglikelihood(theta, model, x, y, sigma_noise)
     return logposterior
+
+def get_logposteriorpredictive_parallel_fn(device):
+    def logposteriorpredictive(theta, model, x, y, sigma_noise):
+        y_pred = model(theta,x)
+        L = _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device))
+        loglikelihood=torch.sum(L,1)
+        N=torch.as_tensor(float(theta.shape[0]),device=device)
+        likelihood_mean=loglikelihood.logsumexp(0)-torch.log(N)
+        return likelihood_mean
+    return logposteriorpredictive
 
 def get_logposteriorpredictive_fn(device):
     def logposteriorpredictive(ensemble, model, x, y, sigma_noise):
