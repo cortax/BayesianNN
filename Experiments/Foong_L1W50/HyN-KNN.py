@@ -175,8 +175,8 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
                         y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
                         plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
                     plt.scatter(x_train.cpu(), y_train.cpu())
-                    fig.savefig(tempdir.name+'/training'+str(c)'.png', dpi=5*fig.dpi)
-                    mlflow.log_artifact(tempdir.name+'/training'+str(c)'.png')
+                    fig.savefig(tempdir.name+'/training'+str(c)+'.png', dpi=5*fig.dpi)
+                    mlflow.log_artifact(tempdir.name+'/training'+str(c)+'.png')
                     plt.close()
 
 if __name__== "__main__":
