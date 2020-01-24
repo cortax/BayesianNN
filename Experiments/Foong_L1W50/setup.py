@@ -1,6 +1,11 @@
 import torch
 from torch import nn
 from Tools.NNtools import *
+import tempfile
+import mlflow
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use('Agg')
 from torch.distributions.multivariate_normal import MultivariateNormal
 
 nblayers = 1
@@ -20,8 +25,8 @@ class MLP(nn.Module):
         for j in range(len(self.layers)-1):
             x = torch.tanh(self.layers[j](x))
         x = self.layers[-1](x)
-        return x    
-    
+        return x
+
 class parallel_MLP(nn.Module):
             def __init__(self, layerwidth):
                 super(parallel_MLP, self).__init__()
@@ -40,7 +45,7 @@ class parallel_MLP(nn.Module):
                 m3=self.activation(m2)
                 m4=torch.matmul(theta[2].view(nb_theta,1,1,self.nb_neur),m3)
                 m5=m4.add(theta[3].reshape(nb_theta,1,1,1))
-                return m5.squeeze(-1)    
+                return m5.squeeze(-1)
 
 def get_training_data(device):
     training_data = torch.load('Experiments/Foong_L1W50/Data/foong_data.pt')
@@ -115,7 +120,7 @@ def get_logposterior_parallel_fn(device):
         return logprior(theta).add(loglikelihood_parallel(theta, model, x, y, sigma_noise))
     return logposterior_parallel
 
-    
+
 def get_logposterior_fn(device):
     logprior = get_logprior_fn(device)
     loglikelihood = get_loglikelihood_fn(device)
@@ -142,3 +147,95 @@ def get_logposteriorpredictive_fn(device):
             complogproba.append(-torch.tensor(float(len(ensemble))).log() + _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device)))
         return torch.logsumexp(torch.stack(complogproba), dim=0).sum().unsqueeze(-1)
     return logposteriorpredictive
+
+
+def log_model_evaluation(ensemble, device):
+    with torch.no_grad():
+        tempdir = tempfile.TemporaryDirectory(dir='/dev/shm')
+
+        logposterior = get_logposterior_fn(device)
+        model = get_model(device)
+        x_train, y_train = get_training_data(device)
+        x_validation, y_validation = get_validation_data(device)
+        x_test, y_test = get_test_data(device)
+        logtarget = lambda theta: logposterior(theta, model, x_train, y_train, 0.1)
+
+        logposteriorpredictive = get_logposteriorpredictive_fn(device)
+        train_post = logposteriorpredictive(ensemble, model, x_train, y_train, 0.1) / len(y_train)
+        mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
+        val_post = logposteriorpredictive(ensemble, model, x_validation, y_validation, 0.1) / len(y_validation)
+        mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
+        test_post = logposteriorpredictive(ensemble, model, x_test, y_test, 0.1) / len(y_test)
+        mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
+
+        x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(11.7, 8.27)
+        plt.xlim(-2, 2)
+        plt.ylim(-4, 4)
+        plt.grid(True, which='major', linewidth=0.5)
+        plt.title('Training set')
+        for theta in ensemble:
+            set_all_parameters(model, theta)
+            y_pred = model(x_lin)
+            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0,
+                     linewidth=1.0, color='black', zorder=80)
+            res = 5
+            for r in range(res):
+                mass = 1.0 - (r + 1) / res
+                plt.fill_between(x_lin.detach().cpu().numpy().squeeze(),
+                                 y_pred.squeeze(0).detach().cpu().numpy().squeeze() - 3 * 0.1 * ((r + 1) / res),
+                                 y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
+                                 alpha=0.2 * mass, color='lightblue', zorder=50)
+        plt.scatter(x_train.cpu(), y_train.cpu(), c='red', zorder=100)
+        fig.savefig(tempdir.name + '/training.png')
+        mlflow.log_artifact(tempdir.name + '/training.png')
+        plt.close()
+
+        x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(11.7, 8.27)
+        plt.xlim(-2, 2)
+        plt.ylim(-4, 4)
+        plt.grid(True, which='major', linewidth=0.5)
+        plt.title('Validation set')
+        for theta in ensemble:
+            set_all_parameters(model, theta)
+            y_pred = model(x_lin)
+            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0,
+                     linewidth=1.0, color='black', zorder=80)
+            res = 5
+            for r in range(res):
+                mass = 1.0 - (r + 1) / res
+                plt.fill_between(x_lin.detach().cpu().numpy().squeeze(),
+                                 y_pred.squeeze(0).detach().cpu().numpy().squeeze() - 3 * 0.1 * ((r + 1) / res),
+                                 y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
+                                 alpha=0.2 * mass, color='lightblue', zorder=50)
+        plt.scatter(x_validation.cpu(), y_validation.cpu(), c='red', zorder=100)
+        fig.savefig(tempdir.name + '/validation.png', dpi=4 * fig.dpi)
+        mlflow.log_artifact(tempdir.name + '/validation.png')
+        plt.close()
+
+        x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(11.7, 8.27)
+        plt.xlim(-2, 2)
+        plt.ylim(-4, 4)
+        plt.grid(True, which='major', linewidth=0.5)
+        plt.title('Test set')
+        for theta in ensemble:
+            set_all_parameters(model, theta)
+            y_pred = model(x_lin)
+            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0,
+                     linewidth=1.0, color='black', zorder=80)
+            res = 5
+            for r in range(res):
+                mass = 1.0 - (r + 1) / res
+                plt.fill_between(x_lin.detach().cpu().numpy().squeeze(),
+                                 y_pred.squeeze(0).detach().cpu().numpy().squeeze() - 3 * 0.1 * ((r + 1) / res),
+                                 y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
+                                 alpha=0.2 * mass, color='lightblue', zorder=50)
+        plt.scatter(x_test.cpu(), y_test.cpu(), c='red', zorder=100)
+        fig.savefig(tempdir.name + '/test.png', dpi=4 * fig.dpi)
+        mlflow.log_artifact(tempdir.name + '/test.png')
+        plt.close()

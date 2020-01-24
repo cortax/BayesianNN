@@ -51,78 +51,7 @@ def main(numiter=1000, burnin=0, thinning=1, temperatures=[], maintempindex=0, b
         mlflow.set_tag('effective temperature', temperatures[maintempindex])
         ensemble = chains[maintempindex][burnin:-1:thinning]
 
-        print(len(ensemble))
-
-        with torch.no_grad():
-            tempdir = tempfile.TemporaryDirectory()
-
-            logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
-            train_post = logposteriorpredictive(ensemble, model, x_train, y_train, 0.1)/len(y_train)
-            mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive(ensemble, model, x_validation, y_validation, 0.1)/len(y_validation)
-            mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive(ensemble, model, x_test, y_test, 0.1)/len(y_test)
-            mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
-
-            x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2) 
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Training set')
-            plt.scatter(x_train.cpu(), y_train.cpu())
-            for theta in ensemble:
-                set_all_parameters(model, theta)
-                y_pred = model(x_lin)
-                plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
-                res = 20
-                for r in range(res):
-                    mass = 1.0-(r+1)/res
-                    plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*0.1*((r+1)/res), y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*0.1*((r+1)/res), alpha=0.2*mass, color='lightblue')
-            fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/training.png')
-            plt.close()
-
-            x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2) 
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Validation set')
-            plt.scatter(x_validation.cpu(), y_validation.cpu())
-            for theta in ensemble:
-                set_all_parameters(model, theta)
-                y_pred = model(x_lin)
-                plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
-                res = 20
-                for r in range(res):
-                    mass = 1.0-(r+1)/res
-                    plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*0.1*((r+1)/res), y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*0.1*((r+1)/res), alpha=0.2*mass, color='lightblue')
-            fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/validation.png')
-            plt.close()
-
-            x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2) 
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Test set')
-            plt.scatter(x_test.cpu(), y_test.cpu())
-            for theta in ensemble:
-                set_all_parameters(model, theta)
-                y_pred = model(x_lin)
-                plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
-                res = 20
-                for r in range(res):
-                    mass = 1.0-(r+1)/res
-                    plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*0.1*((r+1)/res), y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*0.1*((r+1)/res), alpha=0.2*mass, color='lightblue')
-            fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/test.png')
-            plt.close()
+        exp.log_model_evaluation(ensemble, device)
 
 
 if __name__ == "__main__":
