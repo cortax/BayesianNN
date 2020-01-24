@@ -52,10 +52,12 @@ class HyNetEns(nn.Module):
     def sample(self, n=1):
         return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
 
-    
     def forward(self, n=1):
-        return torch.cat([self.components[c](n) for c in range(self.nb_comp)],dim=0)
-    
+        d = torch.distributions.multinomial.Multinomial(n, torch.ones(self.nb_comp))
+        m = d.sample()
+        return torch.cat([self.components[c](int(m[c])) for c in range(len(self.components))])
+
+  
         
 def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cuda:1', verbose=True):
     
