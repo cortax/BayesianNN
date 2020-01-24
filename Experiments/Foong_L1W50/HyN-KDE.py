@@ -202,12 +202,12 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.ylim(-4, 4)
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
-                        for c in range(ensemble_size):
+            for c in range(ensemble_size):
                 for i in range(nb_samples_plot):
                     y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
                     plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2)) 
             plt.scatter(x_train.cpu(), y_train.cpu())
-            fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
+            fig.savefig(tempdir.name+'/training.png', dpi=5*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/training.png')
             plt.close()
             
@@ -218,14 +218,16 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
                     plt.xlim(-2, 2) 
                     plt.ylim(-4, 4)
                     plt.grid(True, which='major', linewidth=0.5)
-                    plt.title('Test set (component '+str(c+1)+')')
-                    plt.scatter(x_test.cpu(), y_test.cpu())                  
+                    plt.title('Training set (component '+str(c+1)+')')                  
                     for i in range(nb_samples_plot):
                         y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
                         plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
-                    fig.savefig(tempdir.name+'/test'+str(c)'.png', dpi=4*fig.dpi)
-                    mlflow.log_artifact(tempdir.name+'/test'+str(c)'.png')
+                    plt.scatter(x_train.cpu(), y_train.cpu())
+                    fig.savefig(tempdir.name+'/training'+str(c)'.png', dpi=5*fig.dpi)
+                    mlflow.log_artifact(tempdir.name+'/training'+str(c)'.png')
                     plt.close()
+                    
+                    
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ensemble_size", type=int, default=1,
