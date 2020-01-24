@@ -63,7 +63,7 @@ class HyNetEns(nn.Module):
 
     
     def forward(self, n=1):
-        return torch.cat([self.components[c](n).squeeze(0) for c in range(self.nb_comp)],dim=0)
+        return torch.cat([self.components[c](n) for c in range(self.nb_comp)],dim=0)
 
     
     '''
