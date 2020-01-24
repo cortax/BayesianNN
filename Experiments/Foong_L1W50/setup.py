@@ -244,7 +244,7 @@ def log_model_evaluation_parallel(ensemble, device):
     with torch.no_grad():
         tempdir = tempfile.TemporaryDirectory(dir='/dev/shm')
 
-        model = get_model_parallel(device)
+        model = get_parallel_model(device)
         x_train, y_train = get_training_data(device)
         x_validation, y_validation = get_validation_data(device)
         x_test, y_test = get_test_data(device)
