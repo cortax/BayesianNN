@@ -24,7 +24,6 @@ class HNet(nn.Module):
                 
                 torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
                 torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
-
     
             def forward(self, n=1):
                 epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
@@ -180,9 +179,60 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
             optimizer.step()
 
-        with torch.no_grad():
-            
-            torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
+               
+        ensemble=Hyper_Nets(1000).tolist()
+        log_model_evaluation(ensemble,device)
+
+
+if __name__== "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ensemble_size", type=int, default=1,
+                        help="number of hypernets to train in the ensemble")
+    parser.add_argument("--lat_dim", type=int, default=5,
+                        help="number of latent dimensions of the hypernets")
+    parser.add_argument("--init_w", type=float, default=0.1,
+                        help="std for weight initialization of output layers")
+    parser.add_argument("--init_b", type=float, default=0.0001,
+                        help="std for bias initialization of output layers")    
+    parser.add_argument("--KDE_prec", type=float, default=1.,
+                        help="factor reducing Silverman's bandwidth")
+    parser.add_argument("--n_samples_KDE", type=int, default=1000,
+                        help="number of samples for KDE")
+    parser.add_argument("--n_samples_ED", type=int, default=5,
+                        help="number of samples for MC estimation of differential entropy")
+    parser.add_argument("--n_samples_LP", type=int, default=5,
+                        help="number of samples for MC estimation of expected logposterior")
+    parser.add_argument("--max_iter", type=int, default=100000,
+                        help="maximum number of learning iterations")
+    parser.add_argument("--learning_rate", type=float, default=0.01,
+                        help="initial learning rate of the optimizer")
+    parser.add_argument("--min_lr", type=float, default=0.0005,
+                        help="minimum learning rate triggering the end of the optimization")
+    parser.add_argument("--patience", type=int, default=100,
+                        help="scheduler patience")
+    parser.add_argument("--lr_decay", type=float, default=0.9,
+                        help="scheduler multiplicative factor decreasing learning rate when patience reached")
+    parser.add_argument("--device", type=str, default=None,
+                        help="force device to be used")
+    parser.add_argument("--verbose", type=bool, default=False,
+                        help="force device to be used")
+    args = parser.parse_args()
+
+    
+
+ 
+    if args.device is None:
+        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = args.device   
+    
+    print(args)
+    
+    main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.KDE_prec, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
+    
+
+    '''
+                torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
             mlflow.log_artifact(tempdir.name+'/hypernets.pt')
 #            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
             
@@ -264,50 +314,4 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
                     fig.savefig(tempdir.name+'/test'+str(c+1)+'.png', dpi=4*fig.dpi)
                     mlflow.log_artifact(tempdir.name+'/test'+str(c+1)+'.png')
                     plt.close()
-
-if __name__== "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ensemble_size", type=int, default=1,
-                        help="number of hypernets to train in the ensemble")
-    parser.add_argument("--lat_dim", type=int, default=5,
-                        help="number of latent dimensions of the hypernets")
-    parser.add_argument("--init_w", type=float, default=0.1,
-                        help="std for weight initialization of output layers")
-    parser.add_argument("--init_b", type=float, default=0.0001,
-                        help="std for bias initialization of output layers")    
-    parser.add_argument("--KDE_prec", type=float, default=1.,
-                        help="factor reducing Silverman's bandwidth")
-    parser.add_argument("--n_samples_KDE", type=int, default=1000,
-                        help="number of samples for KDE")
-    parser.add_argument("--n_samples_ED", type=int, default=5,
-                        help="number of samples for MC estimation of differential entropy")
-    parser.add_argument("--n_samples_LP", type=int, default=5,
-                        help="number of samples for MC estimation of expected logposterior")
-    parser.add_argument("--max_iter", type=int, default=100000,
-                        help="maximum number of learning iterations")
-    parser.add_argument("--learning_rate", type=float, default=0.01,
-                        help="initial learning rate of the optimizer")
-    parser.add_argument("--min_lr", type=float, default=0.0005,
-                        help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=100,
-                        help="scheduler patience")
-    parser.add_argument("--lr_decay", type=float, default=0.9,
-                        help="scheduler multiplicative factor decreasing learning rate when patience reached")
-    parser.add_argument("--device", type=str, default=None,
-                        help="force device to be used")
-    parser.add_argument("--verbose", type=bool, default=False,
-                        help="force device to be used")
-    args = parser.parse_args()
-
-    
-
- 
-    if args.device is None:
-        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
-    else:
-        device = args.device   
-    
-    print(args)
-    
-    main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.KDE_prec, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
-    
+    '''
