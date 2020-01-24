@@ -152,24 +152,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
                 mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()),t)
                 mlflow.log_metric("learning rate", float(lr),t)
             
-            if t % 1000 == 0:
-                x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()
-                nb_samples_plot=1000
-                theta = Hyper_Nets.sample(nb_samples_plot).detach().cpu()
-                fig, ax = plt.subplots()
-                fig.set_size_inches(11.7, 8.27)
-                plt.xlim(-2, 2) 
-                plt.ylim(-4, 4)
-                plt.grid(True, which='major', linewidth=0.5)
-                plt.title('Training step '+str(t))
-                plt.scatter(x_train.cpu(), y_train.cpu())
-                for c in range(ensemble_size):
-                    for i in range(nb_samples_plot):
-                        y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
-                        plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2))            
-                fig.savefig(tempdir.name+'/training'+str(t)+'.png', dpi=5*fig.dpi)
-                mlflow.log_artifact(tempdir.name+'/training'+str(t)+'.png')
-                plt.close()
+
                 
             scheduler.step(L.detach().clone().cpu().numpy())
 
