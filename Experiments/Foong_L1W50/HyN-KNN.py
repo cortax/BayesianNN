@@ -25,8 +25,7 @@ class HNet(nn.Module):
                 
                 torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
                 torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
-
-    
+   
             def forward(self, n=1):
                 epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
                 return self.hnet(epsilon)           
@@ -65,7 +64,8 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
     xpname = exp.experiment_name + 'HyNet-KNN'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
-
+    tempdir = tempfile.TemporaryDirectory()
+    
     with mlflow.start_run(run_name='HyNet-KNN', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
         logposterior = exp.get_logposterior_parallel_fn(device)#new!
@@ -132,14 +132,99 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
 
             optimizer.step()
 
+        
         with torch.no_grad():
-            tempdir = tempfile.TemporaryDirectory()
+            ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(1000)]
+            exp.log_model_evaluation(ensemble,'cpu')
+            
             torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
             mlflow.log_artifact(tempdir.name+'/hypernets.pt')
 
 #            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
             
-            pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
+           
+            x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()
+            nb_samples_plot=1000
+            theta = Hyper_Nets.sample(nb_samples_plot).cpu()
+            
+            fig, ax = plt.subplots()
+            fig.set_size_inches(11.7, 8.27)
+            plt.xlim(-2, 2) 
+            plt.ylim(-4, 4)
+            plt.grid(True, which='major', linewidth=0.5)
+            plt.title('Training set')
+                        for c in range(ensemble_size):
+                for i in range(nb_samples_plot):
+                    y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
+                    plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2)) 
+            plt.scatter(x_train.cpu(), y_train.cpu())
+            fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
+            mlflow.log_artifact(tempdir.name+'/training.png')
+            plt.close()
+            
+            if ensemble_size>1:
+                for c in range(ensemble_size):
+                    fig, ax = plt.subplots()
+                    fig.set_size_inches(11.7, 8.27)
+                    plt.xlim(-2, 2) 
+                    plt.ylim(-4, 4)
+                    plt.grid(True, which='major', linewidth=0.5)
+                    plt.title('Test set (component '+str(c+1)+')')
+                    plt.scatter(x_test.cpu(), y_test.cpu())                  
+                    for i in range(nb_samples_plot):
+                        y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
+                        plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
+                    fig.savefig(tempdir.name+'/test'+str(c)'.png', dpi=4*fig.dpi)
+                    mlflow.log_artifact(tempdir.name+'/test'+str(c)'.png')
+                    plt.close()
+
+if __name__== "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ensemble_size", type=int, default=1,
+                        help="number of hypernets to train in the ensemble")
+    parser.add_argument("--lat_dim", type=int, default=5,
+                        help="number of latent dimensions of the hypernets")
+    parser.add_argument("--init_w", type=float, default=0.1,
+                        help="std for weight initialization of output layers")
+    parser.add_argument("--init_b", type=float, default=0.0001,
+                        help="std for bias initialization of output layers")    
+    parser.add_argument("--n_samples_KNN", type=int, default=1000,
+                        help="number of samples for KNN (nearest neighbour entropy estimate)")
+    parser.add_argument("--n_samples_ED", type=int, default=5,
+                        help="number of samples for MC estimation of differential entropy")
+    parser.add_argument("--n_samples_LP", type=int, default=5,
+                        help="number of samples for MC estimation of expected logposterior")
+    parser.add_argument("--max_iter", type=int, default=100000,
+                        help="maximum number of learning iterations")
+    parser.add_argument("--learning_rate", type=float, default=0.01,
+                        help="initial learning rate of the optimizer")
+    parser.add_argument("--min_lr", type=float, default=0.0005,
+                        help="minimum learning rate triggering the end of the optimization")
+    parser.add_argument("--patience", type=int, default=100,
+                        help="scheduler patience")
+    parser.add_argument("--lr_decay", type=float, default=0.9,
+                        help="scheduler multiplicative factor decreasing learning rate when patience reached")
+    parser.add_argument("--device", type=str, default=None,
+                        help="force device to be used")
+    parser.add_argument("--verbose", type=bool, default=False,
+                        help="force device to be used")
+    args = parser.parse_args()
+
+    
+
+ 
+    if args.device is None:
+        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+    else:
+        device = args.device   
+    
+    print(args)
+    
+    main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.n_samples_KNN, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
+    
+
+    
+    ''' pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
             nb_samples_postpred=int(np.ceil(10000/ensemble_size))
             logposteriorpredictive = exp.get_logposteriorpredictive_parallel_fn('cpu')
@@ -201,64 +286,5 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
             fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/test.png')
             plt.close()
-            
-            if ensemble_size>1:
-                for c in range(ensemble_size):
-                    fig, ax = plt.subplots()
-                    fig.set_size_inches(11.7, 8.27)
-                    plt.xlim(-2, 2) 
-                    plt.ylim(-4, 4)
-                    plt.grid(True, which='major', linewidth=0.5)
-                    plt.title('Test set (component '+str(c+1)+')')
-                    plt.scatter(x_test.cpu(), y_test.cpu())                  
-                    for i in range(nb_samples_plot):
-                        y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
-                        plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
-                    fig.savefig(tempdir.name+'/test'+str(c+1)+'.png', dpi=4*fig.dpi)
-                    mlflow.log_artifact(tempdir.name+'/test'+str(c+1)+'.png')
-                    plt.close()
 
-if __name__== "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ensemble_size", type=int, default=1,
-                        help="number of hypernets to train in the ensemble")
-    parser.add_argument("--lat_dim", type=int, default=5,
-                        help="number of latent dimensions of the hypernets")
-    parser.add_argument("--init_w", type=float, default=0.1,
-                        help="std for weight initialization of output layers")
-    parser.add_argument("--init_b", type=float, default=0.0001,
-                        help="std for bias initialization of output layers")    
-    parser.add_argument("--n_samples_KNN", type=int, default=1000,
-                        help="number of samples for KNN (nearest neighbour entropy estimate)")
-    parser.add_argument("--n_samples_ED", type=int, default=5,
-                        help="number of samples for MC estimation of differential entropy")
-    parser.add_argument("--n_samples_LP", type=int, default=5,
-                        help="number of samples for MC estimation of expected logposterior")
-    parser.add_argument("--max_iter", type=int, default=100000,
-                        help="maximum number of learning iterations")
-    parser.add_argument("--learning_rate", type=float, default=0.01,
-                        help="initial learning rate of the optimizer")
-    parser.add_argument("--min_lr", type=float, default=0.0005,
-                        help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=100,
-                        help="scheduler patience")
-    parser.add_argument("--lr_decay", type=float, default=0.9,
-                        help="scheduler multiplicative factor decreasing learning rate when patience reached")
-    parser.add_argument("--device", type=str, default=None,
-                        help="force device to be used")
-    parser.add_argument("--verbose", type=bool, default=False,
-                        help="force device to be used")
-    args = parser.parse_args()
-
-    
-
- 
-    if args.device is None:
-        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
-    else:
-        device = args.device   
-    
-    print(args)
-    
-    main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.n_samples_KNN, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
-    
+    '''
