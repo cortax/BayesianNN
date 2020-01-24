@@ -136,7 +136,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,n_samples_KNN=1000,n_sa
         
         with torch.no_grad():
             ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(1000)]
-            exp.log_model_evaluation(ensemble,'cpu')
+            exp.log_model_evaluation_parallel(ensemble,'cpu')
             
             torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
             mlflow.log_artifact(tempdir.name+'/hypernets.pt')
