@@ -181,7 +181,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
                
         ensemble=Hyper_Nets(1000).tolist()
-        log_model_evaluation(ensemble,device)
+        exp.log_model_evaluation(ensemble,device)
 
 
 if __name__== "__main__":
