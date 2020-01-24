@@ -253,7 +253,8 @@ def log_model_evaluation_parallel(ensemble, device):
         logposteriorpredictive = get_logposteriorpredictive_parallel_fn(device)
         train_post = logposteriorpredictive(ensemble_t, model, x_train, y_train, 0.1)
         mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-        val_post = logposteriorpredictive(ensemble_t, model, x_validation, y_validation, 0.1)        mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
+        val_post = logposteriorpredictive(ensemble_t, model, x_validation, y_validation, 0.1)     
+        mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
         test_post = logposteriorpredictive(ensemble_t, model, x_test, y_test, 0.1)
         mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
