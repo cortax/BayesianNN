@@ -36,14 +36,16 @@ class HyNetEns(nn.Module):
         self.output_dim=output_dim
         self.components= nn.ModuleList([HNet(lat_dim,output_dim,output_dim,activation,init_w,init_b) for i in range(nb_comp)]).to(device)   
 
-    # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
+        # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
     def get_H(self, nb_samples):
-        theta=self.sample(nb_samples)
-        c_=(nb_samples*(self.output_dim+2))/4
-        c=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
-        H_=theta.var(1)/c
+        theta=self.sample(nb_samples).detach()
+        S_=(nb_samples*(self.output_dim+2))/4
+        S=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
+        H=torch.Tensor(self.nb_comp,self.output_dim)
+        for c in range(self.nb_comp):
+            H[c]=torch.as_tensor(np.cov(theta[c].transpose(0,1).numpy()))
         #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
-        return theta, H_.clamp(torch.finfo().eps,float('inf'))
+        return theta, (H/S).clamp(torch.finfo().eps,float('inf'))
 
     def KDE(self, theta_,theta, H_):
         def kernel(theta1,theta2,H):
@@ -69,6 +71,16 @@ class HyNetEns(nn.Module):
 
     
     '''
+        # (last)"Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
+    def get_H(self, nb_samples):
+        theta=self.sample(nb_samples)
+        c_=(nb_samples*(self.output_dim+2))/4
+        c=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
+        H_=theta.var(1)/c
+        #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
+        return theta, H_.clamp(torch.finfo().eps,float('inf'))
+
+
     # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
     def get_H(self, nb_samples, prec=KDE_prec):
         theta=self.sample(nb_samples)
