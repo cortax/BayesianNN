@@ -42,7 +42,7 @@ class HyNetEns(nn.Module):
         c_=(nb_samples*(self.output_dim+2))/4
         c=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
         #H_=theta.var(1)/c
-        H_=(theta.var(1).max(1).values/c)*torch.ones(self.output_dim) #to try!
+        H_=(theta.var()/c)*torch.ones(self.output_dim) #to try!
         return theta, H_.clamp(torch.finfo().eps,float('inf'))
 
     def KDE(self, theta_,theta, H_):
