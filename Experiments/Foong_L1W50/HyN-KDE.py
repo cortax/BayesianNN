@@ -42,7 +42,7 @@ class HyNetEns(nn.Module):
         theta_=theta.clone().transpose(1,2).detach().cpu().numpy()
         S_=(nb_samples*(self.output_dim+2))/4
         S=torch.as_tensor(S_).pow(2/(self.output_dim+4)).to(device)      
-        H=torch.Tensor(self.nb_comp,self.output_dim).to(device)
+        H=torch.Tensor(self.nb_comp,self.output_dim,self.output_dim).to(device)
         for c in range(self.nb_comp):
             H[c]=torch.as_tensor(np.cov(theta_[c]))
         #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
