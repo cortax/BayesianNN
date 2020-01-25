@@ -39,18 +39,15 @@ class HyNetEns(nn.Module):
         # "Silverman's rule of thumb", Wand and Jones p.111 "Kernel Smoothing" 1995.                                 
     def get_H(self, nb_samples):
         theta=self.sample(nb_samples)
-        theta_=theta.clone().transpose(1,2).detach().cpu().numpy()
-        S_=(nb_samples*(self.output_dim+2))/4
-        S=torch.as_tensor(S_).pow(2/(self.output_dim+4)).to(device)      
-        H=torch.Tensor(self.nb_comp,self.output_dim,self.output_dim).to(device)
-        for c in range(self.nb_comp):
-            H[c]=torch.as_tensor(np.cov(theta_[c]))
+        c_=(nb_samples*(self.output_dim+2))/4
+        c=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
+        H_=theta.var(1)/c
         #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
-        return theta, (H/S).to(device)
+        return theta, H_.clamp(torch.finfo().eps,float('inf'))
 
     def KDE(self, theta_,theta, H_):
         def kernel(theta1,theta2,H):
-            mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, H)
+            mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diagflat(H))
             return mvn.log_prob(theta2)
         LQ=torch.Tensor(theta_.shape[0],self.nb_comp,theta.shape[1]).to(device) 
         for c in range(self.nb_comp):
