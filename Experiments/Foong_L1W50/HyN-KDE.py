@@ -46,11 +46,11 @@ class HyNetEns(nn.Module):
         for c in range(self.nb_comp):
             H[c]=torch.as_tensor(np.cov(theta_[c]))
         #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
-        return theta, (H/S).clamp(torch.finfo().eps,float('inf')).to(device)
+        return theta, (H/S).to(device)
 
     def KDE(self, theta_,theta, H_):
         def kernel(theta1,theta2,H):
-            mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diagflat(H))
+            mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, H)
             return mvn.log_prob(theta2)
         LQ=torch.Tensor(theta_.shape[0],self.nb_comp,theta.shape[1]).to(device) 
         for c in range(self.nb_comp):
