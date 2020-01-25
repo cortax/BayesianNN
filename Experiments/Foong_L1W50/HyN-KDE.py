@@ -40,8 +40,8 @@ class HyNetEns(nn.Module):
     def get_H(self, nb_samples):
         theta=self.sample(nb_samples).detach()
         S_=(nb_samples*(self.output_dim+2))/4
-        S=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
-        H=torch.Tensor(self.nb_comp,self.output_dim)
+        S=torch.as_tensor(S_).pow(2/(self.output_dim+4)).to(device)      
+        H=torch.Tensor(self.nb_comp,self.output_dim).to(device)
         for c in range(self.nb_comp):
             H[c]=torch.as_tensor(np.cov(theta[c].transpose(0,1).numpy()))
         #H_=theta.var(1).min(1).values/c*torch.ones(self.output_dim) #to try!
