@@ -47,7 +47,7 @@ class HyNetEns(nn.Module):
 
     def KDE(self, theta_,theta, H_):
         def kernel(theta1,theta2,H):
-            mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diag(H))
+            mvn = torch.distributions.multivariate_normal.MultivariateNormal(theta1, torch.diagflat(H))
             return mvn.log_prob(theta2)
         LQ=torch.Tensor(theta_.shape[0],self.nb_comp,theta.shape[1]).to(device) 
         for c in range(self.nb_comp):
