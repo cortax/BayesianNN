@@ -132,11 +132,9 @@ def get_logposteriorpredictive_parallel_fn(device):
     def logposteriorpredictive(theta, model, x, y, sigma_noise):
         y_pred = model(theta,x)
         L = _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device))
-        print(L.shape)
         n_x=torch.as_tensor(float(x.shape[0]),device=device)
         n_theta=torch.as_tensor(float(theta.shape[0]),device=device)
         log_posterior_predictive=torch.logsumexp(L,0)-torch.log(n_theta)
-        print(log_posterior_predictive.shape)
         log_mean_posterior_predictive=log_posterior_predictive.logsumexp(0)-torch.log(n_x)
         return log_mean_posterior_predictive
     return logposteriorpredictive
