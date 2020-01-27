@@ -129,7 +129,7 @@ def get_logposterior_fn(device):
     return logposterior
 
 def get_logposteriorpredictive_parallel_fn(device):    
-    def logposteriorpredictive_pl(theta, model, x, y, sigma_noise):
+    def logposteriorpredictive(theta, model, x, y, sigma_noise):
         y_pred = model(theta,x)
         L = _log_norm(y_pred, y, torch.tensor([sigma_noise],device=device))
         print(L.shape)
