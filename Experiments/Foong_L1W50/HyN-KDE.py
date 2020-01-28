@@ -108,13 +108,12 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
     with mlflow.start_run(run_name='HyNet-KDE', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
-        logposterior = exp.get_logposterior_parallel_fn(device)#new!
-        model = exp.get_parallel_model(device) #new!
+        logposterior = logposterior = exp.get_logposterior_fn(device)
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
         x_test_ib, y_test_ib= exp.get_test_ib_data(device)
-        logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
+        logtarget = lambda theta : logposterior(theta, x_train, y_train, 0.1 )
 
         mlflow.log_param('ensemble_size', ensemble_size)
         mlflow.log_param('HyperNet_lat_dim', lat_dim)
@@ -175,10 +174,11 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
             optimizer.step()
 
+        ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(1000)]
+        exp.log_model_evaluation(ensemble, 'cpu')
+       
         with torch.no_grad():
-            ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(1000)]
-            exp.log_model_evaluation_parallel(ensemble,'cpu')
-            
+                      
             torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
             mlflow.log_artifact(tempdir.name+'/hypernets.pt')
 
@@ -266,87 +266,3 @@ if __name__== "__main__":
     main(args.ensemble_size,args.lat_dim,args.init_w,args.init_b, args.KDE_prec, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
     
 
-    '''
-                torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
-            mlflow.log_artifact(tempdir.name+'/hypernets.pt')
-#            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
-            
-            pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
-            mlflow.log_artifact(tempdir.name+'/training_loss.csv')
-            nb_samples_postpred=int(np.ceil(10000/ensemble_size))
-            logposteriorpredictive = exp.get_logposteriorpredictive_parallel_fn('cpu')
-            train_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).cpu(), model, x_train.cpu(), y_train.cpu(), 0.1)
-            mlflow.log_metric("training log posterior predictive", float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_validation.cpu(), y_validation.cpu(), 0.1)
-            mlflow.log_metric("validation log posterior predictive", float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_test.cpu(), y_test.cpu(), 0.1)
-            mlflow.log_metric("test log posterior predictive", float(test_post.detach().cpu()))
-            test_ib_post = logposteriorpredictive(Hyper_Nets(nb_samples_postpred).detach().cpu(), model, x_test_ib.cpu(), y_test_ib.cpu(), 0.1)
-            mlflow.log_metric("test in between log posterior predictive", float(test_ib_post.detach().cpu()))
-            
-            
-            x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()
-            nb_samples_plot=1000
-            theta = Hyper_Nets.sample(nb_samples_plot).cpu()
-            
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2) 
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Training set')
-            plt.scatter(x_train.cpu(), y_train.cpu())
-            for c in range(ensemble_size):
-                for i in range(nb_samples_plot):
-                    y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
-                    plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2))            
-            fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/training.png')
-            plt.close()
-
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2) 
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Validation set')
-            plt.scatter(x_validation.cpu(), y_validation.cpu())
-            for c in range(Hyper_Nets.nb_comp):
-                for i in range(nb_samples_plot):
-                    y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
-                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
-            fig.savefig(tempdir.name+'/validation.png', dpi=4*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/validation.png')
-            plt.close()
-
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2) 
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Test set')
-            plt.scatter(x_test.cpu(), y_test.cpu())
-            for c in range(Hyper_Nets.nb_comp):
-                for i in range(nb_samples_plot):
-                    y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
-                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
-            fig.savefig(tempdir.name+'/test.png', dpi=4*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/test.png')
-            plt.close()
-            
-            if ensemble_size>1:
-                for c in range(ensemble_size):
-                    fig, ax = plt.subplots()
-                    fig.set_size_inches(11.7, 8.27)
-                    plt.xlim(-2, 2) 
-                    plt.ylim(-4, 4)
-                    plt.grid(True, which='major', linewidth=0.5)
-                    plt.title('Test set (component '+str(c+1)+')')
-                    plt.scatter(x_test.cpu(), y_test.cpu())                  
-                    for i in range(nb_samples_plot):
-                        y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
-                        plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
-                    fig.savefig(tempdir.name+'/test'+str(c+1)+'.png', dpi=4*fig.dpi)
-                    mlflow.log_artifact(tempdir.name+'/test'+str(c+1)+'.png')
-                    plt.close()
-    '''
