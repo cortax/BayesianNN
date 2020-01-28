@@ -12,7 +12,7 @@ import argparse
 import pandas as pd
 
 
-def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, n_ELBO_samples=10, patience=100, lr_decay=0.9, init_std=1.0, optimize=0, expansion=0, seed=-1, device='cpu', verbose=0):
+def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, n_ELBO_samples=100, patience=100, lr_decay=0.9, init_std=1.0, optimize=0, expansion=0, seed=-1, device='cpu', verbose=0):
     seeding(seed)
 
     xpname = exp.experiment_name + ' MFVI'
@@ -23,11 +23,10 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, n_ELBO_samples=10, 
         mlflow.set_tag('device', device)
         mlflow.set_tag('seed', seed)
         logposterior = exp.get_logposterior_fn(device)
-        model = exp.get_model(device)
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
-        logtarget = lambda theta: logposterior(theta, model, x_train, y_train, 0.1)
+        logtarget = lambda theta: logposterior(theta, x_train, y_train, exp.sigma_noise)
 
         mlflow.log_param('n_ELBO_samples', n_ELBO_samples)
         mlflow.log_param('learning_rate', learning_rate)
@@ -68,10 +67,10 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, n_ELBO_samples=10, 
         q.rho.requires_grad = True
         if expansion:
             q.mu.requires_grad = False
-            mlflow.log_param('expansion', 0)
+            mlflow.log_param('expansion', 1)
         else:
             q.mu.requires_grad = True
-            mlflow.log_param('expansion', 1)
+            mlflow.log_param('expansion', 0)
         optimizer = torch.optim.Adam(q.parameters(), lr=learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
 
@@ -79,14 +78,11 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, n_ELBO_samples=10, 
         for t in range(max_iter - 1):
             optimizer.zero_grad()
 
-            listDIV = []
-            for i in range(n_ELBO_samples):
-                z = q.sample(1)
-                LQ = q.log_prob(z)
-                LP = logposterior(z, model, x_train, y_train, sigma_noise=0.1)
-                listDIV.append((LQ - LP))
+            z = q.sample(n_ELBO_samples)
+            LQ = q.log_prob(z)
+            LP = logposterior(z, x_train, y_train, sigma_noise=0.1)
+            L = (LQ - LP).mean()
 
-            L = torch.stack(listDIV).mean()
             L.backward()
 
             if verbose:
@@ -102,91 +98,8 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, n_ELBO_samples=10, 
 
             optimizer.step()
 
-        with torch.no_grad():
-            tempdir = tempfile.TemporaryDirectory()
-
-            ensemble = [q.sample() for _ in range(1000)]
-
-            logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
-            train_post = logposteriorpredictive(ensemble, model, x_train, y_train, 0.1) / len(y_train)
-            mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive(ensemble, model, x_validation, y_validation, 0.1) / len(y_validation)
-            mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive(ensemble, model, x_test, y_test, 0.1) / len(y_test)
-            mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
-
-            x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2)
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Training set')
-            for theta in ensemble:
-                set_all_parameters(model, theta)
-                y_pred = model(x_lin)
-                plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0,
-                         linewidth=1.0, color='black', zorder=80)
-                res = 20
-                for r in range(res):
-                    mass = 1.0 - (r + 1) / res
-                    plt.fill_between(x_lin.detach().cpu().numpy().squeeze(),
-                                     y_pred.squeeze(0).detach().cpu().numpy().squeeze() - 3 * 0.1 * ((r + 1) / res),
-                                     y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
-                                     alpha=0.2 * mass, color='lightblue', zorder=50)
-            plt.scatter(x_train.cpu(), y_train.cpu(), c='red', zorder=100)
-            fig.savefig(tempdir.name + '/training.png', dpi=4 * fig.dpi)
-            mlflow.log_artifact(tempdir.name + '/training.png')
-            plt.close()
-
-            x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2)
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Validation set')
-            for theta in ensemble:
-                set_all_parameters(model, theta)
-                y_pred = model(x_lin)
-                plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0,
-                         linewidth=1.0, color='black', zorder=80)
-                res = 20
-                for r in range(res):
-                    mass = 1.0 - (r + 1) / res
-                    plt.fill_between(x_lin.detach().cpu().numpy().squeeze(),
-                                     y_pred.squeeze(0).detach().cpu().numpy().squeeze() - 3 * 0.1 * ((r + 1) / res),
-                                     y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
-                                     alpha=0.2 * mass, color='lightblue', zorder=50)
-            plt.scatter(x_validation.cpu(), y_validation.cpu(), c='red', zorder=100)
-            fig.savefig(tempdir.name + '/validation.png', dpi=4 * fig.dpi)
-            mlflow.log_artifact(tempdir.name + '/validation.png')
-            plt.close()
-
-            x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2)
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Test set')
-            for theta in ensemble:
-                set_all_parameters(model, theta)
-                y_pred = model(x_lin)
-                plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0,
-                         linewidth=1.0, color='black', zorder=80)
-                res = 20
-                for r in range(res):
-                    mass = 1.0 - (r + 1) / res
-                    plt.fill_between(x_lin.detach().cpu().numpy().squeeze(),
-                                     y_pred.squeeze(0).detach().cpu().numpy().squeeze() - 3 * 0.1 * ((r + 1) / res),
-                                     y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
-                                     alpha=0.2 * mass, color='lightblue', zorder=50)
-            plt.scatter(x_test.cpu(), y_test.cpu(), c='red', zorder=100)
-            fig.savefig(tempdir.name + '/test.png', dpi=4 * fig.dpi)
-            mlflow.log_artifact(tempdir.name + '/test.png')
-            plt.close()
-
+        ensemble = [q.sample() for _ in range(1000)]
+        exp.log_model_evaluation(ensemble, device)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

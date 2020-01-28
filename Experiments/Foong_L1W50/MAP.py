@@ -22,15 +22,14 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
         mlflow.set_tag('device', device) 
         mlflow.set_tag('seed', seed)
         logposterior = exp.get_logposterior_fn(device)
-        model = exp.get_model(device)
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
-        logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
+        logtarget = lambda theta: logposterior(theta, x_train, y_train, exp.sigma_noise)
         
         mlflow.log_param('init_std', init_std) 
         std = torch.tensor(init_std)
-        theta = torch.nn.Parameter( torch.empty([1,exp.param_count],device=device).normal_(std=std), requires_grad=True)
+        theta = torch.nn.Parameter(torch.empty([1, exp.param_count], device=device).normal_(std=std), requires_grad=True)
         
         mlflow.log_param('learning_rate', learning_rate)
         optimizer = torch.optim.Adam([theta], lr=learning_rate)
@@ -72,11 +71,11 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
 
             logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
-            train_post = logposteriorpredictive([theta], model, x_train, y_train, 0.1)/len(y_train)
+            train_post = logposteriorpredictive([theta], x_train, y_train, 0.1)/len(y_train)
             mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive([theta], model, x_validation, y_validation, 0.1)/len(y_validation)
+            val_post = logposteriorpredictive([theta],  x_validation, y_validation, 0.1)/len(y_validation)
             mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive([theta], model, x_test, y_test, 0.1)/len(y_test)
+            test_post = logposteriorpredictive([theta], x_test, y_test, 0.1)/len(y_test)
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
             x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
@@ -87,8 +86,7 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Training set')
             plt.scatter(x_train.cpu(), y_train.cpu())
-            set_all_parameters(model, theta)
-            y_pred = model(x_lin)
+            y_pred = exp.mlp(x_lin, theta)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
             res = 20
             for r in range(res):
@@ -106,8 +104,7 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Validation set')
             plt.scatter(x_validation.cpu(), y_validation.cpu())
-            set_all_parameters(model, theta)
-            y_pred = model(x_lin)
+            y_pred = exp.mlp(x_lin, theta)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
             res = 20
             for r in range(res):
@@ -125,8 +122,7 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             plt.grid(True, which='major', linewidth=0.5)
             plt.title('Test set')
             plt.scatter(x_test.cpu(), y_test.cpu())
-            set_all_parameters(model, theta)
-            y_pred = model(x_lin)
+            y_pred = exp.mlp(x_lin, theta)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
             res = 20
             for r in range(res):
