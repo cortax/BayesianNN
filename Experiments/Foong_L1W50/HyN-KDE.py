@@ -174,7 +174,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
             optimizer.step()
 
-        ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(1000)]
+        ensemble = [Hyper_Nets().unsqueeze(0).detach().clone().cpu() for _ in range(1000)]
         exp.log_model_evaluation(ensemble, 'cpu')
        
         with torch.no_grad():
