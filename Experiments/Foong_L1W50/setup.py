@@ -113,15 +113,16 @@ def get_logposterior_fn(device):
     return logposterior
 
 
-def get_logposteriorpredictive_fn_yann(device):
+#NLPD from Quinonero-Candela and al.
+# the average negative log predictive density (NLPD) of the true targets
+def get_NLPD_fn(device):
     def logposteriorpredictive(theta, x, y, sigma_noise):
         y_pred = mlp(x, theta)
         L = _log_norm(y_pred, y, torch.tensor([sigma_noise], device=device))
         n_x = torch.as_tensor(float(x.shape[0]), device=device)
         n_theta = torch.as_tensor(float(theta.shape[0]), device=device)
         log_posterior_predictive = torch.logsumexp(L, 0) - torch.log(n_theta)
-        log_mean_posterior_predictive = log_posterior_predictive.logsumexp(0) - torch.log(n_x)
-        return log_mean_posterior_predictive
+        return log_posterior_predictive.mean()
     return logposteriorpredictive
 
 
@@ -233,6 +234,8 @@ def log_model_evaluation(ensemble, device):
         x_train, y_train = get_training_data(device)
         x_validation, y_validation = get_validation_data(device)
         x_test, y_test = get_test_data(device)
+        x_test_ib, y_test_ib = get_test_ib_data(device)
+
 
         #ensemble_t = torch.cat(ensemble, dim=0)
         logposteriorpredictive = get_logposteriorpredictive_fn(device)
@@ -242,7 +245,22 @@ def log_model_evaluation(ensemble, device):
         mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
         test_post = logposteriorpredictive(ensemble, x_test, y_test, sigma_noise)
         mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
+        test_ib_post = logposteriorpredictive(ensemble, x_test_ib, y_test_ib, sigma_noise)
+        mlflow.log_metric("test in-between log posterior predictive", -float(test_post.detach().cpu()))
+        
+        
+        NLPD = get_NLPD_fn(device)
+        train_NLPD = NLPD(ensemble, x_train, y_train, sigma_noise)
+        mlflow.log_metric("training NLPD loss", -float(train_NLPD.detach().cpu()))
+        val_NLPD = NLPD(ensemble, x_validation, y_validation, sigma_noise)
+        mlflow.log_metric("validation NLPD loss", -float(val_NLPD.detach().cpu()))
+        test_NLPD = NLPD(ensemble, x_test, y_test, sigma_noise)
+        mlflow.log_metric("test NLPD loss", -float(test_NLPD.detach().cpu()))
+        test_ib_NLPD = NLPD(ensemble, x_test_ib, y_test_ib, sigma_noise)
+        mlflow.log_metric("test NLPD loss", -float(test_ib_NLPD.detach().cpu()))
 
+        
+        
         x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
         fig, ax = plt.subplots()
         fig.set_size_inches(11.7, 8.27)
