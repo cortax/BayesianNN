@@ -74,6 +74,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
 
+    
     with mlflow.start_run(run_name='HyNet-KDE', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
         logposterior = logposterior = exp.get_logposterior_fn(device)
@@ -82,7 +83,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
         x_test, y_test = exp.get_test_data(device)
         x_test_ib, y_test_ib= exp.get_test_ib_data(device)
         logtarget = lambda theta : logposterior(theta, x_train, y_train, 0.1 )
-
+        
         mlflow.log_param('ensemble_size', ensemble_size)
         mlflow.log_param('HyperNet_lat_dim', lat_dim)
         mlflow.log_param('HyperNet_nb_neurons', exp.param_count)
@@ -107,13 +108,15 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
         
         tempdir = tempfile.TemporaryDirectory()
         
+        KDE=exp.get_KDE_fn(device)
+
         
         training_loss = []
         for t in range(max_iter):
             optimizer.zero_grad()
 
             theta,H=Hyper_Nets.get_H(n_samples_KDE)
-            ED=-Hyper_Nets.KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
+            ED=KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
             LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
             L =-ED-LP
 

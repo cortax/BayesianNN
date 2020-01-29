@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 matplotlib.use('Agg')
 from torch.distributions.multivariate_normal import MultivariateNormal
 import pandas as pd
+import math
 
 
 nblayers = 1
@@ -105,6 +106,33 @@ def get_test_ib_data(device):
     y_test = y_test.unsqueeze(-1)
     return x_test, y_test
 
+"""
+   KDE by components, returns a KDE estimation for x based on batched samples y with corresponding kernels H 
+
+    Parameters:
+        x (Tensor): Data tensor for KDE evaluation, size n_ed X dim 
+        y (Tensor): Data tensor for KDE computation, size nb_comp X n_kde X dim
+        H (Tensor): Diagonals of kernel covariance_matrix, size nb_comp X dim 
+        std (Tensor): Positive scalar
+
+    Returns:
+        logproba (Tensor): Same size as x
+    """
+
+def get_KDE_fn(device):
+    def KDE(x,y,H):
+        dim=x.shape[-1]
+        n_ed=x.shape[0]
+        n_comp=y.shape[0]
+        n_kde=y.shape[1]
+        d=((y.view(n_comp,n_kde,1,dim)-x.view(1,1,n_ed,dim))**2)
+        H_=H.view(n_comp,dim,1,1).inverse().view(n_comp,1,1,dim)
+        const=0.5*H.log().sum(1)+0.5*dim*torch.tensor(2*math.pi).log()
+        const=const.view(n_comp,1,1)
+        ln=-0.5*(H_*d).sum(3)-const
+        N=torch.as_tensor(float(n_comp*n_kde),device=device)
+        return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
+    return KDE
 
 def _log_norm(x, mu, std):
     """
