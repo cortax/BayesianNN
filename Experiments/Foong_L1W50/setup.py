@@ -150,14 +150,15 @@ def _log_norm(x, mu, std):
 
 
 def get_logprior_fn(device):
-    S = torch.eye(param_count).to(device)
+    S = torch.ones(param_count).to(device)
     mu = torch.zeros(param_count).to(device)
-    prior = MultivariateNormal(mu, scale_tril=S)
-
+    dim=param_count
     def logprior(x):
-        v = prior.log_prob(x).unsqueeze(-1)
-        return v
-
+        n_x=x.shape[0]
+        H=S.view(dim,1,1).inverse().view(1,1,dim)
+        d=((x-mu.view(1,dim))**2).view(1,n_x,dim)
+        const=0.5*S.log().sum()+0.5*dim*torch.tensor(2*math.pi).log()
+        return -0.5*(H*d).sum(2)-const
     return logprior
 
 
