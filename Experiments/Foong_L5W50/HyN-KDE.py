@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 from Tools.NNtools import *
 import tempfile
 import mlflow
-import Experiments.Foong_L1W50.setup as exp
+import Experiments.Foong_L5W50.setup as exp
 import argparse
 
 
 class HNet(nn.Module):
-            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.1, init_b=.1):
+            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.4, init_b=0.001):
                 super(HNet, self).__init__()
                 self.lat_dim = lat_dim
                 self.output_dim=output_dim
@@ -41,7 +41,6 @@ class HyNetEns(nn.Module):
         c_=(nb_samples*(self.output_dim+2))/4
         c=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
         H_=theta.var(1)/c
-        #H_=(theta.var()/c)*torch.ones(self.output_dim) #to try!
         return theta, H_.clamp(torch.finfo().eps,float('inf'))
 
     def KDE(self, theta_,theta, H_):
@@ -66,7 +65,8 @@ class HyNetEns(nn.Module):
         return torch.cat([self.components[c](int(m[c])) for c in range(len(self.components))])
 
 
-def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cuda:1', verbose=True):
+        
+def main(ensemble_size=1, lat_dim=5, init_w=.01, init_b=.000001, KDE_prec=1., n_samples_KDE=1000, n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cuda:1', verbose=True):
 
     activation=nn.ReLU()
     
@@ -193,9 +193,9 @@ if __name__== "__main__":
                         help="number of hypernets to train in the ensemble")
     parser.add_argument("--lat_dim", type=int, default=5,
                         help="number of latent dimensions of the hypernets")
-    parser.add_argument("--init_w", type=float, default=0.1,
+    parser.add_argument("--init_w", type=float, default=0.01,
                         help="std for weight initialization of output layers")
-    parser.add_argument("--init_b", type=float, default=0.0001,
+    parser.add_argument("--init_b", type=float, default=0.000001,
                         help="std for bias initialization of output layers")    
     parser.add_argument("--KDE_prec", type=float, default=1.,
                         help="factor reducing Silverman's bandwidth")
@@ -211,7 +211,7 @@ if __name__== "__main__":
                         help="initial learning rate of the optimizer")
     parser.add_argument("--min_lr", type=float, default=0.0005,
                         help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=100,
+    parser.add_argument("--patience", type=int, default=500,
                         help="scheduler patience")
     parser.add_argument("--lr_decay", type=float, default=0.9,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")

@@ -14,7 +14,7 @@ nblayers = 1
 activation=nn.Tanh()
 sigma_noise = torch.tensor(0.1)
 layerwidth = 50
-param_count = 151
+param_count = 2*layerwidth+(nblayers-1)*(layerwidth**2+layerwidth)+layerwidth+1
 experiment_name = 'Foong L1/W50'
 
 """
