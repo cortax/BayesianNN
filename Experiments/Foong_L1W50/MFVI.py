@@ -9,7 +9,6 @@ import mlflow
 import Experiments.Foong_L1W50.setup as exp
 from Inference.Variational import MeanFieldVariationalDistribution
 import argparse
-import pandas as pd
 
 
 def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, n_ELBO_samples=100, patience=100, lr_decay=0.9, init_std=1.0, optimize=0, expansion=0, seed=-1, device='cpu', verbose=0):

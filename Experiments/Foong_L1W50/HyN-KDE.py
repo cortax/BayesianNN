@@ -8,7 +8,6 @@ import tempfile
 import mlflow
 import Experiments.Foong_L1W50.setup as exp
 import argparse
-import pandas as pd
 
 
 class HNet(nn.Module):
@@ -99,7 +98,7 @@ class HyNetEns(nn.Module):
     '''
         
 def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cuda:1', verbose=True):
-    
+
     activation=nn.ReLU()
     
     xpname = exp.experiment_name + 'HyNet-KDE'
@@ -153,7 +152,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
             #training_loss.append(L.detach().clone().cpu().numpy())
 
-            
+            training_loss.append(L.detach().clone().cpu().numpy())
             lr = optimizer.param_groups[0]['lr']
 
             if t % 50 ==0:
@@ -174,7 +173,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
 
             optimizer.step()
 
-        ensemble = [Hyper_Nets().unsqueeze(0).detach().clone().cpu() for _ in range(1000)]
+        ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(1000)]
         exp.log_model_evaluation(ensemble, 'cpu')
        
         with torch.no_grad():
@@ -196,7 +195,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             plt.scatter(x_train.cpu(), y_train.cpu())
             for c in range(ensemble_size):
                 for i in range(nb_samples_plot):
-                    y_pred = model(theta[c,i].unsqueeze(0),x_lin.cpu())
+                    y_pred = exp.mlp(x_lin.cpu(),theta[c,i].unsqueeze(0))
                     plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2)) 
             fig.savefig(tempdir.name+'/trainingpc.png', dpi=5*fig.dpi)
             mlflow.log_artifact(tempdir.name+'/trainingpc.png')
@@ -211,7 +210,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
                     plt.grid(True, which='major', linewidth=0.5)
                     plt.title('Training set (component '+str(c+1)+')')                  
                     for i in range(nb_samples_plot):
-                        y_pred = model(theta[c,i].unsqueeze(0),x_lin).cpu()
+                        y_pred = exp.mlp(x_lin.cpu(),theta[c,i].unsqueeze(0))
                         plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
                     plt.scatter(x_train.cpu(), y_train.cpu())
                     fig.savefig(tempdir.name+'/training'+str(c)+'.png', dpi=5*fig.dpi)
