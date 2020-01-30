@@ -11,7 +11,7 @@ import argparse
 
 
 class HNet(nn.Module):
-            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.4, init_b=0.001):
+            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.1, init_b=.1):
                 super(HNet, self).__init__()
                 self.lat_dim = lat_dim
                 self.output_dim=output_dim
@@ -41,6 +41,7 @@ class HyNetEns(nn.Module):
         c_=(nb_samples*(self.output_dim+2))/4
         c=torch.as_tensor(c_).pow(2/(self.output_dim+4)).to(device)      
         H_=theta.var(1)/c
+        #H_=(theta.var()/c)*torch.ones(self.output_dim) #to try!
         return theta, H_.clamp(torch.finfo().eps,float('inf'))
 
     def KDE(self, theta_,theta, H_):
@@ -65,8 +66,7 @@ class HyNetEns(nn.Module):
         return torch.cat([self.components[c](int(m[c])) for c in range(len(self.components))])
 
 
-        
-def main(ensemble_size=1, lat_dim=5, init_w=.01, init_b=.000001, KDE_prec=1., n_samples_KDE=1000, n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cuda:1', verbose=True):
+def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_KDE=1000,n_samples_ED=20, n_samples_LP=20, max_iter=10000, learning_rate=0.001, min_lr=0.000005, patience=100, lr_decay=0.9,  device='cuda:1', verbose=True):
 
     activation=nn.ReLU()
     
@@ -74,6 +74,7 @@ def main(ensemble_size=1, lat_dim=5, init_w=.01, init_b=.000001, KDE_prec=1., n_
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
 
+    
     with mlflow.start_run(run_name='HyNet-KDE', experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device) 
         logposterior = logposterior = exp.get_logposterior_fn(device)
@@ -82,7 +83,7 @@ def main(ensemble_size=1, lat_dim=5, init_w=.01, init_b=.000001, KDE_prec=1., n_
         x_test, y_test = exp.get_test_data(device)
         x_test_ib, y_test_ib= exp.get_test_ib_data(device)
         logtarget = lambda theta : logposterior(theta, x_train, y_train, 0.1 )
-
+        
         mlflow.log_param('ensemble_size', ensemble_size)
         mlflow.log_param('HyperNet_lat_dim', lat_dim)
         mlflow.log_param('HyperNet_nb_neurons', exp.param_count)
@@ -107,13 +108,15 @@ def main(ensemble_size=1, lat_dim=5, init_w=.01, init_b=.000001, KDE_prec=1., n_
         
         tempdir = tempfile.TemporaryDirectory()
         
+        KDE=exp.get_KDE_fn(device)
+
         
         training_loss = []
         for t in range(max_iter):
             optimizer.zero_grad()
 
             theta,H=Hyper_Nets.get_H(n_samples_KDE)
-            ED=-Hyper_Nets.KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
+            ED=KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
             LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
             L =-ED-LP
 
@@ -195,7 +198,7 @@ if __name__== "__main__":
                         help="number of latent dimensions of the hypernets")
     parser.add_argument("--init_w", type=float, default=0.01,
                         help="std for weight initialization of output layers")
-    parser.add_argument("--init_b", type=float, default=0.000001,
+    parser.add_argument("--init_b", type=float, default=0.0001,
                         help="std for bias initialization of output layers")    
     parser.add_argument("--KDE_prec", type=float, default=1.,
                         help="factor reducing Silverman's bandwidth")
@@ -211,7 +214,7 @@ if __name__== "__main__":
                         help="initial learning rate of the optimizer")
     parser.add_argument("--min_lr", type=float, default=0.0005,
                         help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=500,
+    parser.add_argument("--patience", type=int, default=1000,
                         help="scheduler patience")
     parser.add_argument("--lr_decay", type=float, default=0.9,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
