@@ -116,7 +116,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             optimizer.zero_grad()
 
             theta,H=Hyper_Nets.get_H(n_samples_KDE)
-            ED=KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
+            ED=-KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
             LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
             L =-ED-LP
 
@@ -196,9 +196,9 @@ if __name__== "__main__":
                         help="number of hypernets to train in the ensemble")
     parser.add_argument("--lat_dim", type=int, default=5,
                         help="number of latent dimensions of the hypernets")
-    parser.add_argument("--init_w", type=float, default=0.1,
+    parser.add_argument("--init_w", type=float, default=0.2,
                         help="std for weight initialization of output layers")
-    parser.add_argument("--init_b", type=float, default=0.0001,
+    parser.add_argument("--init_b", type=float, default=0.000001,
                         help="std for bias initialization of output layers")    
     parser.add_argument("--KDE_prec", type=float, default=1.,
                         help="factor reducing Silverman's bandwidth")
@@ -212,9 +212,9 @@ if __name__== "__main__":
                         help="maximum number of learning iterations")
     parser.add_argument("--learning_rate", type=float, default=0.01,
                         help="initial learning rate of the optimizer")
-    parser.add_argument("--min_lr", type=float, default=0.0005,
+    parser.add_argument("--min_lr", type=float, default=0.00001,
                         help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=100,
+    parser.add_argument("--patience", type=int, default=1000,
                         help="scheduler patience")
     parser.add_argument("--lr_decay", type=float, default=0.9,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
