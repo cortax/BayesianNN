@@ -116,7 +116,7 @@ def main(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_samples_K
             optimizer.zero_grad()
 
             theta,H=Hyper_Nets.get_H(n_samples_KDE)
-            ED=KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
+            ED=-KDE(Hyper_Nets(n_samples_ED),theta,1/KDE_prec*H).mean()
             LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
             L =-ED-LP
 
