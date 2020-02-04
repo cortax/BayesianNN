@@ -49,9 +49,7 @@ def make_datasets(txt, size_train, scaler, n_splits):
         torch.save(X_test, txt + '/data/' + txt + '_X_test_(' + str(i) + ').pt')
         torch.save(y_test, txt + '/data/' + txt + '_y_test_(' + str(i) + ').pt')
         
-def normalize(txt, size_train, scaler):
-
-    X_train, y_train, X_test, y_test = load_data(txt, size_train)
+def normalize(X_train, y_train, X_test, y_test, scaler):
 
     scaler_X = scaler
     scaler_y = scaler
