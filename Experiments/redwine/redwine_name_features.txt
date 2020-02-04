@@ -1,0 +1,1 @@
+Fixed acidity, Volatile acidity, Citric acid, Residual sugar, Chlorides, Free sulfur dioxide, Total sulfur dioxide, Density pH, Sulphates, Alcohol, Quality
