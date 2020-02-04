@@ -5,9 +5,10 @@ import math
 
 
 class HNet(nn.Module):
-            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.1, init_b=.1):
+            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.1, init_b=.1, device='cpu'):
                 super(HNet, self).__init__()
                 self.lat_dim = lat_dim
+                self.device=device
                 self.output_dim=output_dim
                 self.hnet=nn.Sequential(
                         nn.Linear(lat_dim,nb_neur),
@@ -19,15 +20,15 @@ class HNet(nn.Module):
                 torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
     
             def forward(self, n=1):
-                epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
+                epsilon = torch.randn(size=(n,self.lat_dim)).to(self.device)
                 return self.hnet(epsilon)           
 
 class HyNetEns(nn.Module):
-    def __init__(self,nb_comp,lat_dim,layer_width, output_dim, activation, init_w,init_b):
+    def __init__(self,nb_comp,lat_dim,layer_width, output_dim, activation, init_w,init_b,device='cpu'):
         super(HyNetEns, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
-        self.components= nn.ModuleList([HNet(lat_dim,layer_width,output_dim,activation,init_w,init_b) for i in range(nb_comp)]).to(device)   
+        self.components= nn.ModuleList([HNet(lat_dim,layer_width,output_dim,activation,init_w,init_b,device) for i in range(nb_comp)]).to(device)   
     def sample(self, n=1):
         return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
 
@@ -53,37 +54,39 @@ Hyper_Nets.sample(100)
 
 ### Entropy approximation
 
-def KDE(x,y,prec):
-    """
-    KDE    
-    
-    Parameters:
-        x (Tensor): Inputs, NbExemples X NbDimensions   
-        y (Tensor):  Batched samples, NbBatch x NbSamples X NbDimensions
-        prec (Float): scalar factor for bandwidth scaling
-    
+def get_KDE(device):
+    def KDE(x,y,prec):
+        """
+        KDE    
 
-    Returns:
-        (Tensor) KDE estimate for x based on batched diagonal "Silverman's rule of thumb", NbExemples X 1
-        See Wand and Jones p.111 "Kernel Smoothing" 1995.  
-    
-    """
-    
-    dim=x.shape[-1]
-    n_ed=x.shape[0]
-    n_comp=y.shape[0]
-    n_kde=y.shape[1]
-    c_=(n_kde*(dim+2))/4
-    c=torch.as_tensor(c_).pow(2/(dim+4)).to(device)  
-    H=prec*(y.var(1)/c).clamp(torch.finfo().eps,float('inf'))
+        Parameters:
+            x (Tensor): Inputs, NbExemples X NbDimensions   
+            y (Tensor):  Batched samples, NbBatch x NbSamples X NbDimensions
+            prec (Float): scalar factor for bandwidth scaling
 
-    d=((y.view(n_comp,n_kde,1,dim)-x.view(1,1,n_ed,dim))**2)
-    H_=H.view(n_comp,dim,1,1).inverse().view(n_comp,1,1,dim)
-    const=0.5*H.log().sum(1)+0.5*dim*torch.tensor(2*math.pi).log()
-    const=const.view(n_comp,1,1)
-    ln=-0.5*(H_*d).sum(3)-const
-    N=torch.as_tensor(float(n_comp*n_kde),device=device)
-    return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
+
+        Returns:
+            (Tensor) KDE estimate for x based on batched diagonal "Silverman's rule of thumb", NbExemples X 1
+            See Wand and Jones p.111 "Kernel Smoothing" 1995.  
+
+        """
+
+        dim=x.shape[-1]
+        n_ed=x.shape[0]
+        n_comp=y.shape[0]
+        n_kde=y.shape[1]
+        c_=(n_kde*(dim+2))/4
+        c=torch.as_tensor(c_).pow(2/(dim+4)).to(device)  
+        H=prec*(y.var(1)/c).clamp(torch.finfo().eps,float('inf'))
+
+        d=((y.view(n_comp,n_kde,1,dim)-x.view(1,1,n_ed,dim))**2)
+        H_=H.view(n_comp,dim,1,1).inverse().view(n_comp,1,1,dim)
+        const=0.5*H.log().sum(1)+0.5*dim*torch.tensor(2*math.pi).log()
+        const=const.view(n_comp,1,1)
+        ln=-0.5*(H_*d).sum(3)-const
+        N=torch.as_tensor(float(n_comp*n_kde),device=device)
+        return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
+    return KDE
 
 
 def NNE(theta,k=1):
