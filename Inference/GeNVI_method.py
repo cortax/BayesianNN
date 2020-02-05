@@ -66,7 +66,7 @@ def get_KDE(device):
 
 
         Returns:
-            (Tensor) KDE estimate for x based on batched diagonal "Silverman's rule of thumb", NbExemples X 1
+            (Tensor) KDE log estimate for x based on batched diagonal "Silverman's rule of thumb", NbExemples
             See Wand and Jones p.111 "Kernel Smoothing" 1995.  
 
         """

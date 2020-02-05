@@ -1,5 +1,8 @@
 import torch
 import math
+import mlflow
+import numpy as np
+
 
 def _log_norm(x, mu, std,device):
     """
@@ -71,3 +74,29 @@ def RMSE(theta,model,x,y,inv_transform,device):
     mse=(y_pred-y.view(n_samples,1))**2
     return mse.mean().sqrt()
 
+def log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, step,device):
+    with torch.no_grad():
+        nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, device)
+        mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),step)
+        mlflow.log_metric("nlpd_std train", float(nlp_tr[0].detach().clone().cpu().numpy()),step)
+        rms_tr=RMSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,device)
+        mlflow.log_metric("rmse train", float(rms_tr.detach().clone().cpu().numpy()),step)
+
+        nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, device)              
+        mlflow.log_metric("nlpd test", float(nlp[1].detach().clone().cpu().numpy()),step)
+        mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),step)
+        rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
+        mlflow.log_metric("rmse test", float(rms.detach().clone().cpu().numpy()),step)
+        
+
+        
+def seeding(manualSeed):
+    np.random.seed(manualSeed)
+    torch.manual_seed(manualSeed)
+    torch.cuda.manual_seed(manualSeed)
+    torch.cuda.manual_seed_all(manualSeed)
+
+    torch.backends.cudnn.enabled = False 
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+    
