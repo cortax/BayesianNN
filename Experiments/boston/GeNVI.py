@@ -4,7 +4,7 @@ import mlflow
 import tempfile
 
 from Inference.GeNVI_method import *
-from Experiments.Boston.setup import *
+from Experiments.boston.setup import *
 from Prediction.logposterior import get_logposterior
 
 input_dim=13
