@@ -29,13 +29,15 @@ def normalize(X_train, y_train, X_test, y_test,device):
     scaler_y = StandardScaler()
 
     X_train = torch.as_tensor(scaler_X.fit_transform(X_train)).float().to(device)
+    y_train_un=y_train.clone().float().to(device)
     y_train = torch.as_tensor(scaler_y.fit_transform(y_train)).float().to(device)
-
-    inverse_scaler_y = lambda t: torch.as_tensor(scaler_y.inverse_transform(t)).to(device)
+   
+    
+    inverse_scaler_y = lambda t: torch.as_tensor(scaler_y.inverse_transform(t.cpu())).to(device)
 
     X_test = torch.as_tensor(scaler_X.transform(X_test)).float().to(device)
-    y_test=y_test.float().to(device)
-    return X_train, y_train, X_test, y_test, inverse_scaler_y
+    y_test_un=y_test.float().to(device)
+    return X_train, y_train, y_train_un, X_test, y_test_un,  inverse_scaler_y
 
 def get_data(splitting_index,device):
     X_train = torch.load('Experiments/boston/data/boston_X_train_('+str(splitting_index)+').pt')

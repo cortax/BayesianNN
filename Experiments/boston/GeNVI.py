@@ -28,7 +28,7 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
     
     with mlflow.start_run():#run_name='GeNVI-KDE', experiment_id=expdata.experiment_id
         
-        X_train, y_train, X_test, y_test, inverse_scaler_y=get_data(splitting_index,device)
+        X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(splitting_index, device)
     
         param_count, mlp=get_my_mlp()
 
@@ -83,12 +83,19 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
             mlflow.log_metric("learning rate", float(lr),t)
             
             with torch.no_grad():
-                theta=Hyper_Nets(100)
-                nlp=NLPD(theta,mlp,X_test,y_test,sigma_noise, inverse_scaler_y,device)
+                theta=Hyper_Nets(100).cpu()
+                nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, 'cpu')
+                mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),t)
+                mlflow.log_metric("nlpd_std train", float(nlp_tr[0].detach().clone().cpu().numpy()),t)
+                rms_tr=RMSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,'cpu')
+                mlflow.log_metric("rmse train", float(rms_tr.detach().clone().cpu().numpy()),t)
+                
+                nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, 'cpu')              
                 mlflow.log_metric("nlpd test", float(nlp[1].detach().clone().cpu().numpy()),t)
                 mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),t)
-                rms=RMSE(theta,mlp,X_test,y_test,inverse_scaler_y,device)
+                rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,'cpu')
                 mlflow.log_metric("rmse test", float(rms.detach().clone().cpu().numpy()),t)
+                
                 
                 
             scheduler.step(L.detach().clone().cpu().numpy())
@@ -99,11 +106,12 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
 
             if lr < min_lr:
                 break
-
+            
                 
             optimizer.step()
             
-            
+        mlflow.pytorch.save_model(Hyper_Nets,tempdir.name+'/hypernets.pt' )
+        mlflow.log_artifact(tempdir.name+'/hypernets.pt')
 
 
 """            
