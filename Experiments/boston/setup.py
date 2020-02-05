@@ -15,7 +15,7 @@ layerwidth = 50
 
 
 
-sigma_noise=1.
+sigma_noise=1.5
 
 
 

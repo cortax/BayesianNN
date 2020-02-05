@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import mlflow
+import mlflow.pytorch
 import tempfile
 import argparse
 
@@ -29,7 +30,10 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
     with mlflow.start_run():#run_name='GeNVI-KDE', experiment_id=expdata.experiment_id
         
         X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(splitting_index, device)
-    
+        
+        mlflow.log_param('sigma noise', sigma_noise)
+        mlflow.log_param('split', splitting_index)
+        
         param_count, mlp=get_my_mlp()
 
         logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
@@ -83,17 +87,17 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
             mlflow.log_metric("learning rate", float(lr),t)
             
             with torch.no_grad():
-                theta=Hyper_Nets(100).cpu()
-                nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, 'cpu')
+                theta=Hyper_Nets(100).detach()
+                nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, device)
                 mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),t)
                 mlflow.log_metric("nlpd_std train", float(nlp_tr[0].detach().clone().cpu().numpy()),t)
-                rms_tr=RMSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,'cpu')
+                rms_tr=RMSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,device)
                 mlflow.log_metric("rmse train", float(rms_tr.detach().clone().cpu().numpy()),t)
                 
-                nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, 'cpu')              
+                nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, device)              
                 mlflow.log_metric("nlpd test", float(nlp[1].detach().clone().cpu().numpy()),t)
                 mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),t)
-                rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,'cpu')
+                rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
                 mlflow.log_metric("rmse test", float(rms.detach().clone().cpu().numpy()),t)
                 
                 
@@ -110,56 +114,10 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
                 
             optimizer.step()
             
-        mlflow.pytorch.save_model(Hyper_Nets,tempdir.name+'/hypernets.pt' )
-        mlflow.log_artifact(tempdir.name+'/hypernets.pt')
+        
+        mlflow.pytorch.log_model(Hyper_Nets,'models')
 
 
-"""            
-        ensemble = [Hyper_Nets().detach().clone().cpu() for _ in range(1000)]
-        exp.log_model_evaluation(ensemble, 'cpu')
-       
-        with torch.no_grad():
-                      
-            torch.save(Hyper_Nets,tempdir.name+'/hypernets.pt')
-            mlflow.log_artifact(tempdir.name+'/hypernets.pt')
-
-            
-            x_lin =  torch.linspace(-2.,2.0).unsqueeze(1).cpu()
-            nb_samples_plot=2000
-            theta = Hyper_Nets.sample(nb_samples_plot).cpu()
-            
-            fig, ax = plt.subplots()
-            fig.set_size_inches(11.7, 8.27)
-            plt.xlim(-2, 2) 
-            plt.ylim(-4, 4)
-            plt.grid(True, which='major', linewidth=0.5)
-            plt.title('Training set')
-            plt.scatter(x_train.cpu(), y_train.cpu())
-            for c in range(ensemble_size):
-                for i in range(nb_samples_plot):
-                    y_pred = exp.mlp(x_lin.cpu(),theta[c,i].unsqueeze(0))
-                    plt.plot(x_lin, y_pred.squeeze(0), alpha=0.05, linewidth=1, color='C'+str(c+2)) 
-            fig.savefig(tempdir.name+'/trainingpc.png', dpi=5*fig.dpi)
-            mlflow.log_artifact(tempdir.name+'/trainingpc.png')
-            plt.close()
-            
-            if ensemble_size>1:
-                for c in range(ensemble_size):
-                    fig, ax = plt.subplots()
-                    fig.set_size_inches(11.7, 8.27)
-                    plt.xlim(-2, 2) 
-                    plt.ylim(-4, 4)
-                    plt.grid(True, which='major', linewidth=0.5)
-                    plt.title('Training set (component '+str(c+1)+')')                  
-                    for i in range(nb_samples_plot):
-                        y_pred = exp.mlp(x_lin.cpu(),theta[c,i].unsqueeze(0))
-                        plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.05, linewidth=1, color='C'+str(c+2))             
-                    plt.scatter(x_train.cpu(), y_train.cpu())
-                    fig.savefig(tempdir.name+'/training'+str(c)+'.png', dpi=5*fig.dpi)
-                    mlflow.log_artifact(tempdir.name+'/training'+str(c)+'.png')
-                    plt.close()
-                    
-"""
 
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
@@ -179,13 +137,13 @@ if __name__== "__main__":
                         help="number of samples for KDE")
     parser.add_argument("--n_samples_ED", type=int, default=50,
                         help="number of samples for MC estimation of differential entropy")
-    parser.add_argument("--n_samples_LP", type=int, default=50,
+    parser.add_argument("--n_samples_LP", type=int, default=100,
                         help="number of samples for MC estimation of expected logposterior")
-    parser.add_argument("--max_iter", type=int, default=100000,
+    parser.add_argument("--max_iter", type=int, default=1000000,
                         help="maximum number of learning iterations")
     parser.add_argument("--learning_rate", type=float, default=0.03,
                         help="initial learning rate of the optimizer")
-    parser.add_argument("--min_lr", type=float, default=0.000001,
+    parser.add_argument("--min_lr", type=float, default=0.00000001,
                         help="minimum learning rate triggering the end of the optimization")
     parser.add_argument("--patience", type=int, default=10,
                         help="scheduler patience")
