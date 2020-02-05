@@ -29,10 +29,10 @@ def normalize(X_train, y_train, X_test, y_test,device):
     return X_train, y_train, X_test,y_test , inverse_scaler_y
 
 def get_data(splitting_index,device):
-    X_train = torch.load('Experiments/Boston/data/boston_X_train_('+str(splitting_index)+').pt')
-    y_train = torch.load('Experiments/Boston/data/boston_y_train_('+str(splitting_index)+').pt')
-    X_test = torch.load('Experiments/Boston/data/boston_X_test_('+str(splitting_index)+').pt')
-    y_test=torch.load('Experiments/Boston/data/boston_y_test_('+str(splitting_index)+').pt')
+    X_train = torch.load('Experiments/boston/data/boston_X_train_('+str(splitting_index)+').pt')
+    y_train = torch.load('Experiments/boston/data/boston_y_train_('+str(splitting_index)+').pt')
+    X_test = torch.load('Experiments/boston/data/boston_X_test_('+str(splitting_index)+').pt')
+    y_test=torch.load('Experiments/boston/data/boston_y_test_('+str(splitting_index)+').pt')
     return normalize(X_train, y_train, X_test, y_test,device)
 
 

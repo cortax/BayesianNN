@@ -97,11 +97,11 @@ def main():#(ensemble_size=1,lat_dim=5,init_w=.2,init_b=.001,KDE_prec=1.,n_sampl
             training_loss.append(L.detach().clone().cpu().numpy())
             lr = optimizer.param_groups[0]['lr']
 
-            if t % 50 ==0:
-                mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
-                mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()),t)
-                mlflow.log_metric("learning rate", float(lr),t)
             
+            mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
+            mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()),t)
+            mlflow.log_metric("learning rate", float(lr),t)
+
 
                 
             scheduler.step(L.detach().clone().cpu().numpy())
