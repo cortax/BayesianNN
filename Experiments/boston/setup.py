@@ -3,16 +3,25 @@ from torch import nn
 
 from Prediction.mlp import *
 
-from Prediction.logposterior import logposterior
-
 from sklearn.preprocessing import StandardScaler
 
+
+experiment_name='Boston'
+
 input_dim=13
-nb_layers = 1
-activation_pn=nn.ReLU()
+nblayers = 1
+activation=nn.ReLU()
 layerwidth = 50
 
+
+
 sigma_noise=1.
+
+
+
+def get_my_mlp():
+    return get_mlp(input_dim,layerwidth,nblayers,activation)
+
 
 def normalize(X_train, y_train, X_test, y_test,device):
 
@@ -26,7 +35,7 @@ def normalize(X_train, y_train, X_test, y_test,device):
 
     X_test = torch.as_tensor(scaler_X.transform(X_test)).float().to(device)
     y_test=y_test.float().to(device)
-    return X_train, y_train, X_test,y_test , inverse_scaler_y
+    return X_train, y_train, X_test, y_test, inverse_scaler_y
 
 def get_data(splitting_index,device):
     X_train = torch.load('Experiments/boston/data/boston_X_train_('+str(splitting_index)+').pt')
@@ -36,5 +45,4 @@ def get_data(splitting_index,device):
     return normalize(X_train, y_train, X_test, y_test,device)
 
 
-    
     
