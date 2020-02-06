@@ -7,12 +7,12 @@ import argparse
 
 
 from Inference.GeNVI_method import *
-from Experiments.boston.setup import *
 from Prediction.metrics import get_logposterior,log_metrics
 
-splitting_index=0
 
+from Experiments.foong.setup import *
 
+ 
 
 def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_decay,  device, verbose):
     
@@ -22,10 +22,9 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
     
     with mlflow.start_run():#run_name='GeNVI-KDE', experiment_id=expdata.experiment_id
         
-        X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(splitting_index, device)
+        X_train, y_train, X_test, y_test, X_ib_test, y_ib_test, X_valid, y_valid, inverse_scaler_y = get_data(device)
         
         mlflow.log_param('sigma noise', sigma_noise)
-        mlflow.log_param('split', splitting_index)
         
         param_count, mlp=get_my_mlp()
 
@@ -80,8 +79,10 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
         with torch.no_grad():
             theta=theta_ens
             
-            log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
+            log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
 
+            
+            plot_test(X_train, y_train, X_test,y_test,theta.unsqueeze(1), mlp)
 
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
@@ -91,7 +92,7 @@ if __name__== "__main__":
                         help="parameter controling initialization of theta")
     parser.add_argument("--max_iter", type=int, default=1000000,
                         help="maximum number of learning iterations")
-    parser.add_argument("--learning_rate", type=float, default=0.03,
+    parser.add_argument("--learning_rate", type=float, default=0.1,
                         help="initial learning rate of the optimizer")
     parser.add_argument("--min_lr", type=float, default=0.00000001,
                         help="minimum learning rate triggering the end of the optimization")
@@ -102,7 +103,7 @@ if __name__== "__main__":
     parser.add_argument("--device", type=str, default=None,
                         help="force device to be used")
     parser.add_argument("--verbose", type=bool, default=False,
-                        help="force device to be used")
+                        help="display in terminal")
     args = parser.parse_args()
 
     
