@@ -21,12 +21,15 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
     expdata = mlflow.get_experiment_by_name(xpname)
     
     with mlflow.start_run():#run_name='GeNVI-KDE', experiment_id=expdata.experiment_id
+        mlflow.set_tag('device', device)
         
         X_train, y_train, X_test, y_test, X_ib_test, y_ib_test, X_valid, y_valid, inverse_scaler_y = get_data(device)
         
         mlflow.log_param('sigma noise', sigma_noise)
         
         param_count, mlp=get_my_mlp()
+        mlflow.set_tag('dimensions', param_count)
+        
 
         logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
          
@@ -48,7 +51,7 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
         for k in range(ensemble_size):
             with mlflow.start_run(run_name='component', nested=True):
                 std = torch.tensor(init_std)
-                theta = torch.nn.Parameter( torch.empty([1,param_count],device=device).normal_(std=std), requires_grad=True)
+                theta = torch.nn.Parameter(std*torch.randn(1,param_count), requires_grad=True)
                 optimizer = torch.optim.Adam([theta], lr=learning_rate)
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
 
@@ -68,10 +71,15 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
                     if lr < min_lr:
                         break
 
+                    if verbose:
+                        stats = 'Run {}. Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(k,t, max_iter, L, lr)
+                        print(stats)
+
                     optimizer.step()
                     
-            with torch.no_grad():
-                theta_ens[k]=theta.detach()
+                with torch.no_grad():
+                    log_metrics(theta.detach(), mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
+                    theta_ens[k]=theta.squeeze().detach()
         
 
 
@@ -116,5 +124,5 @@ if __name__== "__main__":
     
     print(args)
 
-main(args.ensemble_size,args.init_std, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,  args.device, args.verbose)
+main(args.ensemble_size,args.init_std, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,  device, args.verbose)
 

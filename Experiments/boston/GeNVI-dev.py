@@ -153,6 +153,8 @@ if __name__== "__main__":
                         help="force device to be used")
     parser.add_argument("--verbose", type=bool, default=False,
                         help="force device to be used")
+    parser.add_argument("--show_metrics", type=bool, default=False,
+                        help="log metrics during training")
     args = parser.parse_args()
 
     
@@ -165,5 +167,5 @@ if __name__== "__main__":
     
     print(args)
     
-main(args.ensemble_size,args.lat_dim,args.layerwidth, args.init_w, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose)
+main(args.ensemble_size,args.lat_dim,args.layerwidth, args.init_w, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device=device, verbose=args.verbose,args.show_metrics)
 

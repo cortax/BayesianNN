@@ -24,7 +24,7 @@ class MeanFieldVariationalDistribution(nn.Module):
         return self.mu + sigma *epsilon
     
     def _rho_to_sigma(self, rho):
-        sigma = torch.log(1 + torch.exp(rho))
+        sigma = torch.log(torch.exp(rho)+1.)
         return sigma
 
     

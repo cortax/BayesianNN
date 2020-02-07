@@ -70,7 +70,7 @@ def plot_test(x_train, y_train, x_test,y_test,theta, model):
     plt.scatter(x_train.cpu(), y_train.cpu(),color='black',zorder=1)    
 
     plt_linewidth=get_linewidth(2*sigma_noise,ax)
-    alpha=(1/torch.tensor(float(ensemble_sz)).sqrt()).clamp(0.01,0.9)
+    alpha=(.9/torch.tensor(float(ensemble_sz*nb_samples_plot)).sqrt()).clamp(0.01,1.)
     for c in range(ensemble_sz):
         for i in range(nb_samples_plot):
             y_pred = model(x_lin.cpu(),theta[c,i].unsqueeze(0))

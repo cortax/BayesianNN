@@ -76,18 +76,21 @@ def RMSE(theta,model,x,y,inv_transform,device):
 
 def log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, step,device):
     with torch.no_grad():
-        nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, device)
-        mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),step)
-        mlflow.log_metric("nlpd_std train", float(nlp_tr[0].detach().clone().cpu().numpy()),step)
-        rms_tr=RMSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,device)
-        mlflow.log_metric("rmse train", float(rms_tr.detach().clone().cpu().numpy()),step)
-
-        nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, device)              
-        mlflow.log_metric("nlpd test", float(nlp[1].detach().clone().cpu().numpy()),step)
-        mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),step)
-        rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
-        mlflow.log_metric("rmse test", float(rms.detach().clone().cpu().numpy()),step)
         
+            mlflow.log_metric("epoch", int(step))
+
+            nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, device)
+            mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),step)
+            mlflow.log_metric("nlpd_std train", float(nlp_tr[0].detach().clone().cpu().numpy()),step)
+            rms_tr=RMSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,device)
+            mlflow.log_metric("rmse train", float(rms_tr.detach().clone().cpu().numpy()),step)
+
+            nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, device)              
+            mlflow.log_metric("nlpd test", float(nlp[1].detach().clone().cpu().numpy()),step)
+            mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),step)
+            rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
+            mlflow.log_metric("rmse test", float(rms.detach().clone().cpu().numpy()),step)
+
 
         
 def seeding(manualSeed):

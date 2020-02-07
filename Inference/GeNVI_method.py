@@ -108,4 +108,4 @@ def NNE(theta,k=1):
     N=torch.as_tensor(float(nb_samples),device=device)
     pi=torch.as_tensor(math.pi,device=device)
     lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
-    return torch.digamma(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+    return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))

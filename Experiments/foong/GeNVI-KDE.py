@@ -7,10 +7,11 @@ import argparse
 
 
 from Inference.GeNVI_method import *
-from Experiments.boston.setup import *
 from Prediction.metrics import get_logposterior,log_metrics
 
-splitting_index=0
+from Experiments.foong.setup import *
+
+
 
 init_b=.001
 HN_activation=nn.ReLU()
@@ -21,7 +22,7 @@ KDE_prec=1.
 
  
 
-def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=1000, n_samples_ED=50, n_samples_LP=50, max_iter=100000, learning_rate=0.03, min_lr=0.000001, patience=10, lr_decay=0.5,  device=None, verbose=False,show_metrics=False):
+def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=1000, n_samples_ED=50, n_samples_LP=50, max_iter=100000, learning_rate=0.03, min_lr=0.000001, patience=10, lr_decay=0.5,  device=None, verbose=False, show_metrics=False):
     
     xpname = experiment_name+'/GeNVI-KDE'
     mlflow.set_experiment(xpname)
@@ -29,17 +30,12 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
     
     with mlflow.start_run():#run_name='GeNVI-KDE', experiment_id=expdata.experiment_id
         mlflow.set_tag('device', device) 
-        mlflow.set_tag('device', device)
         
-
-
-        X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(splitting_index, device)
+        X_train, y_train, X_test, y_test, X_ib_test, y_ib_test, X_valid, y_valid, inverse_scaler_y = get_data(device)
         
         mlflow.log_param('sigma noise', sigma_noise)
-        mlflow.log_param('split', splitting_index)
-        
+
         param_count, mlp=get_my_mlp()
-        
         mlflow.set_tag('dimensions', param_count)
 
         logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
@@ -91,9 +87,9 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
             mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
             mlflow.log_metric("learning rate", float(lr),t)
             
-            if show_metrics:
+            if show_metrics :
                 theta=Hyper_Nets(100).detach()
-                log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
+                log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
 
                 
                 
@@ -108,10 +104,15 @@ def main(ensemble_size=1,lat_dim=5,HN_layerwidth=50,init_w=.2, n_samples_KDE=100
             
                 
             optimizer.step()
-            
         
-        theta=Hyper_Nets(1000).detach()
-        log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
+
+        with torch.no_grad():
+            theta = Hyper_Nets(1000)
+            log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
+
+            theta_plot=Hyper_Nets.sample(100)
+            plot_test(X_train, y_train, X_test,y_test,theta_plot, mlp)
+       
         mlflow.pytorch.log_model(Hyper_Nets,'models')
 
 
@@ -151,7 +152,7 @@ if __name__== "__main__":
     parser.add_argument("--verbose", type=bool, default=False,
                         help="force device to be used")
     parser.add_argument("--show_metrics", type=bool, default=False,
-                        help="log metrics during training")    
+                        help="log metrics during training")   
     args = parser.parse_args()
 
     
@@ -164,5 +165,4 @@ if __name__== "__main__":
     
     print(args)
     
-main(args.ensemble_size,args.lat_dim,args.layerwidth, args.init_w, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device, args.verbose,args.show_metrics)
-
+main(args.ensemble_size,args.lat_dim,args.layerwidth, args.init_w, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device, args.verbose, args.show_metrics)

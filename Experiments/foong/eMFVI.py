@@ -11,10 +11,9 @@ from Prediction.metrics import get_logposterior, log_metrics, seeding
 from Inference.MFVI import MeanFieldVariationalDistribution, MeanFieldVariationalMixtureDistribution
 
 
-from Experiments.boston.setup import *
+from Experiments.foong.setup import *
 
 
-splitting_index=0
 
 """
 def MAP(dim,max_iter, init_std, learning_rate, patience, lr_decay, min_lr, logtarget, device, verbose):
@@ -52,14 +51,11 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005,  n
     with mlflow.start_run():#run_name='eMFVI', experiment_id=expdata.experiment_id
         mlflow.set_tag('device', device)
         mlflow.set_tag('seed', seed)
-
-
         
-        X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(splitting_index, device)
+        X_train, y_train, X_test, y_test, X_ib_test, y_ib_test, X_valid, y_valid, inverse_scaler_y = get_data(device)
         
         mlflow.log_param('sigma noise', sigma_noise)
-        mlflow.log_param('split', splitting_index)
-        
+
         param_count, mlp=get_my_mlp()
         mlflow.set_tag('dimensions', param_count)
 
@@ -101,7 +97,7 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005,  n
             if show_metrics:
                 with torch.no_grad():
                     theta = MFVI(100)
-                    log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
+                    log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
 
             if verbose:
                 stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
@@ -111,9 +107,16 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005,  n
                 break
 
             optimizer.step()
+        
+        
+        with torch.no_grad():
+            theta = MFVI(1000)
+            log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
 
-        theta=MFVI(1000).detach()
-        log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
+            theta_plot=MFVI.sample(100)
+            plot_test(X_train, y_train, X_test,y_test,theta_plot, mlp)
+        
+        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ensemble_size", type=int, default=1,
@@ -156,8 +159,10 @@ if __name__ == "__main__":
         seed = args.seed
 
     if args.device is None:
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     else:
         device = args.device
 
-    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr,  args.n_samples_ED, args.n_samples_LP,  args.patience, args.lr_decay, args.init_std, args.optimize, seed, device, args.verbose,args.show_metrics)
+    print(args)
+    
+    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr,  args.n_samples_ED, args.n_samples_LP,  args.patience, args.lr_decay, args.init_std, args.optimize, seed, device, args.verbose, args.show_metrics)
