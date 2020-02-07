@@ -65,6 +65,8 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
 
                     mlflow.log_metric("-log posterior", float(L.detach().clone().cpu().numpy()),t)
                     mlflow.log_metric("learning rate", float(lr),t)
+                    mlflow.log_metric("epoch", t)
+
 
                     scheduler.step(L.detach().clone().cpu().numpy())
                     
@@ -98,7 +100,7 @@ if __name__== "__main__":
                         help="number of MAPs to train in the ensemble")
     parser.add_argument("--init_std", type=float, default=1.0,
                         help="parameter controling initialization of theta")
-    parser.add_argument("--max_iter", type=int, default=1000000,
+    parser.add_argument("--max_iter", type=int, default=100000,
                         help="maximum number of learning iterations")
     parser.add_argument("--learning_rate", type=float, default=0.1,
                         help="initial learning rate of the optimizer")

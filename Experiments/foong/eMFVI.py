@@ -93,6 +93,7 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005,  n
             mlflow.log_metric("-log posterior", float(-LP.detach().squeeze().clone().cpu().numpy()),t)
             mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
             mlflow.log_metric("learning rate", float(lr),t)
+            mlflow.log_metric("epoch", t)
             
             if show_metrics:
                 with torch.no_grad():

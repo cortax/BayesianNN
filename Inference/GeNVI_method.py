@@ -88,24 +88,25 @@ def get_KDE(device):
         return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
     return KDE
 
+def get_NNE(device):
+    def NNE(theta,k=1):
+        """
+        Parameters:
+            theta (Tensor): Samples, NbExemples X NbDimensions   
+            k (Int): ordinal number
 
-def NNE(theta,k=1):
-    """
-    Parameters:
-        theta (Tensor): Samples, NbExemples X NbDimensions   
-        k (Int): ordinal number
+        Returns:
+            (Float) k-Nearest Neighbour Estimation of the entropy of theta  
 
-    Returns:
-        (Float) k-Nearest Neighbour Estimation of the entropy of theta  
-    
-    """
-    nb_samples=theta.shape[0]
-    dim=theta.shape[1]
-    D=torch.cdist(theta,theta)
-    a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf')).to(device)
-    d=torch.as_tensor(float(dim),device=device)
-    K=torch.as_tensor(float(k),device=device)
-    N=torch.as_tensor(float(nb_samples),device=device)
-    pi=torch.as_tensor(math.pi,device=device)
-    lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
-    return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+        """
+        nb_samples=theta.shape[0]
+        dim=theta.shape[1]
+        D=torch.cdist(theta,theta)
+        a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf')).to(device)
+        d=torch.as_tensor(float(dim),device=device)
+        K=torch.as_tensor(float(k),device=device)
+        N=torch.as_tensor(float(nb_samples),device=device)
+        pi=torch.as_tensor(math.pi,device=device)
+        lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
+        return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+    return NNE
