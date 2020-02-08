@@ -24,11 +24,10 @@ def main(numiter=1000, burnin=0, thinning=1, temperatures=[], maintempindex=0, b
         mlflow.set_tag('device', device) 
         mlflow.set_tag('seed', seed)    
         logposterior = exp.get_logposterior_fn(device)
-        model = exp.get_model(device)
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
-        logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
+        logtarget = lambda theta: logposterior(theta, x_train, y_train, exp.sigma_noise)
 
         sampler = PTMCMCSampler(logtarget, exp.param_count, baseMHproposalNoise, temperatureNoiseReductionFactor, temperatures, device)
 
@@ -55,6 +54,7 @@ def main(numiter=1000, burnin=0, thinning=1, temperatures=[], maintempindex=0, b
 
 
 if __name__ == "__main__":
+    # python -m Experiments.Foong_L1W50.PTMCMC --numiter=60000 --burnin=10000 --thinning=50 --temperatures=1.0,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1 --maintempindex=0 --baseMHproposalNoise=0.006 --temperatureNoiseReductionFactor=0.5 --std_init=0.02 --optimize=2000000 --device=cpu
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--numiter", type=int, default=1000,

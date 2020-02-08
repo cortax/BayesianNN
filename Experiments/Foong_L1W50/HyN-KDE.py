@@ -12,22 +12,22 @@ import pandas as pd
 
 
 class HNet(nn.Module):
-            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.4, init_b=0.001):
-                super(HNet, self).__init__()
-                self.lat_dim = lat_dim
-                self.output_dim=output_dim
-                self.hnet=nn.Sequential(
-                        nn.Linear(lat_dim,nb_neur),
-                        activation,
-                        nn.Linear(nb_neur,output_dim)
-                        ).to(device)
-                
-                torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
-                torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
-    
-            def forward(self, n=1):
-                epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
-                return self.hnet(epsilon)           
+    def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.4, init_b=0.001):
+        super(HNet, self).__init__()
+        self.lat_dim = lat_dim
+        self.output_dim=output_dim
+        self.hnet=nn.Sequential(
+                nn.Linear(lat_dim,nb_neur),
+                activation,
+                nn.Linear(nb_neur,output_dim)
+                ).to(device)
+
+        torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
+        torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
+
+    def forward(self, n=1):
+        epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
+        return self.hnet(epsilon)
 
 class HyNetEns(nn.Module):
     def __init__(self,nb_comp,lat_dim, output_dim, activation, init_w,init_b):

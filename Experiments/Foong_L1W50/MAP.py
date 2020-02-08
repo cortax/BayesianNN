@@ -71,11 +71,11 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             mlflow.log_artifact(tempdir.name+'/training_loss.csv')
 
             logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
-            train_post = logposteriorpredictive([theta], x_train, y_train, 0.1)/len(y_train)
+            train_post = logposteriorpredictive([theta], x_train, y_train, exp.sigma_noise)/len(y_train)
             mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-            val_post = logposteriorpredictive([theta],  x_validation, y_validation, 0.1)/len(y_validation)
+            val_post = logposteriorpredictive([theta],  x_validation, y_validation, exp.sigma_noise)/len(y_validation)
             mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-            test_post = logposteriorpredictive([theta], x_test, y_test, 0.1)/len(y_test)
+            test_post = logposteriorpredictive([theta], x_test, y_test, exp.sigma_noise)/len(y_test)
             mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
             x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
@@ -133,6 +133,8 @@ def main(max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_de
             plt.close()
 
 if __name__== "__main__":
+    #  python -m Experiments.Foong_L1W50.MAP --max_iter=1000000 --learning_rate=0.05 --min_lr=0.0001 --patience=400 --lr_decay=0.7 --init_std=0.1 --verbose=1 --device=cuda:0
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--max_iter", type=int, default=100000,
                         help="maximum number of learning iterations")

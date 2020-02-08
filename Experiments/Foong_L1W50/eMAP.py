@@ -11,7 +11,7 @@ import argparse
 import pandas as pd
 
 
-def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, init_std=1.0, seed=-1, device='cpu'):
+def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, patience=100, lr_decay=0.9, init_std=1.0, seed=-1, device='cpu', verbose=False):
     seeding(seed)
     
     xpname = exp.experiment_name +' eMAP'
@@ -22,11 +22,10 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
         mlflow.set_tag('device', device) 
         mlflow.set_tag('seed', seed)    
         logposterior = exp.get_logposterior_fn(device)
-        model = exp.get_model(device)
         x_train, y_train = exp.get_training_data(device)
         x_validation, y_validation = exp.get_validation_data(device)
         x_test, y_test = exp.get_test_data(device)
-        logtarget = lambda theta : logposterior(theta, model, x_train, y_train, 0.1 )
+        logtarget = lambda theta: logposterior(theta, x_train, y_train, exp.sigma_noise)
 
         mlflow.log_param('ensemble_size', ensemble_size)
         mlflow.log_param('learning_rate', learning_rate)
@@ -47,7 +46,7 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
 
                 training_loss = []
-                for t in range(max_iter-1):
+                for t in range(max_iter):
                     optimizer.zero_grad()
 
                     L = -torch.mean(logtarget(theta))
@@ -57,49 +56,59 @@ def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005, pa
 
                     lr = optimizer.param_groups[0]['lr']
                     scheduler.step(L.detach().clone().cpu().numpy())
+
+                    if verbose:
+                        stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
+                        print(stats)
+
                     if lr < min_lr:
                         break
 
                     optimizer.step()
                         
-                with torch.no_grad():  
+                with torch.no_grad():
                     tempdir = tempfile.TemporaryDirectory()
 
                     mlflow.log_metric("training loss", float(L.detach().clone().cpu().numpy()))
 
-                    pd.DataFrame(training_loss).to_csv(tempdir.name+'/training_loss.csv', index=False, header=False)
-                    mlflow.log_artifact(tempdir.name+'/training_loss.csv')
+                    pd.DataFrame(training_loss).to_csv(tempdir.name + '/training_loss.csv', index=False, header=False)
+                    mlflow.log_artifact(tempdir.name + '/training_loss.csv')
 
                     logposteriorpredictive = exp.get_logposteriorpredictive_fn(device)
-                    train_post = logposteriorpredictive([theta], model, x_train, y_train, 0.1)/len(y_train)
+                    train_post = logposteriorpredictive([theta], x_train, y_train, exp.sigma_noise) / len(y_train)
                     mlflow.log_metric("training log posterior predictive", -float(train_post.detach().cpu()))
-                    val_post = logposteriorpredictive([theta], model, x_validation, y_validation, 0.1)/len(y_validation)
+                    val_post = logposteriorpredictive([theta], x_validation, y_validation, exp.sigma_noise) / len(
+                        y_validation)
                     mlflow.log_metric("validation log posterior predictive", -float(val_post.detach().cpu()))
-                    test_post = logposteriorpredictive([theta], model, x_test, y_test, 0.1)/len(y_test)
+                    test_post = logposteriorpredictive([theta], x_test, y_test, exp.sigma_noise) / len(y_test)
                     mlflow.log_metric("test log posterior predictive", -float(test_post.detach().cpu()))
 
                     x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1).to(device)
                     fig, ax = plt.subplots()
                     fig.set_size_inches(11.7, 8.27)
-                    plt.xlim(-2, 2) 
+                    plt.xlim(-2, 2)
                     plt.ylim(-4, 4)
                     plt.grid(True, which='major', linewidth=0.5)
                     plt.title('Training set')
                     plt.scatter(x_train.cpu(), y_train.cpu())
-                    set_all_parameters(model, theta)
-                    y_pred = model(x_lin)
-                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
+                    y_pred = exp.mlp(x_lin, theta)
+                    plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0,
+                             linewidth=1.0, color='black')
                     res = 20
                     for r in range(res):
-                        mass = 1.0-(r+1)/res
-                        plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*0.1*((r+1)/res), y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*0.1*((r+1)/res), alpha=0.2*mass, color='lightblue')
-                    fig.savefig(tempdir.name+'/training.png', dpi=4*fig.dpi)
-                    mlflow.log_artifact(tempdir.name+'/training.png')
+                        mass = 1.0 - (r + 1) / res
+                        plt.fill_between(x_lin.detach().cpu().numpy().squeeze(),
+                                         y_pred.squeeze(0).detach().cpu().numpy().squeeze() - 3 * 0.1 * ((r + 1) / res),
+                                         y_pred.squeeze(0).detach().cpu().numpy().squeeze() + 3 * 0.1 * ((r + 1) / res),
+                                         alpha=0.2 * mass, color='lightblue')
+                    fig.savefig(tempdir.name + '/training.png', dpi=4 * fig.dpi)
+                    mlflow.log_artifact(tempdir.name + '/training.png')
                     plt.close()
 
                     ensemble.append(theta.detach().clone())
 
         exp.log_model_evaluation(ensemble, device)
+
 
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
@@ -121,6 +130,8 @@ if __name__== "__main__":
                         help="scheduler patience")
     parser.add_argument("--device", type=str, default=None,
                         help="force device to be used")
+    parser.add_argument("--verbose", type=bool, default=False,
+                        help="force device to be used")
     args = parser.parse_args()
 
     print(args)
@@ -135,4 +146,4 @@ if __name__== "__main__":
     else:
         device = args.device
 
-    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.init_std, seed=seed, device=device)
+    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, args.init_std, seed=seed, device=device, verbose=args.verbose)
