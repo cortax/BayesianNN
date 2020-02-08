@@ -9,6 +9,8 @@ from Inference.map_method import main, getParser
 import Experiments.boston.setup as data
 
 if __name__== "__main__":
+    # example the commande de run "python -m ... --param=1 ...
+
     parser = getParser()
     args = parser.parse_args()
     print(args)
@@ -18,6 +20,6 @@ if __name__== "__main__":
     else:
         device = args.device
 
-    main(data.get_data, data.get_model, data.sigma_noise, data.experiment_name, data.nb_split, args.ensemble_size,
+    main(data.get_data, data.get_model, data.sigma_noise, data.experiment_name, args.ensemble_size,
         args.init_std, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device, args.verbose)
 
