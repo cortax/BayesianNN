@@ -16,9 +16,7 @@ layerwidth = 50
 
 sigma_noise=1.
 
-nb_split=5
-
-
+#nb_split=5
 #predictive net:
 
 def get_model():
@@ -41,7 +39,8 @@ def normalize(X_train, y_train, X_test, y_test,device):
     y_test_un=y_test.float().to(device)
     return X_train, y_train, y_train_un, X_test, y_test_un,  inverse_scaler_y
 
-def get_data(splitting_index,device):
+def get_data(device):
+    splitting_index = 0 # TODO: Faire un train(70)-validation(30)
     X_train = torch.load(exp_path+'data/boston_X_train_('+str(splitting_index)+').pt')
     y_train = torch.load(exp_path+'data/boston_y_train_('+str(splitting_index)+').pt')
     X_test = torch.load(exp_path+'data/boston_X_test_('+str(splitting_index)+').pt')
