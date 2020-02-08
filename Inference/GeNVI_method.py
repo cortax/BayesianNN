@@ -247,11 +247,11 @@ parser.add_argument("--n_samples_LP", type=int, default=100,
                     help="number of samples for MC estimation of expected logposterior")
 parser.add_argument("--max_iter", type=int, default=100000,
                     help="maximum number of learning iterations")
-parser.add_argument("--learning_rate", type=float, default=0.03,
+parser.add_argument("--learning_rate", type=float, default=0.08,
                     help="initial learning rate of the optimizer")
 parser.add_argument("--min_lr", type=float, default=0.00000001,
                     help="minimum learning rate triggering the end of the optimization")
-parser.add_argument("--patience", type=int, default=100,
+parser.add_argument("--patience", type=int, default=400,
                     help="scheduler patience")
 parser.add_argument("--lr_decay", type=float, default=.5,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")

@@ -28,7 +28,7 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
         mlflow.log_param('sigma noise', sigma_noise)
         mlflow.log_param('split', splitting_index)
         
-        param_count, mlp=get_my_mlp()
+        param_count, mlp=get_model()
         mlflow.set_tag('dimensions', param_count)
 
         logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
@@ -46,12 +46,14 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
         mlflow.log_param('min_lr', min_lr)
         
         
-        theta_ens = torch.empty(ensemble_size,param_count)
+        theta_ens = torch.empty((ensemble_size,param_count),device=device)
 
         for k in range(ensemble_size):
             with mlflow.start_run(run_name='component', nested=True):
-                std = torch.tensor(init_std)
-                theta = torch.nn.Parameter(std*torch.randn(1,param_count), requires_grad=True)
+                theta = torch.empty((1,param_count), device=device)
+                torch.nn.init.normal_(theta, 0.,std=init_std)
+                theta.requires_grad=True
+                
                 optimizer = torch.optim.Adam([theta], lr=learning_rate)
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
 

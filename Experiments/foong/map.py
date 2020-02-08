@@ -6,7 +6,6 @@ import tempfile
 import argparse
 
 
-from Inference.GeNVI_method import *
 from Prediction.metrics import get_logposterior,log_metrics
 
 
@@ -46,19 +45,20 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
         mlflow.log_param('min_lr', min_lr)
         
         
-        theta_ens = torch.empty(ensemble_size,param_count)
+        theta_ens = torch.empty((ensemble_size,param_count),device=device)
 
         for k in range(ensemble_size):
             with mlflow.start_run(run_name='component', nested=True):
-                std = torch.tensor(init_std)
-                theta = torch.nn.Parameter(std*torch.randn(1,param_count), requires_grad=True)
+                theta = torch.empty((1,param_count), device=device)
+                torch.nn.init.normal_(theta, 0.,std=init_std)
+                theta.requires_grad=True
                 optimizer = torch.optim.Adam([theta], lr=learning_rate)
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
 
                 for t in range(max_iter-1):
                     optimizer.zero_grad()
 
-                    L = -torch.mean(logtarget(theta))
+                    L = -logtarget(theta)
                     L.backward()
 
                     lr = optimizer.param_groups[0]['lr']
@@ -80,7 +80,7 @@ def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_d
                     optimizer.step()
                     
                 with torch.no_grad():
-                    log_metrics(theta.detach(), mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
+                    log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
                     theta_ens[k]=theta.squeeze().detach()
         
 
