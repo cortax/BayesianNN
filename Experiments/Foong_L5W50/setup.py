@@ -11,12 +11,12 @@ import pandas as pd
 import math
 
 
-nblayers = 1
+nblayers = 5
 activation=nn.Tanh()
 sigma_noise = torch.tensor(0.1)
 layerwidth = 50
 param_count = 2*layerwidth+(nblayers-1)*(layerwidth**2+layerwidth)+layerwidth+1
-experiment_name = 'Foong L1/W50'
+experiment_name = 'Foong L5/W50'
 
 """
 def mlp(x, theta):
@@ -106,7 +106,7 @@ def get_test_ib_data(device):
     y_test = y_test.unsqueeze(-1)
     return x_test, y_test
 
-"""
+    """
    KDE by components, returns a KDE estimation for x based on batched samples y with corresponding kernels H 
 
     Parameters:

@@ -6,27 +6,27 @@ import matplotlib.pyplot as plt
 from Tools.NNtools import *
 import tempfile
 import mlflow
-import Experiments.Foong_L1W50.setup as exp
+import Experiments.Foong_L5W50.setup as exp
 import argparse
 
 
 class HNet(nn.Module):
-    def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.4, init_b=0.001):
-        super(HNet, self).__init__()
-        self.lat_dim = lat_dim
-        self.output_dim=output_dim
-        self.hnet=nn.Sequential(
-                nn.Linear(lat_dim,nb_neur),
-                activation,
-                nn.Linear(nb_neur,output_dim)
-                ).to(device)
-
-        torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
-        torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
-
-    def forward(self, n=1):
-        epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
-        return self.hnet(epsilon)
+            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.1, init_b=.1):
+                super(HNet, self).__init__()
+                self.lat_dim = lat_dim
+                self.output_dim=output_dim
+                self.hnet=nn.Sequential(
+                        nn.Linear(lat_dim,nb_neur),
+                        activation,
+                        nn.Linear(nb_neur,output_dim)
+                        ).to(device)
+                
+                torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
+                torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
+    
+            def forward(self, n=1):
+                epsilon = torch.randn(size=(n,self.lat_dim)).to(device)
+                return self.hnet(epsilon)           
 
 class HyNetEns(nn.Module):
     def __init__(self,nb_comp,lat_dim, output_dim, activation, init_w,init_b):
@@ -196,9 +196,9 @@ if __name__== "__main__":
                         help="number of hypernets to train in the ensemble")
     parser.add_argument("--lat_dim", type=int, default=5,
                         help="number of latent dimensions of the hypernets")
-    parser.add_argument("--init_w", type=float, default=0.2,
+    parser.add_argument("--init_w", type=float, default=0.01,
                         help="std for weight initialization of output layers")
-    parser.add_argument("--init_b", type=float, default=0.000001,
+    parser.add_argument("--init_b", type=float, default=0.0001,
                         help="std for bias initialization of output layers")    
     parser.add_argument("--KDE_prec", type=float, default=1.,
                         help="factor reducing Silverman's bandwidth")
@@ -212,7 +212,7 @@ if __name__== "__main__":
                         help="maximum number of learning iterations")
     parser.add_argument("--learning_rate", type=float, default=0.01,
                         help="initial learning rate of the optimizer")
-    parser.add_argument("--min_lr", type=float, default=0.00001,
+    parser.add_argument("--min_lr", type=float, default=0.0005,
                         help="minimum learning rate triggering the end of the optimization")
     parser.add_argument("--patience", type=int, default=1000,
                         help="scheduler patience")
