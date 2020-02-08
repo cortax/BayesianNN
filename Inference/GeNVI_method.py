@@ -218,7 +218,7 @@ def main(get_data,get_model,sigma_noise,experiment_name,nb_split,ensemble_size,l
             
         
         theta=Hyper_Nets(1000).detach()
-        log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, data.sigma_noise, inverse_scaler_y, t,device)
+        log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
         mlflow.pytorch.log_model(Hyper_Nets,'models')
 
 
