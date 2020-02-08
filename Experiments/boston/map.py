@@ -16,7 +16,7 @@ splitting_index=0
 
 def main(ensemble_size,init_std, max_iter, learning_rate, min_lr, patience, lr_decay,  device, verbose):
     
-    xpname = experiment_name+'/eMAP'
+    xpname = experiment_name+'/MAP'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
     

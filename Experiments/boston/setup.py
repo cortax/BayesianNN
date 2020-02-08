@@ -5,6 +5,7 @@ from Prediction.mlp import *
 
 from sklearn.preprocessing import StandardScaler
 
+exp_path="Experiments/boston/"
 
 experiment_name='Boston'
 
@@ -13,13 +14,14 @@ nblayers = 1
 activation=nn.ReLU()
 layerwidth = 50
 
-
-
 sigma_noise=1.
 
+nb_split=0
 
 
-def get_my_mlp():
+#predictive net:
+
+def get_model():
     return get_mlp(input_dim,layerwidth,nblayers,activation)
 
 
@@ -40,10 +42,10 @@ def normalize(X_train, y_train, X_test, y_test,device):
     return X_train, y_train, y_train_un, X_test, y_test_un,  inverse_scaler_y
 
 def get_data(splitting_index,device):
-    X_train = torch.load('Experiments/boston/data/boston_X_train_('+str(splitting_index)+').pt')
-    y_train = torch.load('Experiments/boston/data/boston_y_train_('+str(splitting_index)+').pt')
-    X_test = torch.load('Experiments/boston/data/boston_X_test_('+str(splitting_index)+').pt')
-    y_test=torch.load('Experiments/boston/data/boston_y_test_('+str(splitting_index)+').pt')
+    X_train = torch.load(exp_path+'data/boston_X_train_('+str(splitting_index)+').pt')
+    y_train = torch.load(exp_path+'data/boston_y_train_('+str(splitting_index)+').pt')
+    X_test = torch.load(exp_path+'data/boston_X_test_('+str(splitting_index)+').pt')
+    y_test=torch.load(exp_path+'data/boston_y_test_('+str(splitting_index)+').pt')
     return normalize(X_train, y_train, X_test, y_test,device)
 
 
