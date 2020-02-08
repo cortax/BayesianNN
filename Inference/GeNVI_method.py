@@ -174,7 +174,7 @@ def main(get_data,get_model,sigma_noise,experiment_name,nb_split,ensemble_size,l
         splitting_metrics=[]
                 
         for split in range(nb_split):
-            with mlflow.start_run(run_name='split', nested=True):
+            with mlflow.start_run(run_name='split '+str(split), nested=True):
        
                 X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(split, device) 
                 logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
