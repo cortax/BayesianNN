@@ -16,7 +16,7 @@ layerwidth = 50
 
 sigma_noise=1.
 
-nb_split=0
+nb_split=5
 
 
 #predictive net:

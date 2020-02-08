@@ -90,9 +90,23 @@ def log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise,
             mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),step)
             rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
             mlflow.log_metric("rmse test", float(rms.detach().clone().cpu().numpy()),step)
+    return torch.stack([nlp_tr[1], rms_tr, nlp[1], rms],0)
 
+def log_split_metrics(split_metrics_list):
+    metrics=torch.mean(torch.stack(split_metrics_list,dim=0),dim=0).clone().cpu().numpy()
+    metrics_std=torch.std(torch.stack(split_metrics_list,dim=0),dim=0).clone().cpu().numpy()
+    
+    mlflow.log_metric("nlpd train", metrics[0])
+    mlflow.log_metric("nlpd train std", metrics_std[0])
+    mlflow.log_metric("rmse train", metrics[1])
+    mlflow.log_metric("rmse train std", metrics_std[1])
 
-        
+   
+    mlflow.log_metric("nlpd test", metrics[2])
+    mlflow.log_metric("nlpd test std", metrics_std[2])
+    mlflow.log_metric("rmse test", metrics[3])
+    mlflow.log_metric("rmse test std",metrics_std[3])
+
 def seeding(manualSeed):
     np.random.seed(manualSeed)
     torch.manual_seed(manualSeed)

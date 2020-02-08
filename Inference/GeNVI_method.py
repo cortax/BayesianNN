@@ -6,7 +6,7 @@ import argparse
 import mlflow
 import mlflow.pytorch
 
-from Prediction.metrics import get_logposterior,log_metrics
+from Prediction.metrics import get_logposterior,log_metrics,log_split_metrics
 
 
 
@@ -132,12 +132,15 @@ def main(get_data,get_model,sigma_noise,experiment_name,nb_split,ensemble_size,l
     else:
             entropy_mthd=str(kNNE)+'NNE'
     
-    with mlflow.start_run(run_name=entropy_mthd):
+    with mlflow.start_run():
         mlflow.set_tag('device', device) 
-        mlflow.set_tag('device', device)
+        mlflow.set_tag('method', entropy_mthd)
+        
+        
 
-        X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(nb_split, device) 
+        
         param_count, mlp=get_model()  
+        
         
         mlflow.log_param('sigma noise', sigma_noise)
         mlflow.log_param('split nb', nb_split)
@@ -145,7 +148,6 @@ def main(get_data,get_model,sigma_noise,experiment_name,nb_split,ensemble_size,l
         
         mlflow.set_tag('dimensions', param_count)
 
-        logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
          
         KDE=get_KDE(device)
         NNE=get_NNE(device)
@@ -154,17 +156,12 @@ def main(get_data,get_model,sigma_noise,experiment_name,nb_split,ensemble_size,l
         mlflow.log_param('HyperNet_lat_dim', lat_dim)
         mlflow.log_param('HyperNet_layerwidth', HN_layerwidth)
        
-        Hyper_Nets=HyNetEns(ensemble_size, lat_dim, HN_layerwidth, param_count, HN_activation, init_w, init_b,device)
-        
+         
         mlflow.log_param('learning_rate', learning_rate)
         mlflow.log_param('patience', patience)
         mlflow.log_param('lr_decay', lr_decay)
         
-        optimizer = torch.optim.Adam(Hyper_Nets.parameters(), lr=learning_rate)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
-        
-        
-        
+                
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
         
@@ -174,54 +171,66 @@ def main(get_data,get_model,sigma_noise,experiment_name,nb_split,ensemble_size,l
         mlflow.log_param('n_samples_LP', n_samples_LP)
         
         
-        
-        
-        for t in range(max_iter):
-            optimizer.zero_grad()
-
-            if kNNE==0:
-                ED=-KDE(Hyper_Nets(n_samples_ED),Hyper_Nets.sample(n_samples_KDE),KDE_prec).mean()
-            else:
-                ED=NNE(Hyper_Nets(n_samples_NNE),kNNE)
+        splitting_metrics=[]
                 
-            LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
-            L =-ED-LP
-            L.backward()
-            
+        for split in range(nb_split):
+            with mlflow.start_run(run_name='split', nested=True):
+       
+                X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(split, device) 
+                logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
 
-            lr = optimizer.param_groups[0]['lr']
-            
-            mlflow.log_metric("ELBO", float(L.detach().clone().cpu().numpy()),t)
-            mlflow.log_metric("-log posterior", float(-LP.detach().clone().cpu().numpy()),t)
-            mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
-            mlflow.log_metric("learning rate", float(lr),t)
-            mlflow.log_metric("epoch", t)
+                Hyper_Nets=HyNetEns(ensemble_size, lat_dim, HN_layerwidth, param_count, HN_activation, init_w, init_b,device)
 
-            
-            if show_metrics:
-                theta=Hyper_Nets(100).detach()
-                log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
-
+                optimizer = torch.optim.Adam(Hyper_Nets.parameters(), lr=learning_rate)
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
                 
-                
-            scheduler.step(L.detach().clone().cpu().numpy())
+                              
+                for t in range(max_iter):
+                    optimizer.zero_grad()
 
-            if verbose:
-                stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
-                print(stats)
+                    if kNNE==0:
+                        ED=-KDE(Hyper_Nets(n_samples_ED),Hyper_Nets.sample(n_samples_KDE),KDE_prec).mean()
+                    else:
+                        ED=NNE(Hyper_Nets(n_samples_NNE),kNNE)
 
-            if lr < min_lr:
-                break
-            
-                
-            optimizer.step()
-            
-        
-        theta=Hyper_Nets(1000).detach()
-        log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
-        mlflow.pytorch.log_model(Hyper_Nets,'models')
+                    LP=logtarget(Hyper_Nets(n_samples_LP)).mean()
+                    L =-ED-LP
+                    L.backward()
 
 
+                    lr = optimizer.param_groups[0]['lr']
+
+                    mlflow.log_metric("ELBO", float(L.detach().clone().cpu().numpy()),t)
+                    mlflow.log_metric("-log posterior", float(-LP.detach().clone().cpu().numpy()),t)
+                    mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
+                    mlflow.log_metric("learning rate", float(lr),t)
+                    mlflow.log_metric("epoch", t)
+
+
+                    if show_metrics:
+                        theta=Hyper_Nets(100).detach()
+                        log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
+
+
+
+                    scheduler.step(L.detach().clone().cpu().numpy())
+
+                    if verbose:
+                        stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
+                        print(stats)
+
+                    if lr < min_lr:
+                        break
+
+
+                    optimizer.step()
+
+
+                theta=Hyper_Nets(1000).detach()
+                splitting_metrics.append(log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device))
+                mlflow.pytorch.log_model(Hyper_Nets,'models')
+
+        log_split_metrics(splitting_metrics)
 
 
 parser = argparse.ArgumentParser()
