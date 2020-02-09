@@ -9,19 +9,18 @@ exp_path="Experiments/boston/"
 
 experiment_name='Boston'
 
-input_dim=13
+input_dim = 13
 nblayers = 1
-activation=nn.ReLU()
+activation = nn.ReLU()
 layerwidth = 50
 
-sigma_noise=1.
+sigma_noise = 1.0
 
 #nb_split=5
 #predictive net:
 
 def get_model():
     return get_mlp(input_dim,layerwidth,nblayers,activation)
-
 
 def normalize(X_train, y_train, X_test, y_test,device):
 
