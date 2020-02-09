@@ -34,10 +34,29 @@ class HyNetEns(nn.Module):
         super(HyNetEns, self).__init__()
         self.nb_comp=nb_comp
         self.output_dim=output_dim
-        self.components= nn.ModuleList([HNet(lat_dim,layer_width,output_dim,activation,init_w,init_b,device) for i in range(nb_comp)]).to(device)   
+        self.components= nn.ModuleList([HNet(lat_dim,layer_width,output_dim,activation,init_w,init_b,device) for i in range(nb_comp)]).to(device)
+
+        self._best_compnents = None
+        self._best_score = float('inf')
+
     def sample(self, n=1):
         return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
 
+    def _save_best_model(self, score,epoch,ED,LP):
+        if score < self._best_score:
+            torch.save({
+                'epoch': epoch,
+                'state_dict': self.state_dict(),
+                'ELBO': score,
+                'ED':ED,
+                'LP':LP
+            }, 'best.pt')
+            self._best_score=score
+
+    def _get_best_model(self):
+        best= torch.load('best.pt')
+        self.load_state_dict(best['state_dict'])
+        return best['epoch'], best['ELBO'], best['ED'], best['LP']
     
     def forward(self, n=1):
         d = torch.distributions.multinomial.Multinomial(n, torch.ones(self.nb_comp))
@@ -127,6 +146,7 @@ def get_entropy(kNNE,n_samples_ED,n_samples_KDE,KDE_prec,n_samples_NNE,device):
         def entropy(GeN):
             NNE=get_NNE(device)
             return NNE(GeN(n_samples_NNE), kNNE)
+        return entropy
 
 def getParser():
     parser = argparse.ArgumentParser()
@@ -207,8 +227,7 @@ def main(get_data, get_model, sigma_noise, experiment_name,
         mlflow.log_param('n_samples_ED', n_samples_ED)
         mlflow.log_param('n_samples_LP', n_samples_LP)
         
-        KDE=get_KDE(device)
-        NNE=get_NNE(device)
+
         entropy=get_entropy(kNNE, n_samples_ED,n_samples_KDE,KDE_prec,n_samples_NNE,device)
 
 
@@ -238,11 +257,10 @@ def main(get_data, get_model, sigma_noise, experiment_name,
 
 
             if show_metrics:
-                mlflow.log_metric("ELBO", float(L.detach().clone().cpu().numpy()), t)
-                mlflow.log_metric("-log posterior", float(-LP.detach().clone().cpu().numpy()), t)
-                mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()), t)
-                mlflow.log_metric("learning rate", float(lr), t)
-                mlflow.log_metric("epoch", t)
+                mlflow.log_metric("tr ELBO", float(L.detach().clone().cpu().numpy()), t)
+                mlflow.log_metric("tr -log posterior", float(-LP.detach().clone().cpu().numpy()), t)
+                mlflow.log_metric("tr differential entropy", float(ED.detach().clone().cpu().numpy()), t)
+                mlflow.log_metric("tr learning rate", float(lr), t)
 
                 #to log metrics
                 #theta=Hyper_Nets(100).detach()
@@ -256,15 +274,25 @@ def main(get_data, get_model, sigma_noise, experiment_name,
                 stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
                 print(stats)
 
+            Hyper_Nets._save_best_model(L,t,ED,LP)
+
             if lr < min_lr:
                 break
 
 
             optimizer.step()
 
+        Epoch,ELBO,ED,LP=Hyper_Nets._get_best_model()
+
 
         theta=Hyper_Nets(1000).detach()
         log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t,device)
+        mlflow.log_metric("ELBO", float(ELBO.detach().clone().cpu().numpy()), t)
+        mlflow.log_metric("Epoch", Epoch, t)
+
+
+        mlflow.log_metric("-log posterior", float(-LP.detach().clone().cpu().numpy()), t)
+        mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()), t)
         mlflow.pytorch.log_model(Hyper_Nets,'models')
 
 

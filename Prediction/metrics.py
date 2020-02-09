@@ -25,6 +25,15 @@ def _log_norm(x, mu, std,device):
 
 
 def logprior(x,device):
+    """
+     Evaluation of log proba with prior N(0,I_n) avec n=x.shape[-1]
+
+     Parameters:
+         x (Tensor): Data tensor of size S
+
+     Returns:
+         logproba (Tensor): Same size as x with logproba(i)=log p(x(i)|0,I)
+     """
     dim=x.shape[-1]
     S = torch.ones(dim).to(device)
     mu = torch.zeros(dim).to(device)
@@ -78,7 +87,7 @@ def MSE(theta,model,x,y,inv_transform,device):
 def log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, step,device):
     with torch.no_grad():
         
-            mlflow.log_metric("epoch", int(step))
+            mlflow.log_metric("epochs", int(step))
 
             nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, device)
             mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),step)
