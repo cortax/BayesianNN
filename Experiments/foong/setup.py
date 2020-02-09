@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from Prediction.mlp import *
+from NeuralNetwork.mlp import *
 
 
 import mlflow
