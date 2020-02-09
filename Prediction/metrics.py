@@ -56,6 +56,7 @@ def get_logposterior(model,x,y,sigma_noise,device):
 ##Metrics
 
 #NLPD from Quinonero-Candela and al.
+# average Negative Log Likelihood
 # the average negative log predictive density (NLPD) of the true targets
 
 def NLPD(theta,model, x, y, sigma_noise,inv_transform,device):

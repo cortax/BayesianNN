@@ -57,49 +57,49 @@ def main(get_data, get_model, sigma_noise, experiment_name, ensemble_size, init_
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
         
-        with mlflow.start_run(run_name='MAP'):
-            X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(device)
-            logtarget=get_logposterior(mlp, X_train, y_train, sigma_noise, device)
 
-            theta_ens = torch.empty((ensemble_size,param_count), device=device)
+        X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y = get_data(device)
+        logtarget=get_logposterior(mlp, X_train, y_train, sigma_noise, device)
 
-            for k in range(ensemble_size):
-                with mlflow.start_run(run_name='component', nested=True):
-                    theta = torch.empty((1,param_count), device=device)
-                    torch.nn.init.normal_(theta, 0., =init_std)
-                    theta.requires_grad=True
+        theta_ens = torch.empty((ensemble_size,param_count), device=device)
 
-                    optimizer = torch.optim.Adam([theta], lr=learning_rate)
-                    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
+        for k in range(ensemble_size):
+            with mlflow.start_run(run_name='component', nested=True):
+                theta = torch.empty((1,param_count), device=device)
+                torch.nn.init.normal_(theta, 0., std=init_std)
+                theta.requires_grad=True
 
-                    for t in range(max_iter-1):
-                        optimizer.zero_grad()
+                optimizer = torch.optim.Adam([theta], lr=learning_rate)
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
 
-                        L = -torch.mean(logtarget(theta))
-                        L.backward()
+                for t in range(max_iter-1):
+                    optimizer.zero_grad()
 
-                        lr = optimizer.param_groups[0]['lr']
+                    L = -torch.mean(logtarget(theta))
+                    L.backward()
 
-                        # TODO: Vérifier la performance ici avec et sans log interne dans la boucle
-                        mlflow.log_metric("-log posterior", float(L.detach().clone().cpu().numpy()), t)
-                        mlflow.log_metric("learning rate", float(lr), t)
-                        mlflow.log_metric("epoch", t)
+                    lr = optimizer.param_groups[0]['lr']
 
-                        if verbose:
-                            stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(k, t, max_iter, L, lr)
-                            print(stats)
+                    # TODO: Vérifier la performance ici avec et sans log interne dans la boucle
+                    mlflow.log_metric("-log posterior", float(L.detach().clone().cpu().numpy()), t)
+                    mlflow.log_metric("learning rate", float(lr), t)
+                    mlflow.log_metric("epoch", t)
 
-                        scheduler.step(L.detach().clone().cpu().numpy())
-                        optimizer.step()
+                    if verbose:
+                        stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(k, t, max_iter, L, lr)
+                        print(stats)
 
-                        if lr < min_lr:
-                            break
+                    scheduler.step(L.detach().clone().cpu().numpy())
+                    optimizer.step()
 
-                    with torch.no_grad():
-                        log_metrics(theta.detach(), mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t, device)
-                        theta_ens[k]=theta.squeeze().detach()
+                    if lr < min_lr:
+                        break
 
-            with torch.no_grad():
-                theta = theta_ens
-                log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t, device)
+                with torch.no_grad():
+                    log_metrics(theta.detach(), mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t, device)
+                    theta_ens[k]=theta.squeeze().detach()
+
+        with torch.no_grad():
+            theta = theta_ens
+            log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, t, device)
 
