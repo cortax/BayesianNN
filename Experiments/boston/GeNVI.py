@@ -6,6 +6,11 @@ import argparse
 from Inference.GeNVI_method import main, getParser
 import Experiments.boston.setup as data
 
+## command line example
+# python -m Experiments.boston.GeNVI --verbose=True --max_iter=1000 --show_metrics=True
+
+
+
 
 if __name__== "__main__":
 
