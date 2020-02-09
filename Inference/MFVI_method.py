@@ -18,8 +18,7 @@ class MeanFieldVariationalDistribution(nn.Module):
         self.nb_dim = nb_dim
         self.rho = nn.Parameter(torch.log(torch.exp(sigma*torch.ones(nb_dim, device=device)) - 1), requires_grad=True)
         self.mu = nn.Parameter(std_init*torch.randn(nb_dim, device=device), requires_grad=True)
-  
-        
+
     @property
     def sigma(self):
         return self._rho_to_sigma(self.rho)
@@ -33,7 +32,6 @@ class MeanFieldVariationalDistribution(nn.Module):
         sigma = torch.log(torch.exp(rho)+1.)
         return sigma
 
-    
     def log_prob(self, x):
         S = self.sigma
         mu = self.mu
@@ -43,7 +41,6 @@ class MeanFieldVariationalDistribution(nn.Module):
         d=((x-mu.view(1,dim))**2).view(n_x,dim)
         const=0.5*S.log().sum()+0.5*dim*torch.tensor(2*math.pi).log()
         return -0.5*(H*d).sum(2).squeeze()-const
-
 
 class MeanFieldVariationalMixtureDistribution(nn.Module):
     def __init__(self, nb_comp, dim,std_init=1.,sigma=1.0, device='cpu'):

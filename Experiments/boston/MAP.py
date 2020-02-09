@@ -1,9 +1,4 @@
 import torch
-from torch import nn
-import mlflow
-import mlflow.pytorch
-import tempfile
-import argparse
 
 from Inference.map_method import main, getParser
 import Experiments.boston.setup as data

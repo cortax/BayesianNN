@@ -34,7 +34,7 @@ def getParser():
                         help="force device to be used")
     return parser
 
-def main(get_data, get_model, sigma_noise, experiment_name, ensemble_size, init_std, max_iter, learning_rate, min_lr, patience, lr_decay,  device, verbose):
+def main(get_data, get_model, sigma_noise, experiment_name, ensemble_size, init_std, max_iter, learning_rate, min_lr, patience, lr_decay, device, verbose):
     xpname = experiment_name + '/MAP'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
