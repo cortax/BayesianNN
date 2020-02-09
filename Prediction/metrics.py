@@ -69,11 +69,11 @@ def NLPD(theta,model, x, y, sigma_noise,inv_transform,device):
 
 #root mean square error
 
-def RMSE(theta,model,x,y,inv_transform,device):
+def MSE(theta,model,x,y,inv_transform,device):
     n_samples=x.shape[0]
     y_pred =inv_transform(model(x, theta)).mean(0)
-    mse=(y_pred-y.view(n_samples,1))**2
-    return mse.mean().sqrt()
+    se=(y_pred-y.view(n_samples,1))**2
+    return torch.std_mean(se)
 
 def log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, step,device):
     with torch.no_grad():
@@ -83,15 +83,18 @@ def log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise,
             nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, device)
             mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),step)
             mlflow.log_metric("nlpd_std train", float(nlp_tr[0].detach().clone().cpu().numpy()),step)
-            rms_tr=RMSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,device)
-            mlflow.log_metric("rmse train", float(rms_tr.detach().clone().cpu().numpy()),step)
+            ms_tr=MSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,device)
+            mlflow.log_metric("rmse train", float(ms_tr[1].sqrt().detach().clone().cpu().numpy()),step)
+            mlflow.log_metric("r_std_se train", float(ms_tr[0].sqrt().detach().clone().cpu().numpy()),step)
+
 
             nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, device)              
             mlflow.log_metric("nlpd test", float(nlp[1].detach().clone().cpu().numpy()),step)
             mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),step)
-            rms=RMSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
-            mlflow.log_metric("rmse test", float(rms.detach().clone().cpu().numpy()),step)
-    return torch.stack([nlp_tr[1], rms_tr, nlp[1], rms],0)
+            ms=MSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
+            mlflow.log_metric("rmse test", float(ms[1].sqrt().detach().clone().cpu().numpy()),step)
+            mlflow.log_metric("r_std_se test", float(ms[0].sqrt().detach().clone().cpu().numpy()), step)
+    return torch.stack([nlp_tr[1], ms_tr[1], nlp[1], ms[1]],0)
 
 def log_split_metrics(split_metrics_list):
     metrics=torch.mean(torch.stack(split_metrics_list,dim=0),dim=0).clone().cpu().numpy()
