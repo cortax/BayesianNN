@@ -6,6 +6,9 @@ from NeuralNetwork.mlp import *
 from Tools import log_norm
 
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_boston
+
 
 exp_path="Experiments/boston/"
 
@@ -18,6 +21,17 @@ layerwidth = 50
 sigma_noise = 1.0
 
 param_count, model = get_mlp(input_dim, layerwidth, nblayers, activation)
+
+
+def get_data(device):
+    X, y = load_boston(return_X_y=True)
+    X_, X_test, y_, y_test = train_test_split(
+        X, y, test_size=0.20, random_state=42)
+
+    X_train, X_validation, y_train, y_validation = train_test_split(
+        X_, y_, test_size=0.20, random_state=42)
+        
+    return normalize(X_train, y_train, X_test, y_test, device)
 
 
 def normalize(X_train, y_train, X_test, y_test, device):
@@ -37,18 +51,44 @@ def normalize(X_train, y_train, X_test, y_test, device):
     y_test_un = y_test.float().to(device)
     return X_train, y_train, y_train_un, X_test, y_test_un, inverse_scaler_y
 
+def validation_avgNLL(theta, model, x, y, sigma_noise, inv_transform, device):
+    y_pred = inv_transform(model(x, theta))
+    L = _log_norm(y_pred, y, sigma_noise, device)
+    n_x = torch.as_tensor(float(x.shape[0]), device=device)
+    n_theta = torch.as_tensor(float(theta.shape[0]), device=device)
+    log_posterior_predictive = torch.logsumexp(L, 0) - torch.log(n_theta)
+    return torch.std_mean(-log_posterior_predictive)
 
-def get_data(device):
-    splitting_index = 0  # TODO: Faire un train(70)-validation(30)
-    X_train = torch.load(
-        exp_path+'data/boston_X_train_('+str(splitting_index)+').pt')
-    y_train = torch.load(
-        exp_path+'data/boston_y_train_('+str(splitting_index)+').pt')
-    X_test = torch.load(
-        exp_path+'data/boston_X_test_('+str(splitting_index)+').pt')
-    y_test = torch.load(
-        exp_path+'data/boston_y_test_('+str(splitting_index)+').pt')
-    return normalize(X_train, y_train, X_test, y_test, device)
+def validation_MSE(theta):
+    n_samples=x.shape[0]
+    y_pred =inv_transform(model(x, theta)).mean(0)
+    se=(y_pred-y.view(n_samples,1))**2
+    return torch.std_mean(se)
+
+def log_metrics(theta, mlp, X_train, y_train_un, X_test, y_test_un, sigma_noise, inverse_scaler_y, step,device):
+    with torch.no_grad():
+        
+        mlflow.log_metric("epochs", int(step))
+
+        nlp_tr=NLPD(theta, mlp, X_train, y_train_un, sigma_noise, inverse_scaler_y, device)
+        mlflow.log_metric("nlpd train", float(nlp_tr[1].detach().clone().cpu().numpy()),step)
+        mlflow.log_metric("nlpd_std train", float(nlp_tr[0].detach().clone().cpu().numpy()),step)
+        ms_tr=MSE(theta,mlp,X_train,y_train_un,inverse_scaler_y,device)
+        mlflow.log_metric("rmse train", float(ms_tr[1].sqrt().detach().clone().cpu().numpy()),step)
+        mlflow.log_metric("r_std_se train", float(ms_tr[0].sqrt().detach().clone().cpu().numpy()),step)
+
+
+        nlp=NLPD(theta,mlp,X_test, y_test_un, sigma_noise, inverse_scaler_y, device)              
+        mlflow.log_metric("nlpd test", float(nlp[1].detach().clone().cpu().numpy()),step)
+        mlflow.log_metric("nlpd_std test", float(nlp[0].detach().clone().cpu().numpy()),step)
+        ms=MSE(theta,mlp,X_test,y_test_un,inverse_scaler_y,device)
+        mlflow.log_metric("rmse test", float(ms[1].sqrt().detach().clone().cpu().numpy()),step)
+        mlflow.log_metric("r_std_se test", float(ms[0].sqrt().detach().clone().cpu().numpy()), step)
+return torch.stack([nlp_tr[1], ms_tr[1], nlp[1], ms[1]],0)
+
+
+
+
 
 
 def get_logposterior(device):
@@ -61,7 +101,6 @@ def get_logposterior(device):
     Returns:
     function: a function taking Tensors as arguments for evaluation
     """
-
 
     def logprior(theta):
         """
