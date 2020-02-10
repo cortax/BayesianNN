@@ -5,12 +5,11 @@ from Experiments.boston import Setup
 from Inference.PointEstimate import AdamGradientDescent
 
 
-def learning(boston, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, verbose):
-    objective_fn = boston.logposterior
+def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
     optimizer = AdamGradientDescent(
-        objective_fn, max_iter, learning_rate, min_lr, patience, lr_decay, boston.device, verbose)
+        objective_fn, max_iter, learning_rate, min_lr, patience, lr_decay, device, verbose)
 
-    theta0 = torch.empty((1,boston.param_count), device=boston.device).normal_(0., std=init_std)
+    theta0 = torch.empty((1, param_count), device=device).normal_(0., std=init_std)
     best_theta, best_score, score = optimizer.run(theta0)
 
     return best_theta, best_score, score
@@ -78,12 +77,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    boston = Setup(args.device)
+    setup = Setup(args.device)
 
     if args.ensemble_size > 1:
-        eMAP(boston, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
+        eMAP(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
     else:
-        MAP(boston, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
+        MAP(setup, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
     
 
     

@@ -5,13 +5,11 @@ from Experiments.foong import Setup
 from Inference.PointEstimate import AdamGradientDescent
 
 
-def learning(setup, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, verbose):
-    objective_fn = setup.logposterior
+def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
     optimizer = AdamGradientDescent(
-        objective_fn, max_iter, learning_rate, min_lr, patience, lr_decay, setup.device, verbose)
+        objective_fn, max_iter, learning_rate, min_lr, patience, lr_decay, device, verbose)
 
-    theta0 = torch.empty((1,setup.param_count), device=setup.device).normal_(0., std=init_std)
-    print(theta0.shape)
+    theta0 = torch.empty((1, param_count), device=device).normal_(0., std=init_std)
     best_theta, best_score, score = optimizer.run(theta0)
 
     return best_theta, best_score, score
@@ -36,8 +34,13 @@ def log_experiment(best_theta, best_score, score, max_iter, learning_rate, init_
         for t in range(len(score)):
             mlflow.log_metric("training loss", float(score[t]), step=t)
 
-def MAP(objective_fn, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
-    best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose)
+
+def MAP(setup, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
+    objective_fn = setup.logposterior
+    param_count = setup.param_count
+    device = setup.device
+    best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience,
+                                             lr_decay, device, verbose)
     # log_experiment(best_theta, best_score, score, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose, False)
 
 def eMAP(objective_fn, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):

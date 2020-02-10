@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 
-#from Experiments import AbstractSetup
+from Experiments import AbstractRegressionSetup
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_boston
 
@@ -20,7 +20,7 @@ layerwidth = 50
 sigma_noise = 1.0
 seed = 42
 
-class Setup(): 
+class Setup(AbstractRegressionSetup): 
     def __init__(self, device):
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
