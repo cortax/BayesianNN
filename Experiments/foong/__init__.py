@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from torch import nn
+import matplotlib.pyplot as plt
 
 from Experiments import AbstractRegressionSetup
 from sklearn.model_selection import train_test_split
@@ -54,6 +55,7 @@ class Setup(AbstractRegressionSetup):
         Returns:
             [tensor] -- MxNx1 tensor of predictions
         """
+        assert type(theta) is torch.Tensor
         y_pred = self._model(X, theta)
         if hasattr(self, '_scaler_y'):
             y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=self.device) + torch.tensor(self._scaler_y.mean_, device=self.device)
@@ -72,8 +74,23 @@ class Setup(AbstractRegressionSetup):
         avgNLL_train = avgNLL(self._loglikelihood, theta, self._X_train, self._y_train)
         avgNLL_validation = avgNLL(self._loglikelihood, theta, self._X_validation, self._y_validation)
         avgNLL_test = avgNLL(self._loglikelihood, theta, self._X_test, self._y_test)
-
         return avgNLL_train, avgNLL_validation, avgNLL_test
+
+    def makeValidationPlot(self, theta):
+        x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(11.7, 8.27)
+        plt.xlim(-2, 2) 
+        plt.ylim(-4, 4)
+        plt.grid(True, which='major', linewidth=0.5)
+        plt.title('Validation set')
+        plt.scatter(self._X_validation.cpu(), self._y_validation.cpu())
+        for i in range(theta.shape[0]):
+            y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0)) 
+            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
+            plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
+        return plt
+        
 
     
 
