@@ -11,9 +11,9 @@ from Tools import logmvn01pdf, log_norm, NormalLogLikelihood
 from Preprocessing import fitStandardScalerNormalization, normalize
 from Metrics import avgNLL
 
+experiment_name = 'Foong'
 data_path='Experiments/foong/data/'
 #exp_path="Experiments/foong/"
-experiment_name='foong'
 
 input_dim = 1
 nblayers = 1
@@ -25,6 +25,9 @@ seed = 42
 class Setup(AbstractRegressionSetup):  
     def __init__(self, device):
         super(Setup).__init__()
+        self.experiment_name = experiment_name
+        self.sigma_noise = sigma_noise
+
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
         self._preparare_data()
@@ -41,6 +44,7 @@ class Setup(AbstractRegressionSetup):
     def _logprior(self, theta):
         return logmvn01pdf(theta)
 
+    # il faudra des méthodes normalize/inverse, car il la normalization est hard-coder
     def _normalized_prediction(self, X, theta):
         """Predict raw inverse normalized values for M models on N data points of D-dimensions
         Arguments:
@@ -62,11 +66,15 @@ class Setup(AbstractRegressionSetup):
     def logposterior(self, theta):
         return self._logprior(theta) + self._loglikelihood(theta, self._X_train, self._y_train)
 
+    # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
     def evaluate_metrics(self, theta):
+        theta = theta.to(self.device)
         avgNLL_train = avgNLL(self._loglikelihood, theta, self._X_train, self._y_train)
         avgNLL_validation = avgNLL(self._loglikelihood, theta, self._X_validation, self._y_validation)
         avgNLL_test = avgNLL(self._loglikelihood, theta, self._X_test, self._y_test)
 
         return avgNLL_train, avgNLL_validation, avgNLL_test
+
+    
 
         
