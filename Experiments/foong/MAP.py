@@ -1,6 +1,7 @@
 import torch
 import argparse
 import mlflow
+import tempfile
 from Experiments.foong import Setup
 from Inference.PointEstimate import AdamGradientDescent
 
@@ -32,13 +33,14 @@ def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
 
-        mlflow.log_metric("training loss", float(best_score))
+        if best_score is not None:
+            mlflow.log_metric("training loss", float(best_score))
         if score is not None:
             for t in range(len(score)):
                 mlflow.log_metric("training loss", float(score[t]), step=t)
 
         if type(best_theta) is list:
-            theta = torch.stack(best_theta)
+            theta = torch.cat([torch.tensor(a) for a in best_theta])
         else:
             theta = torch.tensor(best_theta)          
 
@@ -47,6 +49,11 @@ def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter
         mlflow.log_metric("avgNLL_validation", float(avgNLL_validation.cpu().numpy()))
         mlflow.log_metric("avgNLL_test", float(avgNLL_test.cpu().numpy()))
 
+        fig = setup.makeValidationPlot(theta)
+        tempdir = tempfile.TemporaryDirectory()
+        fig.savefig(tempdir.name+'/validation.png')
+        mlflow.log_artifact(tempdir.name+'/validation.png')
+        fig.close()
 
 def MAP(setup, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
     objective_fn = setup.logposterior
@@ -62,17 +69,16 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
     objective_fn = setup.logposterior
     param_count = setup.param_count
     device = setup.device
-    ensemble = []
+    ensemble_best_theta = []
     ensemble_best_score = []
     ensemble_score = []
     for _ in range(ensemble_size):
         best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
-        ensemble.append(best_theta)
+        ensemble_best_theta.append(best_theta)
         ensemble_best_score.append(best_score)
         ensemble_score.append(score)
 
-    # TODO evaluation d'ensemble et logging
-    log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, True)
+    log_experiment(setup, ensemble_best_theta, None, None, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, True)
 
 if __name__ == "__main__":
     # example the commande de run 
