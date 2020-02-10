@@ -9,6 +9,7 @@ from sklearn.datasets import load_boston
 from Models import get_mlp
 from Tools import logmvn01pdf, log_norm, NormalLogLikelihood
 from Preprocessing import fitStandardScalerNormalization, normalize
+from Metrics import avgNLL
 
 data_path='Experiments/foong/data/'
 #exp_path="Experiments/foong/"
@@ -54,20 +55,18 @@ class Setup(AbstractRegressionSetup):
             y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=self.device) + torch.tensor(self._scaler_y.mean_, device=self.device)
         return y_pred
 
-    def _loglikelihood(self, theta, X, y):
+    def _loglikelihood(self, theta, X, y, raw=False):
         y_pred = self._normalized_prediction(X, theta) # MxNx1 tensor
-        return NormalLogLikelihood(y_pred, y, sigma_noise)
-
-    def _logposterior(self, theta, X, y):
-        return self._logprior(theta) + self._loglikelihood(theta, X, y)
+        return NormalLogLikelihood(y_pred, y, sigma_noise, raw)
 
     def logposterior(self, theta):
         return self._logprior(theta) + self._loglikelihood(theta, self._X_train, self._y_train)
 
-    # def _avgNLL(self, theta, X, y):
-    #     L = self._loglikelihood(theta, X, y)
-    #     n_theta = torch.as_tensor(float(theta.shape[0]), device=self.device)
-    #     log_posterior_predictive = torch.logsumexp(L, 0) - torch.log(n_theta)
-    #     return torch.mean(-log_posterior_predictive)
+    def evaluate_metrics(self, theta):
+        avgNLL_train = avgNLL(self._loglikelihood, theta, self._X_train, self._y_train)
+        avgNLL_validation = avgNLL(self._loglikelihood, theta, self._X_validation, self._y_validation)
+        avgNLL_test = avgNLL(self._loglikelihood, theta, self._X_test, self._y_test)
+
+        return avgNLL_train, avgNLL_validation, avgNLL_test
 
         

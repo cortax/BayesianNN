@@ -21,7 +21,7 @@ def log_norm(x, mu, std):
     c = 2*math.pi*var
     return -0.5 * (1/(var))*d - 0.5 * c.log()
 
-def NormalLogLikelihood(y_pred, y_data, sigma_noise):
+def NormalLogLikelihood(y_pred, y_data, sigma_noise, raw=False):
     """
     Evaluation of a Normal distribution
     
@@ -29,14 +29,18 @@ def NormalLogLikelihood(y_pred, y_data, sigma_noise):
     y_pred (Tensor): tensor of size MxD
     y_data (Tensor): tensor of size 1xD
     sigma_noise (Scalar): standard deviation for the diagonal cov matrix
+    raw (bool): determine if log probabilities are summed (non raw) or not (raw)
 
     Returns:
     logproba (Tensor): Mx1 vector of log probabilities
     """
-    assert y_pred.shape[1] == y_data.shape[1]
-    assert y_data.shape[0] == 1
-    log_proba = log_norm(y_pred, y_data, sigma_noise).sum(dim=[1,2])
-    assert log_proba.ndim == 1
+    assert y_pred.shape[1] == y_data.shape[0]
+    assert y_data.shape[1] == 1
+    if raw:
+        log_proba = log_norm(y_pred, y_data, sigma_noise)
+    else:
+        log_proba = log_norm(y_pred, y_data, sigma_noise).sum(dim=[1,2])
+        assert log_proba.ndim == 1
     return log_proba
 
 def logmvn01pdf(theta):
