@@ -7,11 +7,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_boston
 
 from Models import get_mlp
-from Tools import logmvn01pdf, log_norm
+from Tools import logmvn01pdf, log_norm, NormalLogLikelihood
 from Preprocessing import fitStandardScalerNormalization, normalize
+from Metrics import avgNLL
 
 #exp_path="Experiments/boston/"
-#experiment_name='Boston'
+experiment_name='Boston'
 
 input_dim = 13
 nblayers = 1
@@ -22,6 +23,9 @@ seed = 42
 
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device):
+        self.experiment_name = experiment_name
+        self.sigma_noise = sigma_noise
+
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
 
@@ -45,40 +49,47 @@ class Setup(AbstractRegressionSetup):
         self._X_test, self._y_test = normalize(self._X_test, self._y_test, self._scaler_X, self._scaler_y)
 
     def _flip_data_to_torch(self):
-        self._X = torch.tensor(self._X).float()
-        self._y = torch.tensor(self._y).float()
-        self._X_train = torch.tensor(self._X_train).float()
-        self._y_train = torch.tensor(self._y_train).float()
-        self._X_validation = torch.tensor(self._X_validation).float()
-        self._y_validation = torch.tensor(self._y_validation).float()
-        self._X_test = torch.tensor(self._X_test).float()
-        self._y_test = torch.tensor(self._y_test).float()
+        self._X = torch.tensor(self._X, device=self.device).float()
+        self._y = torch.tensor(self._y, device=self.device).float()
+        self._X_train = torch.tensor(self._X_train, device=self.device).float()
+        self._y_train = torch.tensor(self._y_train, device=self.device).float()
+        self._X_validation = torch.tensor(self._X_validation, device=self.device).float()
+        self._y_validation = torch.tensor(self._y_validation, device=self.device).float()
+        self._X_test = torch.tensor(self._X_test, device=self.device).float()
+        self._y_test = torch.tensor(self._y_test, device=self.device).float()
 
     def _logprior(self, theta):
         return logmvn01pdf(theta)
     
-    def _loglikelihood(self, theta, X, y):
-        """
-        Evaluation of log normal N(y|y_pred,sigma_noise^2*I)
-
-        Parameters:
-        x (Tensor): Data tensor of size NxD
-
+        # il faudra des méthodes normalize/inverse, car il la normalization est hard-coder
+    def _normalized_prediction(self, X, theta):
+        """Predict raw inverse normalized values for M models on N data points of D-dimensions
+        Arguments:
+            X {[tensor]} -- Tensor of size NxD 
+            theta {[type]} -- Tensor[M,:] of models
+        
         Returns:
-        logproba (Tensor): N-dimensional vector of log probabilities
+            [tensor] -- MxNx1 tensor of predictions
         """
         y_pred = self._model(X, theta)
         if hasattr(self, '_scaler_y'):
-            y_pred = y_pred*torch.tensor(self._scaler_y.scale_) + torch.tensor(self._scaler_y.mean_)
-        return log_norm(y_pred, y, sigma_noise)
+            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=self.device) + torch.tensor(self._scaler_y.mean_, device=self.device)
+        return y_pred
+
+    def _loglikelihood(self, theta, X, y, raw=False):
+        y_pred = self._normalized_prediction(X, theta) # MxNx1 tensor
+        return NormalLogLikelihood(y_pred, y, sigma_noise, raw)
 
     def logposterior(self, theta):
-        return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train), dim=1).squeeze() 
+        return self._logprior(theta) + self._loglikelihood(theta, self._X_train, self._y_train)
 
-    def _avgNLL(self, theta, X, y):
-        L = self._loglikelihood(theta, X, y)
-        n_theta = torch.as_tensor(float(theta.shape[0]), device=self.device)
-        log_posterior_predictive = torch.logsumexp(L, 0) - torch.log(n_theta)
-        return torch.mean(-log_posterior_predictive)
+    # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
+    def evaluate_metrics(self, theta):
+        theta = theta.to(self.device)
+        avgNLL_train = avgNLL(self._loglikelihood, theta, self._X_train, self._y_train)
+        avgNLL_validation = avgNLL(self._loglikelihood, theta, self._X_validation, self._y_validation)
+        avgNLL_test = avgNLL(self._loglikelihood, theta, self._X_test, self._y_test)
+
+        return avgNLL_train, avgNLL_validation, avgNLL_test
 
         
