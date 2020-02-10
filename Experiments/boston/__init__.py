@@ -76,12 +76,20 @@ class Setup(AbstractRegressionSetup):
             y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=self.device) + torch.tensor(self._scaler_y.mean_, device=self.device)
         return y_pred
 
-    def _loglikelihood(self, theta, X, y, raw=False):
+    def _loglikelihood(self, theta, X, y):
+        """
+        parameters:
+            theta (Tensor): M x param_count (models)
+            X (Tensor): N x input_dim
+            y (Tensor): N x 1
+        output:
+            LL (Tensor): M x N (models x data)
+        """
         y_pred = self._normalized_prediction(X, theta) # MxNx1 tensor
-        return NormalLogLikelihood(y_pred, y, sigma_noise, raw)
+        return NormalLogLikelihood(y_pred, y, sigma_noise) # MxN
 
     def logposterior(self, theta):
-        return self._logprior(theta) + self._loglikelihood(theta, self._X_train, self._y_train)
+        return self._logprior(theta) + self._loglikelihood(theta, self._X_train, self._y_train).sum(dim=1)
 
     # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
     def evaluate_metrics(self, theta):

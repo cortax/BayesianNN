@@ -1,19 +1,25 @@
 import torch
 import math
 
+#TODO vérifier si ces fonctions ne doivent pas prendre device en argument
+# device ajouter pour logmvn01pdf
+
 
 def log_norm(x, mu, std):
     """
     Evaluation of 1D normal distribution on tensors
 
     Parameters:
-        x (Tensor): Data tensor of size B X S 
-        mu (Tensor): Mean tensor of size S 
+        x (Tensor): Data tensor of size B X S X 1
+        mu (Tensor): Mean tensor of size S X 1
         std (Float): Positive scalar (standard deviation)
 
     Returns:
-        logproba (Tensor): Same size as x with logproba(b,i)=log p(x(b,i),mu(i),std)
+        logproba (Tensor): size B X S X 1 with logproba(b,i)=[log p(x(b,i),mu(i),std)]
     """
+    assert x.shape[1] == mu.shape[0]
+    assert x.shape[2] == mu.shape[1]
+    assert mu.shape[1] == 1
     B = x.shape[0]
     S = x.shape[1]
     var = torch.as_tensor(std**2).type_as(x)
@@ -21,27 +27,24 @@ def log_norm(x, mu, std):
     c = 2*math.pi*var
     return -0.5 * (1/(var))*d - 0.5 * c.log()
 
-def NormalLogLikelihood(y_pred, y_data, sigma_noise, raw=False):
+def NormalLogLikelihood(y_pred, y_data, sigma_noise):
     """
     Evaluation of a Normal distribution
     
     Parameters:
-    y_pred (Tensor): tensor of size MxD
-    y_data (Tensor): tensor of size 1xD
-    sigma_noise (Scalar): standard deviation for the diagonal cov matrix
-    raw (bool): determine if log probabilities are summed (non raw) or not (raw)
+    y_pred (Tensor): tensor of size M X N X 1
+    y_data (Tensor): tensor of size N X 1
+    sigma_noise (Scalar): std for point likelihood: p(y_data | y_pred, sigma_noise) Gaussian N(y_pred,sigma_noise)
 
     Returns:
-    logproba (Tensor): Mx1 vector of log probabilities
+    logproba (Tensor):  (raw) size M X N , with logproba[m,n]= p(y_data[n] | y_pred[m,n], sigma_noise)                        (non raw) size M , logproba[m]=sum_n logproba[m,n]
     """
-    assert y_pred.shape[1] == y_data.shape[0]
-    assert y_data.shape[1] == 1
-    if raw:
-        log_proba = log_norm(y_pred, y_data, sigma_noise)
-    else:
-        log_proba = log_norm(y_pred, y_data, sigma_noise).sum(dim=[1,2])
-        assert log_proba.ndim == 1
-    return log_proba
+# assert taken care of by log_norm
+#    assert y_pred.shape[1] == y_data.shape[0]
+#    assert y_pred.shape[2] == y_data.shape[1]
+#    assert y_data.shape[1] == 1
+    log_proba = log_norm(y_pred, y_data, sigma_noise)
+    return log_proba.squeeze(-1)
 
 def logmvn01pdf(theta):
     """
@@ -51,7 +54,7 @@ def logmvn01pdf(theta):
     x (Tensor): Data tensor of size NxD
 
     Returns:
-    logproba (Tensor): N-dimensional vector of log probabilities
+    logproba (Tensor): size N, vector of log probabilities
     """
     dim = theta.shape[1]
     S = torch.ones(dim).type_as(theta)

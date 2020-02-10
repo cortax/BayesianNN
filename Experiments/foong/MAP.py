@@ -44,10 +44,14 @@ def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter
         else:
             theta = torch.tensor(best_theta)          
 
-        avgNLL_train, avgNLL_validation, avgNLL_test = setup.evaluate_metrics(theta)
-        mlflow.log_metric("avgNLL_train", float(avgNLL_train.cpu().numpy()))
-        mlflow.log_metric("avgNLL_validation", float(avgNLL_validation.cpu().numpy()))
-        mlflow.log_metric("avgNLL_test", float(avgNLL_test.cpu().numpy()))
+        nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta)
+        mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
+        mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
+        mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+
+        mlflow.log_metric("MRSE_train", float(RSE_train[0].cpu().numpy()))
+        mlflow.log_metric("MRSE_validation", float(RSE_validation[0].cpu().numpy()))
+        mlflow.log_metric("MRSE_test", float(RSE_test[0].cpu().numpy()))
 
         fig = setup.makeValidationPlot(theta)
         tempdir = tempfile.TemporaryDirectory()

@@ -1,32 +1,45 @@
 import torch
 
 
-# def MSE(theta,model,x,y,inv_transform,device):
-#     n_samples=x.shape[0]
-#     y_pred =inv_transform(model(x, theta)).mean(0)
-#     se=(y_pred-y.view(n_samples,1))**2
-#     return torch.std_mean(se)
+def RSE(prediction_fn,theta,X,y):
+    """
+    Root Mean Squared Error and Root Std Squared Error
+    Args:
+        prediction_fn: takes (X,theta) and returns y_pred, size N x 1
+        theta: Tensor, size M x P
+        X: Tensor, N x dim
+        y: Tensor, N x 1
 
-def MSE(theta,model,X,y,inv_transform,device):
-    n_samples=x.shape[0]
-    y_pred =inv_transform(model(x, theta)).mean(0)
-    se=(y_pred-y.view(n_samples,1))**2
-    return torch.std_mean(se)
+    Returns:
+        (Mean.sqrt(), Std.sqrt()) for Mean and Std on data (X,y) of the Squared Error
+        of the predictor given by x -> y_pred.mean()
 
-#NLPD from Quinonero-Candela and al.
-# average Negative Log Likelihood
-# the average negative log predictive density (NLPD) of the true targets
+    """
 
-def NLPD(theta,model, x, y, sigma_noise,inv_transform,device):
-    y_pred =inv_transform(model(x, theta))
-    L = _log_norm(y_pred, y, sigma_noise,device)
-    n_x = torch.as_tensor(float(x.shape[0]), device=device)
-    n_theta = torch.as_tensor(float(theta.shape[0]), device=device)
-    log_posterior_predictive = torch.logsumexp(L, 0) - torch.log(n_theta)
-    return torch.std_mean(-log_posterior_predictive)
+    y_pred =prediction_fn(X, theta).mean(0)
+    SE=(y_pred-y)**2
+    MSE=torch.mean(SE)
+    StdSE=torch.std(SE)
+    return (MSE,StdSE)
 
-def avgNLL(loglikelihood, theta, X, y):
-    L = loglikelihood(theta, X, y)
+def nLPP(loglikelihood_fn, theta, X, y):
+    """
+    NLPD from Quinonero-Candela and al.
+    NLL from others
+    nLPP for negative Log Posterior PREDICTIVE
+
+    Args:
+        loglikelihood_fn: takes (theta, X, y) to Tensor of size M x N
+        theta: M x DIM
+        X: N x d
+        y: N x 1
+
+    Returns:
+        (Mean, Std) for Log Posterior Predictive of ensemble Theta on data (X,y)
+    """
+    L = loglikelihood_fn(theta, X, y)
     M = torch.tensor(theta.shape[0]).type_as(theta)
-    log_posterior_predictive = torch.logsumexp(L, 0) - torch.log(M)
-    return torch.mean(-log_posterior_predictive)
+    LPP = torch.logsumexp(L, 0) - torch.log(M)
+    MnLPP=torch.mean(-LPP)
+    SnLPP=torch.std(-LPP)
+    return (MnLPP, SnLPP)
