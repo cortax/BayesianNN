@@ -79,15 +79,15 @@ class MeanFieldVariationInference():
         self._best_theta = None
         self._best_score = None
             
-    def _save_best_model(self, score, theta):
-        return
-        if score < self._best_score:
-            self._best_theta = theta
-            self._best_score = score
+    # def _save_best_model(self, score, theta):
+    #     return
+    #     if score < self._best_score:
+    #         self._best_theta = theta
+    #         self._best_score = score
 
-    def _get_best_model(self):
-        return
-        return self._best_theta, self._best_score
+    # def _get_best_model(self):
+    #     return
+    #     return self._best_theta, self._best_score
 
     def run(self, q):
         q.rho.requires_grad = True
@@ -123,8 +123,8 @@ class MeanFieldVariationInference():
             if lr < self.min_lr:
                 break
 
-        best_theta, best_score = self._get_best_model()
-        return best_theta, best_score, score
+        #best_theta, best_score = self._get_best_model()
+        return q
 
 
 
