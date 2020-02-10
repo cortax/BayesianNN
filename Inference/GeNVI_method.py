@@ -25,7 +25,7 @@ class GeNet(nn.Module):
                 torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
     
             def forward(self, n=1):
-                epsilon = torch.randn(size=(n,self.lat_dim)).to(self.device)
+                epsilon = torch.randn(size=(n,self.lat_dim), device=self.device)
                 return self.hnet(epsilon)           
 
 class GeNetEns(nn.Module):
