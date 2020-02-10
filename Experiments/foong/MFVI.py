@@ -1,139 +1,101 @@
 import torch
-from torch import nn
-import mlflow
-import mlflow.pytorch
-import tempfile
 import argparse
+import mlflow
+import tempfile
+from Experiments.foong import Setup
+from Inference.Variational import MeanFieldVariationInference, MeanFieldVariationalDistribution
 
 
-from Prediction.metrics import get_logposterior, log_metrics, seeding
-from Inference.MFVI_method import MeanFieldVariationalDistribution, MeanFieldVariationalMixtureDistribution
+def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
+    optimizer = MeanFieldVariationInference(
+        objective_fn, max_iter, n_ELBO_samples, learning_rate, min_lr, patience, lr_decay, device, verbose)
 
-
-from Experiments.foong.setup import *
-
-
-
-"""
-def MAP(dim,max_iter, init_std, learning_rate, patience, lr_decay, min_lr, logtarget, device, verbose):
-    std = torch.tensor(init_std)
-    theta = torch.nn.Parameter(torch.empty([1, dim], device=device).normal_(std=std), requires_grad=True)
-    optimizer = torch.optim.Adam([theta], lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)#, patience=patience, factor=lr_decay)
-    
-    for t in range(max_iter):
-        optimizer.zero_grad()
-
-        L = -torch.mean(logtarget(theta))
-        L.backward()
-
-        lr = optimizer.param_groups[0]['lr']
-        scheduler.step(L.detach().clone().cpu().numpy())
-
-        if verbose:
-            stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
-            print(stats)
-
-        if lr < min_lr:
-            break
-        optimizer.step()
-    return theta.detach().clone()
-"""
-
-def main(ensemble_size=1, max_iter=100000, learning_rate=0.01, min_lr=0.0005,  n_samples_ED=50, n_samples_LP=50, patience=100, lr_decay=0.9, init_std=1.0, optimize=0, seed=-1, device='cpu', verbose=0, show_metrics=False):
-    seeding(seed)
-
-    xpname = experiment_name + '/MFVI'
+    q0 = MeanFieldVariationalDistribution(setup.param_count, sigma=0.0000001, device=setup.device)
+    q = optimizer.run(q0)
+    return q
+                   
+def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False):
+    xpname = setup.experiment_name + '/MAP'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
-
-    with mlflow.start_run():#run_name='eMFVI', experiment_id=expdata.experiment_id
+    
+    with mlflow.start_run(experiment_id=expdata.experiment_id, nested=nested): 
         mlflow.set_tag('device', device)
-        mlflow.set_tag('seed', seed)
-        
-        X_train, y_train, X_test, y_test, X_ib_test, y_ib_test, X_valid, y_valid, inverse_scaler_y = get_data(device)
-        
-        mlflow.log_param('sigma noise', sigma_noise)
-
-        param_count, mlp=get_my_mlp()
-        mlflow.set_tag('dimensions', param_count)
-
-        logtarget=get_logposterior(mlp,X_train,y_train,sigma_noise,device)
+        mlflow.set_tag('sigma noise', setup.sigma_noise)
+        mlflow.set_tag('dimensions', setup.param_count)
 
         mlflow.log_param('ensemble_size', ensemble_size)
+        mlflow.log_param('init_std', init_std)
         mlflow.log_param('learning_rate', learning_rate)
-
         mlflow.log_param('patience', patience)
         mlflow.log_param('lr_decay', lr_decay)
-
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
 
-        mlflow.log_param('init_std', init_std)
+        if best_score is not None:
+            mlflow.log_metric("training loss", float(best_score))
+        if score is not None:
+            for t in range(len(score)):
+                mlflow.log_metric("training loss", float(score[t]), step=t)
 
-        MFVI=MeanFieldVariationalMixtureDistribution(ensemble_size,param_count,init_std,device=device)
-        
+        if type(best_theta) is list:
+            theta = torch.cat([torch.tensor(a) for a in best_theta])
+        else:
+            theta = torch.tensor(best_theta)          
 
-        optimizer = torch.optim.Adam(MFVI.parameters(), lr=learning_rate)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
+        avgNLL_train, avgNLL_validation, avgNLL_test = setup.evaluate_metrics(theta)
+        mlflow.log_metric("avgNLL_train", float(avgNLL_train.cpu().numpy()))
+        mlflow.log_metric("avgNLL_validation", float(avgNLL_validation.cpu().numpy()))
+        mlflow.log_metric("avgNLL_test", float(avgNLL_test.cpu().numpy()))
 
-        for t in range(max_iter):
-            optimizer.zero_grad()
+        fig = setup.makeValidationPlot(theta)
+        tempdir = tempfile.TemporaryDirectory()
+        fig.savefig(tempdir.name+'/validation.png')
+        mlflow.log_artifact(tempdir.name+'/validation.png')
+        fig.close()
 
-            ED=-MFVI.log_prob(MFVI(n_samples_ED)).mean()
-            LP=logtarget(MFVI(n_samples_LP)).mean()
-            L =-ED-LP
-            L.backward()
+def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
+    objective_fn = setup.logposterior
+    param_count = setup.param_count
+    device = setup.device
+    ensemble_size = 1
+    q = learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
+    
+    #log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False)
 
-            lr = optimizer.param_groups[0]['lr']
-            scheduler.step(L.detach().clone().cpu().numpy())
-            
-            mlflow.log_metric("ELBO", float(L.detach().squeeze().clone().cpu().numpy()),t)
-            mlflow.log_metric("-log posterior", float(-LP.detach().squeeze().clone().cpu().numpy()),t)
-            mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
-            mlflow.log_metric("learning rate", float(lr),t)
-            mlflow.log_metric("epoch", t)
-            
-            if show_metrics:
-                with torch.no_grad():
-                    theta = MFVI(100)
-                    log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
+# def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
+#     objective_fn = setup.logposterior
+#     param_count = setup.param_count
+#     device = setup.device
+#     ensemble_best_theta = []
+#     ensemble_best_score = []
+#     ensemble_score = []
+#     for _ in range(ensemble_size):
+#         best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
+#         ensemble_best_theta.append(best_theta)
+#         ensemble_best_score.append(best_score)
+#         ensemble_score.append(score)
 
-            if verbose:
-                stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, max_iter, L, lr)
-                print(stats)
+#     log_experiment(setup, ensemble_best_theta, None, None, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, True)
 
-            if lr < min_lr:
-                break
-
-            optimizer.step()
-        
-        
-        with torch.no_grad():
-            theta = MFVI(1000)
-            log_metrics(theta, mlp, X_train, y_train, X_test, y_test, sigma_noise, inverse_scaler_y, t,device)
-
-            theta_plot=MFVI.sample(100)
-            plot_test(X_train, y_train, X_test,y_test,theta_plot, mlp)
-        
-        
 if __name__ == "__main__":
+    # example the commande de run 
+    # python -m Experiments.foong.MFVI --ensemble_size=1 --max_iter=100 --init_std=0.1 --learning_rate=0.1 --min_lr=0.0001 --patience=100 --lr_decay=0.9 --device=cuda:0 --verbose=1 --n_ELBO_samples=100
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--ensemble_size", type=int, default=1,
-                        help="number of model to train in the ensemble")
+                        help="number of models to use in the ensemble")
     parser.add_argument("--max_iter", type=int, default=100000,
                         help="maximum number of learning iterations")
     parser.add_argument("--learning_rate", type=float, default=0.01,
                         help="initial learning rate of the optimizer")
-    parser.add_argument("--n_samples_ED", type=int, default=50,
-                        help="number of samples for MC estimation of differential entropy")
-    parser.add_argument("--n_samples_LP", type=int, default=100,
-                        help="number of samples for MC estimation of expected logposterior")   
     parser.add_argument("--min_lr", type=float, default=0.0005,
                         help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=10,
+    parser.add_argument("--n_ELBO_samples", type=int, default=10,
+                        help="number of Monte Carlo samples to compute ELBO")
+    parser.add_argument("--patience", type=int, default=100,
                         help="scheduler patience")
-    parser.add_argument("--lr_decay", type=float, default=0.1,
+    parser.add_argument("--lr_decay", type=float, default=0.9,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
     parser.add_argument("--init_std", type=float, default=1.0,
                         help="parameter controling initialization of theta")
@@ -142,27 +104,19 @@ if __name__ == "__main__":
     parser.add_argument("--expansion", type=int, default=0,
                         help="variational inference is done only on variance (0,1)")
     parser.add_argument("--seed", type=int, default=None,
-                        help="scheduler patience")
+                        help="seed for random numbers")
     parser.add_argument("--device", type=str, default=None,
                         help="force device to be used")
     parser.add_argument("--verbose", type=bool, default=False,
-                        help="force device to be used")
-    parser.add_argument("--show_metrics", type=bool, default=False,
-                        help="log metrics during training")        
+                        help="force device to be used")  
     args = parser.parse_args()
-
     print(args)
 
-    if args.seed is None:
-        seed = np.random.randint(0, 2 ** 31)
-    else:
-        seed = args.seed
+    setup = Setup(args.device)
 
-    if args.device is None:
-        device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+    if args.ensemble_size > 1:
+        pass
+        #eMFVI(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
     else:
-        device = args.device
-
-    print(args)
+        MFVI(setup, args.max_iter, args.n_ELBO_samples, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
     
-    main(args.ensemble_size, args.max_iter, args.learning_rate, args.min_lr,  args.n_samples_ED, args.n_samples_LP,  args.patience, args.lr_decay, args.init_std, args.optimize, seed, device, args.verbose, args.show_metrics)

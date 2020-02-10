@@ -123,8 +123,8 @@ class MeanFieldVariationInference():
             if lr < self.min_lr:
                 break
 
-        best_theta, best_score = self._get_best_model()
-        return best_theta, best_score, score
+        #best_theta, best_score = self._get_best_model()
+        return q
 
 
 
