@@ -10,7 +10,7 @@ import mlflow.pytorch
 
 
 class GeNet(nn.Module):
-            def __init__(self, lat_dim, nb_neur, output_dim,  activation=nn.ReLU(), init_w=.1, init_b=.1, device='cpu'):
+            def __init__(self, lat_dim, nb_neur, output_dim,  activation, init_w, init_b, device):
                 super(GeNet, self).__init__()
                 self.lat_dim = lat_dim
                 self.device=device
@@ -31,6 +31,7 @@ class GeNet(nn.Module):
 class GeNetEns(nn.Module):
     def __init__(self, nb_comp, lat_dim, layer_width, output_dim, activation, init_w, init_b, device):
         super(GeNetEns, self).__init__()
+        self.device = device
         self.nb_comp=nb_comp
         self.output_dim=output_dim
         self.components= nn.ModuleList([GeNet(lat_dim,layer_width,output_dim,activation,init_w,init_b,device) for i in range(nb_comp)]).to(device)

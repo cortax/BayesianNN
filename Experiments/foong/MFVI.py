@@ -15,7 +15,7 @@ def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, pa
     return q
                    
 def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False):
-    xpname = setup.experiment_name + '/MAP'
+    xpname = setup.experiment_name + '/MFVI'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
     
@@ -41,12 +41,16 @@ def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter
         if type(best_theta) is list:
             theta = torch.cat([torch.tensor(a) for a in best_theta])
         else:
-            theta = torch.tensor(best_theta)          
+            theta = torch.tensor(best_theta)
 
-        avgNLL_train, avgNLL_validation, avgNLL_test = setup.evaluate_metrics(theta)
-        mlflow.log_metric("avgNLL_train", float(avgNLL_train.cpu().numpy()))
-        mlflow.log_metric("avgNLL_validation", float(avgNLL_validation.cpu().numpy()))
-        mlflow.log_metric("avgNLL_test", float(avgNLL_test.cpu().numpy()))
+        nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta)
+        mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
+        mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
+        mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+
+        mlflow.log_metric("MRSE_train", float(RSE_train[0].cpu().numpy()))
+        mlflow.log_metric("MRSE_validation", float(RSE_validation[0].cpu().numpy()))
+        mlflow.log_metric("MRSE_test", float(RSE_test[0].cpu().numpy()))
 
         fig = setup.makeValidationPlot(theta)
         tempdir = tempfile.TemporaryDirectory()
@@ -61,7 +65,7 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
     ensemble_size = 1
     q = learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
     
-    #log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False)
+    #log_experiment(setup, q, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False)
 
 # def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
 #     objective_fn = setup.logposterior
