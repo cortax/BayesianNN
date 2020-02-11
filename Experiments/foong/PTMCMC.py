@@ -57,13 +57,22 @@ def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter
         mlflow.log_artifact(tempdir.name+'/validation.png')
         fig.close()
 
+def draw_experiment_plot(setup, theta):
+	fig = setup.makeValidationPlot(theta)
+	tempdir = tempfile.TemporaryDirectory()
+	fig.savefig(tempdir.name + '/validation.png')
+	mlflow.log_artifact(tempdir.name + '/validation.png')
+	fig.close()
+
 def PTMCMC(setup, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
     objective_fn = setup.logposterior
     param_count = setup.param_count
     device = setup.device
 
-    q = learning(objective_fn, param_count, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device)
-    
+    ensemble = learning(objective_fn, param_count, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device)
+    return ensemble
+
+
     #log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False)
 
 # def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
@@ -84,7 +93,7 @@ def PTMCMC(setup, numiter, burnin, thinning, temperatures, maintempindex, baseMH
 if __name__ == "__main__":
     # example the commande de run 
     #  python -m Experiments.foong.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
-
+    #  python -m Experiments.foong.PTMCMC --numiter=10000 --burnin=100 --thinning=10 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     parser = argparse.ArgumentParser()
     parser.add_argument("--numiter", type=int, default=1000,
                         help="number of iterations in the Markov chain")
@@ -115,4 +124,22 @@ if __name__ == "__main__":
 
     temperatures = [float(n) for n in args.temperatures.split(',')]
 
-    PTMCMC(setup, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)
+
+    output=PTMCMC(setup, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)
+
+    xpname = setup.experiment_name + '/PTMCMC'
+    mlflow.set_experiment(xpname)
+    expdata = mlflow.get_experiment_by_name(xpname)
+
+    with mlflow.start_run(experiment_id=expdata.experiment_id):
+        theta_ens = torch.cat(output[0])
+        # log_GeNVI_experiment(foong, theta_ens, the_epoch, the_scores, log_scores,
+        #                      args.ensemble_size, args.lat_dim, args.layerwidth, foong.param_count, args.init_w,
+        #                      args.EntropyE, args.n_samples_NNE, args.n_samples_KDE, args.n_samples_ED,
+        #                      args.n_samples_LP,
+        #                      args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
+        #                      device)
+
+
+
+        draw_experiment_plot(setup, theta_ens)
