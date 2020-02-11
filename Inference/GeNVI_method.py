@@ -1,10 +1,6 @@
-import numpy as np
 import torch
 from torch import nn
 import math
-import argparse
-import mlflow
-import mlflow.pytorch
 
 
 
@@ -203,12 +199,16 @@ def GeNVI(objective_fn,
 
 class GeNVariationalInference():
     def __init__(self, objective_fn,
-                 GeN, kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
+                 kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
                  device, verbose):
         self.objective_fn = objective_fn
+        self.kNNE=kNNE
+        self.n_samples_NNE=n_samples_NNE
+        self.n_samples_KDE=n_samples_KDE
+        self.n_samples_ED=n_samples_ED
+        self.n_samples_LP=n_samples_LP
         self.max_iter = max_iter
-        self.n_ELBO_samples = n_ELBO_samples
         self.learning_rate = learning_rate
         self.min_lr = min_lr
         self.patience = patience
@@ -216,14 +216,19 @@ class GeNVariationalInference():
         self.device = device
         self.verbose = verbose
 
-        if kNNE == 0:
-            self.entropy= lambda GeN: -KDE(GeN(n_samples_ED), GeN.sample(n_samples_KDE)).mean()
+        self._best_score=float('inf')
+
+
+
+
+    def _entropy(self, GeN):
+        if self.kNNE == 0:
+            ED = -self._KDE(GeN(self.n_samples_ED), GeN.sample(self.n_samples_KDE)).mean()
         else:
-            self.entropy= lambda GeN: NNE = NNE(GeN(n_samples_NNE), kNNE)
+            ED = self._NNE(GeN(self.n_samples_NNE), self.kNNE)
+        return ED
 
-        self._best_score = float('inf')
-
-    def KDE(x, x_kde):
+    def _KDE(self, x, x_kde):
         """
         KDE
 
@@ -254,7 +259,7 @@ class GeNVariationalInference():
         N=torch.as_tensor(float(n_comp*n_kde), device=self.device)
         return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
 
-    def NNE(theta,k=1):
+    def _NNE(self, theta,k=1):
         """
         Parameters:
             theta (Tensor): Samples, NbExemples X NbDimensions
@@ -288,21 +293,21 @@ class GeNVariationalInference():
 
     def _get_best_model(self, GeN):
         best= torch.load('best.pt')
-        Gen.load_state_dict(best['state_dict'])
-        return GeN, best['epoch'], best['ELBO'], best['ED'], best['LP']
+        GeN.load_state_dict(best['state_dict'])
+        return best['epoch'], [best['ELBO'], best['ED'], best['LP']]
 
     def run(self, GeN):
         optimizer = torch.optim.Adam(GeN.parameters(), lr=self.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
                                                                factor=self.lr_decay)
 
-        score_elbo = []
-        score_entropy = []
-        score_logposterior = []
+        self.score_elbo = []
+        self.score_entropy = []
+        self.score_logposterior = []
         for t in range(self.max_iter):
             optimizer.zero_grad()
 
-            ED = entropy(GeN)
+            ED = self._entropy(GeN)
             LP = self.objective_fn(GeN(self.n_samples_LP)).mean()
             L = -ED - LP
             L.backward()
@@ -311,18 +316,19 @@ class GeNVariationalInference():
 
             scheduler.step(L.detach().clone().cpu().numpy())
 
-            if verbose:
+            if self.verbose:
                 stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, self.max_iter, L, lr)
                 print(stats)
 
-            score_elbo.append(L.detach().clone.cpu())
-            score_entropy.append(ED.detach().clone.cpu())
-            score_logposterior.append(LP.detach().clone.cpu())
-            self._save_best_model(L, t, ED, LP)
+            self.score_elbo.append(L.detach().clone().cpu())
+            self.score_entropy.append(ED.detach().clone().cpu())
+            self.score_logposterior.append(LP.detach().clone().cpu())
 
-            if lr < min_lr:
+            self._save_best_model(GeN, L, t, ED, LP)
+
+            if lr < self.min_lr:
                 break
 
             optimizer.step()
 
-        return self._get_best_model(GeN), score_elbo, score_entropy, score_logposterior
+        return self._get_best_model(GeN)

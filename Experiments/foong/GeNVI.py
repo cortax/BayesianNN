@@ -2,59 +2,95 @@ import torch
 from torch import nn
 import tempfile
 import argparse
+import mlflow
 
-from Inference.GeNVI_method import GeNVI, GeNetEns
+from Inference.GeNVI_method import GeNVariationalInference, GeNetEns
 from Experiments.foong import Setup
+
 
 ## command line example
 # python -m Experiments.foong.GeNVI --verbose=True --max_iter=1000 --show_metrics=True
 
-def log_experiment(setup, best_theta, best_score, score, ensemble_size, entropy_method, max_iter, learning_rate, init_std, param_count,
-                   min_lr, patience, lr_decay, device, verbose, nested=False):
-	xpname = setup.experiment_name + '/GeNVI'
-	mlflow.set_experiment(xpname)
-	expdata = mlflow.get_experiment_by_name(xpname)
+def GeNVI_learning(objective_fn,
+                   ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b,
+                   kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
+                   max_iter, learning_rate, min_lr, patience, lr_decay,
+                   device=None, verbose=False):
+	GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count,
+	               activation, init_w, init_b, device)
 
-	with mlflow.start_run(experiment_id=expdata.experiment_id, nested=nested):
-		mlflow.set_tag('device', device)
-		mlflow.set_tag('sigma noise', setup.sigma_noise)
-		mlflow.set_tag('dimensions', setup.param_count)
+	optimizer = GeNVariationalInference(objective_fn,
+	                                    kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
+	                                    max_iter, learning_rate, min_lr, patience, lr_decay,
+	                                    device, verbose)
+	the_epoch, the_scores = optimizer.run(GeN)
+	log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
+	return GeN, the_epoch, the_scores, log_scores
 
-		mlflow.set_tag('dimensions', setup.param_count)
 
-		mlflow.log_param('ensemble_size', ensemble_size)
-		mlflow.log_param('init_std', init_std)
-		mlflow.log_param('learning_rate', learning_rate)
-		mlflow.log_param('patience', patience)
-		mlflow.log_param('lr_decay', lr_decay)
-		mlflow.log_param('max_iter', max_iter)
-		mlflow.log_param('min_lr', min_lr)
+def log_GeNVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
+                         ensemble_size, lat_dim, layerwidth, param_count, init_w,
+                         kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
+                         max_iter, learning_rate, min_lr, patience, lr_decay,
+                         device):
 
-		if best_score is not None:
-			mlflow.log_metric("training loss", float(best_score))
-		if score is not None:
-			for t in range(len(score)):
-				mlflow.log_metric("training loss", float(score[t]), step=t)
 
-		if type(best_theta) is list:
-			theta = torch.cat([torch.tensor(a) for a in best_theta])
-		else:
-			theta = torch.tensor(best_theta)
+	mlflow.set_tag('device', device)
+	mlflow.set_tag('sigma noise', setup.sigma_noise)
+	mlflow.set_tag('dimensions', setup.param_count)
 
-		nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta)
-		mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
-		mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
-		mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+	if kNNE == 0:
+		entropy_mthd = 'KDE'
+	else:
+		entropy_mthd = str(kNNE) + 'NNE'
 
-		mlflow.log_metric("MRSE_train", float(RSE_train[0].cpu().numpy()))
-		mlflow.log_metric("MRSE_validation", float(RSE_validation[0].cpu().numpy()))
-		mlflow.log_metric("MRSE_test", float(RSE_test[0].cpu().numpy()))
+	mlflow.set_tag('entropy', entropy_mthd)
 
-		fig = setup.makeValidationPlot(theta)
-		tempdir = tempfile.TemporaryDirectory()
-		fig.savefig(tempdir.name + '/validation.png')
-		mlflow.log_artifact(tempdir.name + '/validation.png')
-		fig.close()
+	mlflow.log_param('ensemble_size', ensemble_size)
+	mlflow.log_param('lat_dim', lat_dim)
+	mlflow.log_param('layerwidth', layerwidth)
+	mlflow.log_param('param_count', param_count)
+	mlflow.log_param('init_w', init_w)
+
+	mlflow.log_param('n_samples_NNE', n_samples_NNE)
+	mlflow.log_param('n_samples_KDE', n_samples_KDE)
+	mlflow.log_param('n_samples_ED', n_samples_ED)
+	mlflow.log_param('n_samples_LP', n_samples_LP)
+
+	mlflow.log_param('learning_rate', learning_rate)
+	mlflow.log_param('patience', patience)
+	mlflow.log_param('lr_decay', lr_decay)
+	mlflow.log_param('max_iter', max_iter)
+	mlflow.log_param('min_lr', min_lr)
+
+	mlflow.log_metric('The epoch', the_epoch)
+
+	mlflow.log_metric("The elbo", float(the_scores[0]))
+	mlflow.log_metric("The entropy", float(the_scores[1]))
+	mlflow.log_metric("The logposterior", float(the_scores[2]))
+
+	for t in range(len(log_scores[0])):
+		mlflow.log_metric("elbo", float(log_scores[0][t]), step=t)
+		mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
+		mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
+
+	nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta_ens)
+	mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
+	mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
+	mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+
+	mlflow.log_metric("MRSE_train", float(RSE_train[0].cpu().numpy()))
+	mlflow.log_metric("MRSE_validation", float(RSE_validation[0].cpu().numpy()))
+	mlflow.log_metric("MRSE_test", float(RSE_test[0].cpu().numpy()))
+
+
+def draw_experiment_plot(setup, theta):
+	fig = setup.makeValidationPlot(theta)
+	tempdir = tempfile.TemporaryDirectory()
+	fig.savefig(tempdir.name + '/validation.png')
+	mlflow.log_artifact(tempdir.name + '/validation.png')
+	fig.close()
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--ensemble_size", type=int, default=1,
@@ -91,8 +127,6 @@ parser.add_argument("--device", type=str, default=None,
                     help="force device to be used")
 parser.add_argument("--verbose", type=bool, default=False,
                     help="force device to be used")
-parser.add_argument("--show_metrics", type=bool, default=False,
-                    help="log metrics during training")
 
 if __name__ == "__main__":
 	# python -m Experiments.boston.GeNVI --max_iter=10 --verbose=True --device='cpu'
@@ -107,20 +141,30 @@ if __name__ == "__main__":
 
 	foong = Setup(device)
 
-	if args.EntropyE == 0:
-		entropy_mthd = 'KDE'
-	else:
-		entropy_mthd = str(args.EntropyE) + 'NNE'
+	activation = nn.ReLU()
+	init_b = .001
 
-	GeN = GeNetEns(args.ensemble_size, args.lat_dim, args.layerwidth, foong.param_count,
-	               activation=nn.ReLU(), init_w=args.init_w, init_b=.001, device=device)
+	GeN, the_epoch, the_scores, log_scores = GeNVI_learning(foong.logposterior,
+	                                                        args.ensemble_size, args.lat_dim, args.layerwidth,
+	                                                        foong.param_count,
+	                                                        activation, args.init_w, init_b,
+	                                                        args.EntropyE, args.n_samples_NNE, args.n_samples_KDE,
+	                                                        args.n_samples_ED, args.n_samples_LP,
+	                                                        args.max_iter, args.learning_rate, args.min_lr,
+	                                                        args.patience, args.lr_decay,
+	                                                        device, args.verbose)
 
-	GeNVI(foong.logposterior, GeN, args.EntropyE, args.n_samples_NNE, args.n_samples_KDE, args.n_samples_ED,
-	      args.n_samples_LP, args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay, device,
-	      args.verbose)
+	xpname = foong.experiment_name + '/GeNVI'
+	mlflow.set_experiment(xpname)
+	expdata = mlflow.get_experiment_by_name(xpname)
 
+	with mlflow.start_run(experiment_id=expdata.experiment_id):
+		theta_ens = GeN(1000).detach()
+		log_GeNVI_experiment(foong, theta_ens, the_epoch, the_scores, log_scores,
+		                     args.ensemble_size, args.lat_dim, args.layerwidth, foong.param_count, args.init_w,
+		                     args.EntropyE, args.n_samples_NNE, args.n_samples_KDE, args.n_samples_ED,
+		                     args.n_samples_LP,
+		                     args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
+		                     device)
 
-
-	Epoch, ELBO, ED, LP = GeN._get_best_model()
-	best = 'Epoch {}, Training Loss: {}, Entropy: {}, -LogPosterior {}'.format(Epoch, ELBO, ED, LP)
-	print(best)
+		draw_experiment_plot(foong, theta_ens)
