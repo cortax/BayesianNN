@@ -16,46 +16,40 @@ def learning(objective_fn, param_count, numiter, burnin, thinning, temperatures,
     ensemble = chains[maintempindex][burnin:-1:thinning]
 
     return ensemble, chains, ladderAcceptanceRate, swapAcceptanceRate, logProba
-                   
-def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False):
-    xpname = setup.experiment_name + '/MAP'
-    mlflow.set_experiment(xpname)
-    expdata = mlflow.get_experiment_by_name(xpname)
-    
-    with mlflow.start_run(experiment_id=expdata.experiment_id, nested=nested): 
-        mlflow.set_tag('device', device)
-        mlflow.set_tag('sigma noise', setup.sigma_noise)
-        mlflow.set_tag('dimensions', setup.param_count)
 
-        mlflow.log_param('ensemble_size', ensemble_size)
-        mlflow.log_param('init_std', init_std)
-        mlflow.log_param('learning_rate', learning_rate)
-        mlflow.log_param('patience', patience)
-        mlflow.log_param('lr_decay', lr_decay)
-        mlflow.log_param('max_iter', max_iter)
-        mlflow.log_param('min_lr', min_lr)
+def log_PTMCM_experiment(setup, theta_ens, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device='cpu'):
 
-        if best_score is not None:
-            mlflow.log_metric("training loss", float(best_score))
-        if score is not None:
-            for t in range(len(score)):
-                mlflow.log_metric("training loss", float(score[t]), step=t)
+    mlflow.set_tag('device', device)
+    mlflow.set_tag('dimensions', setup.param_count)
+    mlflow.set_tag('temperatures', temperatures)
 
-        if type(best_theta) is list:
-            theta = torch.cat([torch.tensor(a) for a in best_theta])
-        else:
-            theta = torch.tensor(best_theta)          
+    mlflow.log_param('numiter', numiter)
+    mlflow.log_param('burnin', burnin)
+    mlflow.log_param('thinning', thinning)
+    mlflow.log_param('temperatureNoiseReductionFactor',temperatureNoiseReductionFactor)
+    mlflow.log_param('maintempindex', maintempindex)
+    mlflow.log_param('optimize',optimize)
+    mlflow.log_param('baseMHproposalNoise', baseMHproposalNoise)
+    mlflow.log_param('std_init',std_init)
 
-        avgNLL_train, avgNLL_validation, avgNLL_test = setup.evaluate_metrics(theta)
-        mlflow.log_metric("avgNLL_train", float(avgNLL_train.cpu().numpy()))
-        mlflow.log_metric("avgNLL_validation", float(avgNLL_validation.cpu().numpy()))
-        mlflow.log_metric("avgNLL_test", float(avgNLL_test.cpu().numpy()))
 
-        fig = setup.makeValidationPlot(theta)
-        tempdir = tempfile.TemporaryDirectory()
-        fig.savefig(tempdir.name+'/validation.png')
-        mlflow.log_artifact(tempdir.name+'/validation.png')
-        fig.close()
+    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta_ens)
+    mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
+    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
+    mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+
+    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
+    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
+    mlflow.log_metric("SnLPP_test", float(nLPP_test[1].cpu().numpy()))
+
+    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
+    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
+    mlflow.log_metric("MSE_test", float(RSE_test[0].cpu().numpy()))
+
+    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
+    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
+    mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
+
 
 def draw_experiment_plot(setup, theta):
 	fig = setup.makeValidationPlot(theta)
@@ -73,7 +67,6 @@ def PTMCMC(setup, numiter, burnin, thinning, temperatures, maintempindex, baseMH
     return ensemble
 
 
-    #log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False)
 
 # def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
 #     objective_fn = setup.logposterior
@@ -133,13 +126,5 @@ if __name__ == "__main__":
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
         theta_ens = torch.cat(output[0])
-        # log_GeNVI_experiment(foong, theta_ens, the_epoch, the_scores, log_scores,
-        #                      args.ensemble_size, args.lat_dim, args.layerwidth, foong.param_count, args.init_w,
-        #                      args.EntropyE, args.n_samples_NNE, args.n_samples_KDE, args.n_samples_ED,
-        #                      args.n_samples_LP,
-        #                      args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
-        #                      device)
-
-
-
+        log_PTMCM_experiment(setup, theta_ens, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
         draw_experiment_plot(setup, theta_ens)
