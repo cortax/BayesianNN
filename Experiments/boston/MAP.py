@@ -14,7 +14,7 @@ def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_l
 
     return best_theta, best_score, score
                    
-def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False):
+def log_MAP_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False):
     xpname = setup.experiment_name + '/MAP'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)

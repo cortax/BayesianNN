@@ -7,65 +7,90 @@ from Inference.Variational import MeanFieldVariationInference, MeanFieldVariatio
 
 
 def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
-    optimizer = MeanFieldVariationInference(
-        objective_fn, max_iter, n_ELBO_samples, learning_rate, min_lr, patience, lr_decay, device, verbose)
 
-    q0 = MeanFieldVariationalDistribution(setup.param_count, sigma=0.0000001, device=setup.device)
-    q = optimizer.run(q0)
-    return q
+    optimizer = MeanFieldVariationInference(objective_fn, max_iter, n_ELBO_samples,
+                                            learning_rate, min_lr, patience, lr_decay,  device, verbose)
+
+    q0 = MeanFieldVariationalDistribution(param_count, sigma=0.0000001, device=device)
+    the_epoch, the_scores = optimizer.run(q0)
+    log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
+    return q0, the_epoch, the_scores, log_scores
+
                    
-def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False):
-    xpname = setup.experiment_name + '/MFVI'
-    mlflow.set_experiment(xpname)
-    expdata = mlflow.get_experiment_by_name(xpname)
-    
-    with mlflow.start_run(experiment_id=expdata.experiment_id, nested=nested): 
-        mlflow.set_tag('device', device)
-        mlflow.set_tag('sigma noise', setup.sigma_noise)
-        mlflow.set_tag('dimensions', setup.param_count)
+def log_MFVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
+                         ensemble_size, init_std,  n_ELBO_samples,
+                         max_iter, learning_rate, min_lr, patience, lr_decay,
+                         device):
 
-        mlflow.log_param('ensemble_size', ensemble_size)
-        mlflow.log_param('init_std', init_std)
-        mlflow.log_param('learning_rate', learning_rate)
-        mlflow.log_param('patience', patience)
-        mlflow.log_param('lr_decay', lr_decay)
-        mlflow.log_param('max_iter', max_iter)
-        mlflow.log_param('min_lr', min_lr)
 
-        if best_score is not None:
-            mlflow.log_metric("training loss", float(best_score))
-        if score is not None:
-            for t in range(len(score)):
-                mlflow.log_metric("training loss", float(score[t]), step=t)
+    mlflow.set_tag('device', device)
+    mlflow.set_tag('sigma noise', setup.sigma_noise)
+    mlflow.set_tag('dimensions', setup.param_count)
 
-        if type(best_theta) is list:
-            theta = torch.cat([torch.tensor(a) for a in best_theta])
-        else:
-            theta = torch.tensor(best_theta)
+    mlflow.log_param('ensemble_size', ensemble_size)
+    mlflow.log_param('init_std', init_std)
+    mlflow.log_param('n_ELBO_samples', n_ELBO_samples)
 
-        nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta)
-        mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
-        mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
-        mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+    mlflow.log_param('max_iter', max_iter)
+    mlflow.log_param('learning_rate', learning_rate)
+    mlflow.log_param('min_lr', min_lr)
+    mlflow.log_param('patience', patience)
+    mlflow.log_param('lr_decay', lr_decay)
 
-        mlflow.log_metric("MRSE_train", float(RSE_train[0].cpu().numpy()))
-        mlflow.log_metric("MRSE_validation", float(RSE_validation[0].cpu().numpy()))
-        mlflow.log_metric("MRSE_test", float(RSE_test[0].cpu().numpy()))
+    mlflow.log_metric('The epoch', the_epoch)
 
-        fig = setup.makeValidationPlot(theta)
-        tempdir = tempfile.TemporaryDirectory()
-        fig.savefig(tempdir.name+'/validation.png')
-        mlflow.log_artifact(tempdir.name+'/validation.png')
-        fig.close()
+    mlflow.log_metric("The elbo", float(the_scores[0]))
+    mlflow.log_metric("The entropy", float(the_scores[1]))
+    mlflow.log_metric("The logposterior", float(the_scores[2]))
+
+    for t in range(len(log_scores[0])):
+        mlflow.log_metric("elbo", float(log_scores[0][t]), step=t)
+        mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
+        mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
+
+    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta_ens)
+    mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
+    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
+    mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+
+    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
+    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
+    mlflow.log_metric("SnLPP_test", float(nLPP_test[1].cpu().numpy()))
+
+    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
+    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
+    mlflow.log_metric("MSE_test", float(RSE_test[0].cpu().numpy()))
+
+    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
+    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
+    mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
+
+def draw_foong_experiment(setup, theta):
+	fig = setup.makeValidationPlot(theta)
+	tempdir = tempfile.TemporaryDirectory()
+	fig.savefig(tempdir.name + '/validation.png')
+	mlflow.log_artifact(tempdir.name + '/validation.png')
+	fig.close()
 
 def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
     objective_fn = setup.logposterior
     param_count = setup.param_count
     device = setup.device
     ensemble_size = 1
-    q = learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
-    
-    #log_experiment(setup, q, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False)
+    q, the_epoch, the_scores, log_scores = learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
+
+    xpname = setup.experiment_name + '/MFVI'
+    mlflow.set_experiment(xpname)
+    expdata = mlflow.get_experiment_by_name(xpname)
+
+    with mlflow.start_run(experiment_id=expdata.experiment_id):
+        theta_ens=q.sample(1000).detach()
+        log_MFVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
+                            ensemble_size, init_std, n_ELBO_samples,
+                            max_iter, learning_rate, min_lr, patience, lr_decay,
+                            device)
+        draw_foong_experiment(setup, theta_ens)
+
 
 # def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
 #     objective_fn = setup.logposterior
@@ -122,5 +147,8 @@ if __name__ == "__main__":
         pass
         #eMFVI(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
     else:
-        MFVI(setup, args.max_iter, args.n_ELBO_samples, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
-    
+        MFVI(setup, args.max_iter, args.n_ELBO_samples,
+             args.learning_rate, args.init_std, args.min_lr,
+             args.patience, args.lr_decay, args.device, args.verbose)
+
+

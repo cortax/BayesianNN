@@ -49,7 +49,6 @@ def log_GeNVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
 	mlflow.log_param('ensemble_size', ensemble_size)
 	mlflow.log_param('lat_dim', lat_dim)
 	mlflow.log_param('layerwidth', layerwidth)
-	mlflow.log_param('param_count', param_count)
 	mlflow.log_param('init_w', init_w)
 
 	mlflow.log_param('n_samples_NNE', n_samples_NNE)
@@ -79,12 +78,20 @@ def log_GeNVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
 	mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
 	mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
 
-	mlflow.log_metric("MRSE_train", float(RSE_train[0].cpu().numpy()))
-	mlflow.log_metric("MRSE_validation", float(RSE_validation[0].cpu().numpy()))
-	mlflow.log_metric("MRSE_test", float(RSE_test[0].cpu().numpy()))
+	mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
+	mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
+	mlflow.log_metric("SnLPP_test", float(nLPP_test[1].cpu().numpy()))
+
+	mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
+	mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
+	mlflow.log_metric("MSE_test", float(RSE_test[0].cpu().numpy()))
+
+	mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
+	mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
+	mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
 
-def draw_experiment_plot(setup, theta):
+def draw_foong_experiment(setup, theta):
 	fig = setup.makeValidationPlot(theta)
 	tempdir = tempfile.TemporaryDirectory()
 	fig.savefig(tempdir.name + '/validation.png')
@@ -167,4 +174,4 @@ if __name__ == "__main__":
 		                     args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
 		                     device)
 
-		draw_experiment_plot(foong, theta_ens)
+		draw_foong_experiment(foong, theta_ens)

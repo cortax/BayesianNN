@@ -1,7 +1,6 @@
 import torch
-import numpy as np
 from torch import nn
-#from livelossplot import PlotLosses
+
 
 class MeanFieldVariationalDistribution(nn.Module):
     def __init__(self, nb_dim, mu=0.0, sigma=1.0, device='cpu'):
@@ -10,7 +9,7 @@ class MeanFieldVariationalDistribution(nn.Module):
         self.nb_dim = nb_dim
         self.mu = nn.Parameter(torch.Tensor(nb_dim).to(self.device), requires_grad=True)
         self.rho = nn.Parameter(torch.Tensor(nb_dim).to(self.device), requires_grad=True)
-        
+
         if not torch.is_tensor(mu):
             mu = torch.tensor(mu)
             
@@ -58,7 +57,7 @@ class MeanFieldVariationalDistribution(nn.Module):
     def requires_grad_(self, b):
         self.mu.requires_grad_(b)
         self.rho.requires_grad_(b)
-    
+
     def log_prob(self, z):
         S = torch.diag(self.sigma)
         return torch.distributions.multivariate_normal.MultivariateNormal(self.mu, scale_tril=S).log_prob(z).unsqueeze(-1)
@@ -76,18 +75,27 @@ class MeanFieldVariationInference():
         self.device = device
         self.verbose = verbose
 
-        self._best_theta = None
-        self._best_score = None
-            
-    # def _save_best_model(self, score, theta):
-    #     return
-    #     if score < self._best_score:
-    #         self._best_theta = theta
-    #         self._best_score = score
+        self.tempdir_name = ''
 
-    # def _get_best_model(self):
-    #     return
-    #     return self._best_theta, self._best_score
+
+#        self._best_theta = None
+        self._best_score = float('inf')
+
+    def _save_best_model(self, q, epoch, score,  ED, LP):
+        if score < self._best_score:
+            torch.save({
+                'epoch': epoch,
+                'state_dict': q.state_dict(),
+                'ELBO': score,
+                'ED': ED,
+                'LP': LP
+            }, self.tempdir_name+'best.pt')
+            self._best_score = score
+
+    def _get_best_model(self, q):
+        best = torch.load(self.tempdir_name+'best.pt')
+        q.load_state_dict(best['state_dict'])
+        return best['epoch'], [best['ELBO'], best['ED'], best['LP']]
 
     def run(self, q):
         q.rho.requires_grad = True
@@ -97,14 +105,17 @@ class MeanFieldVariationInference():
                                                                factor=self.lr_decay)
         #self._best_q = theta.detach().clone().cpu().numpy()
         #self._best_score = np.inf
-        score = []
+        self.score_elbo = []
+        self.score_entropy = []
+        self.score_logposterior = []
+
         for t in range(self.max_iter - 1):
             optimizer.zero_grad()
 
             theta = q.sample(self.n_ELBO_samples)
-            LQ = q.log_prob(theta).squeeze()
-            LP = self.objective_fn(theta)
-            loss = (LQ - LP).mean()
+            LQ = q.log_prob(theta).squeeze().mean()
+            LP = self.objective_fn(theta).mean()
+            loss = LQ - LP
 
             loss.backward()
 
@@ -114,17 +125,22 @@ class MeanFieldVariationInference():
                 stats = 'Epoch [{}/{}], Loss: {}, Learning Rate: {}'.format(t, self.max_iter, loss, lr)
                 print(stats)
 
-            score.append(loss.detach().clone().cpu().numpy())
+            #score.append(loss.detach().clone().cpu().numpy())
             scheduler.step(loss.detach().clone().cpu().numpy())
             optimizer.step()
 
-            #self._save_best_model(loss.detach().clone().cpu().numpy(), theta.detach().clone().cpu().numpy())
+            self._save_best_model(q,t, loss.detach().clone(), -LQ.detach().clone(), LP.detach().clone())
+
+            self.score_elbo.append(loss.detach().clone().cpu())
+            self.score_entropy.append(-LQ.detach().clone().cpu())
+            self.score_logposterior.append(LP.detach().clone().cpu())
 
             if lr < self.min_lr:
                 break
 
         #best_theta, best_score = self._get_best_model()
-        return q
+        best_epoch, scores=self._get_best_model(q)
+        return best_epoch, scores
 
 
 

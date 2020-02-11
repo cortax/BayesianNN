@@ -218,6 +218,7 @@ class GeNVariationalInference():
 
         self._best_score=float('inf')
 
+        self.tempdir_name = ''#tempfile.TemporaryDirectory()
 
 
 
@@ -280,7 +281,7 @@ class GeNVariationalInference():
         lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
         return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
 
-    def _save_best_model(self, GeN, score,epoch,ED,LP):
+    def _save_best_model(self, GeN, epoch, score,ED,LP):
         if score < self._best_score:
             torch.save({
                 'epoch': epoch,
@@ -288,11 +289,11 @@ class GeNVariationalInference():
                 'ELBO': score,
                 'ED':ED,
                 'LP':LP
-            }, 'best.pt') #TODO décider à quel endroit sauvegarder les modèles
+            }, self.tempdir_name+'best.pt')
             self._best_score=score
 
     def _get_best_model(self, GeN):
-        best= torch.load('best.pt')
+        best= torch.load(self.tempdir_name+'best.pt')
         GeN.load_state_dict(best['state_dict'])
         return best['epoch'], [best['ELBO'], best['ED'], best['LP']]
 
@@ -324,11 +325,11 @@ class GeNVariationalInference():
             self.score_entropy.append(ED.detach().clone().cpu())
             self.score_logposterior.append(LP.detach().clone().cpu())
 
-            self._save_best_model(GeN, L, t, ED, LP)
+            self._save_best_model(GeN, t,L.detach().clone(), ED.detach().clone(), LP.detach().clone())
 
             if lr < self.min_lr:
                 break
 
             optimizer.step()
-
-        return self._get_best_model(GeN)
+        best_epoch, scores =self._get_best_model(GeN)
+        return best_epoch, scores

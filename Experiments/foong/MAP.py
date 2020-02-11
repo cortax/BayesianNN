@@ -14,13 +14,14 @@ def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_l
     best_theta, best_score, score = optimizer.run(theta0)
 
     return best_theta, best_score, score
-                   
-def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False):
+
+
+def log_MAP_experiment(setup, ensemble_best_theta, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device):
     xpname = setup.experiment_name + '/MAP'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
-    
-    with mlflow.start_run(experiment_id=expdata.experiment_id, nested=nested): 
+
+    with mlflow.start_run(experiment_id=expdata.experiment_id):
         mlflow.set_tag('device', device)
         mlflow.set_tag('sigma noise', setup.sigma_noise)
         mlflow.set_tag('dimensions', setup.param_count)
@@ -33,25 +34,30 @@ def log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
 
-        if best_score is not None:
-            mlflow.log_metric("training loss", float(best_score))
-        if score is not None:
-            for t in range(len(score)):
-                mlflow.log_metric("training loss", float(score[t]), step=t)
+        for map in range(ensemble_size):
+            with mlflow.start_run(run_name=str(map),nested=True):
+                mlflow.log_metric("The logposterior", float(ensemble_best_score[map]))
+                for t in range(len(ensemble_score[map])):
+                    mlflow.log_metric("training loss", float(ensemble_score[map][t]),t)
 
-        if type(best_theta) is list:
-            theta = torch.cat([torch.tensor(a) for a in best_theta])
-        else:
-            theta = torch.tensor(best_theta)          
+        theta = torch.cat([torch.as_tensor(_) for _ in ensemble_best_theta])
 
         nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta)
         mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
         mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
         mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
 
-        mlflow.log_metric("MRSE_train", float(RSE_train[0].cpu().numpy()))
-        mlflow.log_metric("MRSE_validation", float(RSE_validation[0].cpu().numpy()))
-        mlflow.log_metric("MRSE_test", float(RSE_test[0].cpu().numpy()))
+        mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
+        mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
+        mlflow.log_metric("SnLPP_test", float(nLPP_test[1].cpu().numpy()))
+
+        mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
+        mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
+        mlflow.log_metric("MSE_test", float(RSE_test[0].cpu().numpy()))
+
+        mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
+        mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
+        mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
         fig = setup.makeValidationPlot(theta)
         tempdir = tempfile.TemporaryDirectory()
@@ -66,8 +72,9 @@ def MAP(setup, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, de
     ensemble_size = 1
     best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience,
                                              lr_decay, device, verbose)
-    
-    log_experiment(setup, best_theta, best_score, score, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, nested=False)
+
+
+    log_MAP_experiment(setup, [best_theta], [best_score], [score], ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
 
 def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
     objective_fn = setup.logposterior
@@ -82,7 +89,7 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
         ensemble_best_score.append(best_score)
         ensemble_score.append(score)
 
-    log_experiment(setup, ensemble_best_theta, None, None, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, True)
+    log_MAP_experiment(setup, ensemble_best_theta, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
 
 if __name__ == "__main__":
     # example the commande de run 
