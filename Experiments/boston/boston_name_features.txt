@@ -1,1 +1,0 @@
-Crim, Zn, Indus, Chas, Nox, Rm, Age, Dis, Rad, Tax, Ptratio, B, Lstat, Medv

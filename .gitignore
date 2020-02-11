@@ -3,6 +3,12 @@
 
 \.ipynb_checkpoints/
 
-\mlruns/
+\mlruns
+
+\.idea
 
 *.pyc
+
+Untitled.ipynb
+
+best.pt

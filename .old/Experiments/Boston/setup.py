@@ -45,7 +45,6 @@ def mlp(x, theta):
 def mlp(x,theta,layerwidth=layerwidth,nb_layers=nblayers,activation=activation):
     """
     Feedforward neural network used as the observation model for the likelihood
-    
 
     Parameters:
         x (Tensor): Input of the network of size NbExemples X NbDimensions
