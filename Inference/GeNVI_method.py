@@ -199,3 +199,130 @@ def GeNVI(objective_fn,
         optimizer.step()
 
     return
+
+
+class GeNVariationalInference():
+    def __init__(self, objective_fn,
+                 GeN, kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
+                 max_iter, learning_rate, min_lr, patience, lr_decay,
+                 device, verbose):
+        self.objective_fn = objective_fn
+        self.max_iter = max_iter
+        self.n_ELBO_samples = n_ELBO_samples
+        self.learning_rate = learning_rate
+        self.min_lr = min_lr
+        self.patience = patience
+        self.lr_decay = lr_decay
+        self.device = device
+        self.verbose = verbose
+
+        if kNNE == 0:
+            self.entropy= lambda GeN: -KDE(GeN(n_samples_ED), GeN.sample(n_samples_KDE)).mean()
+        else:
+            self.entropy= lambda GeN: NNE = NNE(GeN(n_samples_NNE), kNNE)
+
+        self._best_score = float('inf')
+
+    def KDE(x, x_kde):
+        """
+        KDE
+
+        Parameters:
+            x (Tensor): Inputs, NbExemples X NbDimensions
+            x_kde (Tensor):  Batched samples, NbBatch x NbSamples X NbDimensions
+
+
+        Returns:
+            (Tensor) KDE log estimate for x based on batched diagonal "Silverman's rule of thumb", NbExemples
+            See Wand and Jones p.111 "Kernel Smoothing" 1995.
+
+        """
+
+        dim=x.shape[-1]
+        n_ed=x.shape[0]
+        n_comp=x_kde.shape[0]
+        n_kde=x_kde.shape[1]
+        c_=(n_kde*(dim+2))/4
+        c=torch.as_tensor(c_).pow(2/(dim+4)).to(self.device)
+        H=(x_kde.var(1) / c).clamp(torch.finfo().eps, float('inf'))
+
+        d=((x_kde.view(n_comp, n_kde, 1, dim) - x.view(1, 1, n_ed, dim)) ** 2)
+        H_=H.view(n_comp,dim,1,1).inverse().view(n_comp,1,1,dim)
+        const=0.5*H.log().sum(1)+0.5*dim*torch.tensor(2*math.pi).log()
+        const=const.view(n_comp,1,1)
+        ln=-0.5*(H_*d).sum(3)-const
+        N=torch.as_tensor(float(n_comp*n_kde), device=self.device)
+        return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
+
+    def NNE(theta,k=1):
+        """
+        Parameters:
+            theta (Tensor): Samples, NbExemples X NbDimensions
+            k (Int): ordinal number
+
+        Returns:
+            (Float) k-Nearest Neighbour Estimation of the entropy of theta
+
+        """
+        nb_samples=theta.shape[0]
+        dim=theta.shape[1]
+        D=torch.cdist(theta,theta)
+        a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf')).to(device)
+        d=torch.as_tensor(float(dim), device=self.device)
+        K=torch.as_tensor(float(k), device=self.device)
+        N=torch.as_tensor(float(nb_samples), device=self.device)
+        pi=torch.as_tensor(math.pi, device=self.device)
+        lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
+        return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+
+    def _save_best_model(self, GeN, score,epoch,ED,LP):
+        if score < self._best_score:
+            torch.save({
+                'epoch': epoch,
+                'state_dict': GeN.state_dict(),
+                'ELBO': score,
+                'ED':ED,
+                'LP':LP
+            }, 'best.pt') #TODO décider à quel endroit sauvegarder les modèles
+            self._best_score=score
+
+    def _get_best_model(self, GeN):
+        best= torch.load('best.pt')
+        Gen.load_state_dict(best['state_dict'])
+        return GeN, best['epoch'], best['ELBO'], best['ED'], best['LP']
+
+    def run(self, GeN):
+        optimizer = torch.optim.Adam(GeN.parameters(), lr=self.learning_rate)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
+                                                               factor=self.lr_decay)
+
+        score_elbo = []
+        score_entropy = []
+        score_logposterior = []
+        for t in range(self.max_iter):
+            optimizer.zero_grad()
+
+            ED = entropy(GeN)
+            LP = self.objective_fn(GeN(self.n_samples_LP)).mean()
+            L = -ED - LP
+            L.backward()
+
+            lr = optimizer.param_groups[0]['lr']
+
+            scheduler.step(L.detach().clone().cpu().numpy())
+
+            if verbose:
+                stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t, self.max_iter, L, lr)
+                print(stats)
+
+            score_elbo.append(L.detach().clone.cpu())
+            score_entropy.append(ED.detach().clone.cpu())
+            score_logposterior.append(LP.detach().clone.cpu())
+            self._save_best_model(L, t, ED, LP)
+
+            if lr < min_lr:
+                break
+
+            optimizer.step()
+
+        return self._get_best_model(GeN), score_elbo, score_entropy, score_logposterior
