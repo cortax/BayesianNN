@@ -54,7 +54,7 @@ class Setup(AbstractRegressionSetup):
             [tensor] -- MxNx1 tensor of predictions
         """
         assert type(theta) is torch.Tensor
-        y_pred = self._model(X, theta)
+        y_pred = self._model(X.to(device), theta)
         if hasattr(self, '_scaler_y'):
             y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device) + torch.tensor(self._scaler_y.mean_, device=device)
         return y_pred
@@ -70,7 +70,7 @@ class Setup(AbstractRegressionSetup):
             LL (Tensor): M x N (models x data)
         """
         y_pred = self._normalized_prediction(X, theta,device) # MxNx1 tensor
-        return NormalLogLikelihood(y_pred, y, sigma_noise)
+        return NormalLogLikelihood(y_pred, y.to(device), sigma_noise)
 
     def logposterior(self, theta):
         return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device), dim=1)
@@ -87,7 +87,7 @@ class Setup(AbstractRegressionSetup):
     #     RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test)
     #     return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
 
-    def makePlot(self, theta):
+    def makePlot(self, theta,device):
         # def get_linewidth(linewidth, axis):
         #     fig = axis.get_figure()
         #     ppi = 72  # matplolib points per inches
@@ -106,7 +106,7 @@ class Setup(AbstractRegressionSetup):
         linewidth=1.0
         alpha = (.9 / torch.tensor(float(nb_samples_plot)).sqrt()).clamp(0.01, 1.)
         for i in range(theta.shape[0]):
-            y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0))
+            y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0),device)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=alpha, linewidth=linewidth, color='green')
          #   plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
         return plt

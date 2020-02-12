@@ -48,8 +48,8 @@ def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
         mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
         mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
 
-def log_exp_metrics(evaluate_metrics, theta_ens):
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device = 'cpu')
+def log_exp_metrics(evaluate_metrics, theta_ens, device):
+    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device)
     mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
@@ -66,8 +66,8 @@ def log_exp_metrics(evaluate_metrics, theta_ens):
     mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
     mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
-def draw_foong_experiment(setup, theta):
-	fig = setup.makePlot(theta)
+def draw_foong_experiment(setup, theta,device):
+	fig = setup.makePlot(theta,device)
 	tempdir = tempfile.TemporaryDirectory()
 	fig.savefig(tempdir.name + '/validation.png')
 	mlflow.log_artifact(tempdir.name + '/validation.png')
@@ -85,14 +85,14 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
     expdata = mlflow.get_experiment_by_name(xpname)
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
-        theta_ens=q.sample(5000).detach().cpu()
+        theta_ens=q.sample(1000).detach().cpu()
         log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
                             ensemble_size, init_std, n_ELBO_samples,
                             max_iter, learning_rate, min_lr, patience, lr_decay,
                             device)
-        log_exp_metrics(setup.evaluate_metrics, theta_ens)
+        log_exp_metrics(setup.evaluate_metrics, theta_ens,'cpu')
         theta_ens = q.sample(1000).detach().cpu()
-        draw_foong_experiment(setup, theta_ens)
+        draw_foong_experiment(setup, theta_ens, 'cpu')
 
 
 # def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
