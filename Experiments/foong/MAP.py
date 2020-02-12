@@ -40,7 +40,7 @@ def log_MAP_experiment(setup, ensemble_best_theta, ensemble_best_score, ensemble
                 for t in range(len(ensemble_score[map])):
                     mlflow.log_metric("training loss", float(ensemble_score[map][t]),t)
 
-        theta = torch.cat([torch.as_tensor(_) for _ in ensemble_best_theta])
+        theta = torch.stack([torch.as_tensor( _).squeeze() for _ in ensemble_best_theta])
 
         nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta)
         mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
