@@ -15,7 +15,7 @@ class AbstractRegressionSetup(ABC):
         self.plot = False
         pass
 
-    def evaluate_metrics(self, theta,device=self.device):
+    def evaluate_metrics(self, theta,device):
         theta = theta.to(device)
         nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train)
         nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation)

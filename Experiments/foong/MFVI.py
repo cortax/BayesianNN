@@ -49,7 +49,7 @@ def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
         mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
 
 def log_exp_metrics(evaluate_metrics, theta_ens):
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens)
+    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device = 'cpu')
     mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
