@@ -1,7 +1,7 @@
 import torch
 
 
-def RSE(prediction_fn,theta,X,y):
+def RSE(prediction_fn,theta,X,y,device):
     """
     Root Mean Squared Error and Root Std Squared Error
     Args:
@@ -16,13 +16,13 @@ def RSE(prediction_fn,theta,X,y):
 
     """
 
-    y_pred =prediction_fn(X, theta).mean(0)
+    y_pred =prediction_fn(X, theta,device).mean(0)
     SE=(y_pred-y)**2
     MSE=torch.mean(SE)
     StdSE=torch.std(SE)
     return (MSE,StdSE)
 
-def nLPP(loglikelihood_fn, theta, X, y):
+def nLPP(loglikelihood_fn, theta, X, y, device):
     """
     NLPD from Quinonero-Candela and al.
     NLL from others
@@ -37,7 +37,7 @@ def nLPP(loglikelihood_fn, theta, X, y):
     Returns:
         (Mean, Std) for Log Posterior Predictive of ensemble Theta on data (X,y)
     """
-    L = loglikelihood_fn(theta, X, y)
+    L = loglikelihood_fn(theta, X, y,device)
     M = torch.tensor(theta.shape[0]).type_as(theta)
     LPP = torch.logsumexp(L, 0) - torch.log(M)
     MnLPP=torch.mean(-LPP)
