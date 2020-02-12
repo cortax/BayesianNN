@@ -22,7 +22,7 @@ class AbstractRegressionSetup(ABC):
         nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test.to(device),device)
 
         RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train.to(device),device)
-        RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation.to(device), self._y_validation,device)
+        RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation.to(device),device)
         RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test.to(device),device)
         return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
     # @abstractmethod
