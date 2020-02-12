@@ -17,7 +17,7 @@ def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, pa
     return q0, the_epoch, the_scores, log_scores
 
                    
-def log_MFVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
+def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
                          ensemble_size, init_std,  n_ELBO_samples,
                          max_iter, learning_rate, min_lr, patience, lr_decay,
                          device):
@@ -48,7 +48,8 @@ def log_MFVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
         mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
         mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
 
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta_ens)
+def log_exp_metrics(evaluate_metrics, theta_ens):
+    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens)
     mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
@@ -84,11 +85,12 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
     expdata = mlflow.get_experiment_by_name(xpname)
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
-        theta_ens=q.sample(10000).detach().cpu()
-        log_MFVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
+        theta_ens=q.sample(1000).detach().cpu()
+        log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
                             ensemble_size, init_std, n_ELBO_samples,
                             max_iter, learning_rate, min_lr, patience, lr_decay,
                             device)
+        log_exp_metrics(setup.evaluate_metrics, theta_ens)
         theta_ens = q.sample(1000).detach().cpu()
         draw_foong_experiment(setup, theta_ens)
 

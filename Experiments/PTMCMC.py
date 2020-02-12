@@ -104,7 +104,6 @@ if __name__ == "__main__":
     #temperatureNoiseReductionFactor: temperature factor for jump lenght in MCMC sampling ## DO NOT TOUCH!
     #temperatures= 1., .9 ,.8, .7, .6 , .5... to try
 
-    #TODO log ladder acceptance  swapAcceptanceRate,
 
 
     parser = argparse.ArgumentParser()
