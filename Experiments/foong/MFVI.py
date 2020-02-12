@@ -11,7 +11,7 @@ def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, pa
     optimizer = MeanFieldVariationInference(objective_fn, max_iter, n_ELBO_samples,
                                             learning_rate, min_lr, patience, lr_decay,  device, verbose)
 
-    q0 = MeanFieldVariationalDistribution(param_count, sigma=0.0000001, device=device)
+    q0 = MeanFieldVariationalDistribution(param_count,mu=0.0, sigma=0.0000001, device=device)
     the_epoch, the_scores = optimizer.run(q0)
     log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
     return q0, the_epoch, the_scores, log_scores

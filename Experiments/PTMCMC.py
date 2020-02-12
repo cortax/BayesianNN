@@ -2,7 +2,7 @@ import torch
 import argparse
 import mlflow
 import tempfile
-from Experiments.foong import Setup
+from Experiments import switch_setup
 from Inference.MCMC import PTMCMCSampler
 
 
@@ -96,6 +96,7 @@ if __name__ == "__main__":
     #burnin about 10% - 50%
     #thinning given by ensemble_size
     #ensemble size for metrics 10'000
+    # 10'000*thinning=numiter-burnin
     #ensemble_size for plotting
     #maintempindex index of temperature 1.0
     #baseMHproposalNoise
@@ -107,6 +108,8 @@ if __name__ == "__main__":
 
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--setup", type=int, default=1000,
+                        help="data setup on which use the method")
     parser.add_argument("--numiter", type=int, default=1000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burnin", type=int, default=0,
@@ -131,6 +134,8 @@ if __name__ == "__main__":
                         help="force device to be used")
     args = parser.parse_args()
     print(args)
+
+    switch_setup(args.setup)
 
     setup = Setup(args.device)
 

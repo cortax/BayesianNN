@@ -7,7 +7,7 @@ import importlib.util
 def switch_setup(spec):
     return {
         'foong':  importlib.util.spec_from_file_location("Experiments.foong"),#, "/path/to/file.py")
-        'boston': importlib.util.spec_from_file_location("Experiments.foong"),
+        'boston': importlib.util.spec_from_file_location("Experiments.boston"),
     }.get(setup, 'setup not found')
 
 class AbstractRegressionSetup(ABC):

@@ -88,6 +88,13 @@ class Setup(AbstractRegressionSetup):
     #     return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
 
     def makePlot(self, theta):
+        # def get_linewidth(linewidth, axis):
+        #     fig = axis.get_figure()
+        #     ppi = 72  # matplolib points per inches
+        #     length = fig.bbox_inches.height * axis.get_position().height
+        #     value_range = np.diff(axis.get_ylim())[0]
+        #     return linewidth * ppi * length / value_range
+        nb_samples_plot=theta.shape[0]
         x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1)
         fig, ax = plt.subplots()
         fig.set_size_inches(11.7, 8.27)
@@ -95,11 +102,13 @@ class Setup(AbstractRegressionSetup):
         plt.ylim(-4, 4)
         plt.grid(True, which='major', linewidth=0.5)
         plt.title('Validation set')
-        plt.scatter(self._X_validation.cpu(), self._y_validation.cpu())
+        plt.scatter(self._X_test.cpu(), self._y_test.cpu())
+        linewidth=1.0
+        alpha = (.9 / torch.tensor(float(nb_samples_plot)).sqrt()).clamp(0.01, 1.)
         for i in range(theta.shape[0]):
-            y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0)) 
-            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=1.0, linewidth=1.0, color='black')
-            plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
+            y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0))
+            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=alpha, linewidth=linewidth, color='green')
+         #   plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
         return plt
         
 
