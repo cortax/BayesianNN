@@ -26,6 +26,8 @@ class Setup(AbstractRegressionSetup):
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
 
+        self.plot = False
+
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
 
@@ -92,12 +94,22 @@ class Setup(AbstractRegressionSetup):
         return self._logprior(theta) + self._loglikelihood(theta, self._X_train, self._y_train).sum(dim=1)
 
     # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
+    # def evaluate_metrics(self, theta):
+    #     theta = theta.to(self.device)
+    #     avgNLL_train = avgNLL(self._loglikelihood, theta, self._X_train, self._y_train)
+    #     avgNLL_validation = avgNLL(self._loglikelihood, theta, self._X_validation, self._y_validation)
+    #     avgNLL_test = avgNLL(self._loglikelihood, theta, self._X_test, self._y_test)
+    #
+    #     return avgNLL_train, avgNLL_validation, avgNLL_test
+
     def evaluate_metrics(self, theta):
         theta = theta.to(self.device)
-        avgNLL_train = avgNLL(self._loglikelihood, theta, self._X_train, self._y_train)
-        avgNLL_validation = avgNLL(self._loglikelihood, theta, self._X_validation, self._y_validation)
-        avgNLL_test = avgNLL(self._loglikelihood, theta, self._X_test, self._y_test)
+        nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train)
+        nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation)
+        nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test)
 
-        return avgNLL_train, avgNLL_validation, avgNLL_test
-
+        RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train)
+        RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation)
+        RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test)
+        return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
         

@@ -6,7 +6,7 @@ from Experiments.foong import Setup
 from Inference.MCMC import PTMCMCSampler
 
 
-def learning(objective_fn, param_count, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device):
+def learning(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
     sampler = PTMCMCSampler(
         objective_fn, param_count, baseMHproposalNoise, temperatureNoiseReductionFactor, temperatures, device)
         
@@ -17,11 +17,20 @@ def learning(objective_fn, param_count, numiter, burnin, thinning, temperatures,
 
     return ensemble, chains, ladderAcceptanceRate, swapAcceptanceRate, logProba
 
-def log_PTMCM_experiment(setup, theta_ens, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device='cpu'):
+def log_exp_params(param_count, ladderAcceptanceRate, swapAcceptanceRate, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device='cpu'):
 
     mlflow.set_tag('device', device)
-    mlflow.set_tag('dimensions', setup.param_count)
+    mlflow.set_tag('dimensions', param_count)
+
     mlflow.set_tag('temperatures', temperatures)
+
+    ladderAcceptanceRate=[float('{0:.2f}'.format(_)) for _ in ladderAcceptanceRate.tolist()]
+    mlflow.set_tag('ladderAcceptanceRate', ladderAcceptanceRate)
+
+    swapAcceptanceRate=[float('{0:.2f}'.format(_)) for _ in swapAcceptanceRate.tolist()]
+    mlflow.set_tag('swapAcceptanceRate', swapAcceptanceRate)
+
+
 
     mlflow.log_param('numiter', numiter)
     mlflow.log_param('burnin', burnin)
@@ -32,8 +41,8 @@ def log_PTMCM_experiment(setup, theta_ens, numiter, burnin, thinning, temperatur
     mlflow.log_param('baseMHproposalNoise', baseMHproposalNoise)
     mlflow.log_param('std_init',std_init)
 
-
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta_ens)
+def log_exp_metrics(evaluate_metrics,theta_ens):
+    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens)
     mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
@@ -51,19 +60,15 @@ def log_PTMCM_experiment(setup, theta_ens, numiter, burnin, thinning, temperatur
     mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
 
-def draw_experiment_plot(setup, theta):
-	fig = setup.makeValidationPlot(theta)
+def draw_experiment_plot(makePlot_fn, theta):
+	fig = makePlot_fn(theta)
 	tempdir = tempfile.TemporaryDirectory()
 	fig.savefig(tempdir.name + '/validation.png')
 	mlflow.log_artifact(tempdir.name + '/validation.png')
 	fig.close()
 
-def PTMCMC(setup, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
-    objective_fn = setup.logposterior
-    param_count = setup.param_count
-    device = setup.device
-
-    ensemble = learning(objective_fn, param_count, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device)
+def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
+    ensemble = learning(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize)
     return ensemble
 
 
@@ -129,15 +134,15 @@ if __name__ == "__main__":
     setup = Setup(args.device)
 
     temperatures = [float(n) for n in args.temperatures.split(',')]
-
-
-    output=PTMCMC(setup, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)
+    theta_ens, _ ,  ladderAcceptanceRate, swapAcceptanceRate, _ =learning(setup.logposterior, setup.param_count, setup.device, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)
 
     xpname = setup.experiment_name + '/PTMCMC'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
-        theta_ens = torch.cat(output[0])
-        log_PTMCM_experiment(setup, theta_ens, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
-        draw_experiment_plot(setup, theta_ens)
+        theta = torch.cat(theta_ens)
+        log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
+        log_exp_metrics(setup.evaluate_metrics,theta)
+        if setup.plot:
+            draw_experiment_plot(setup.makePlot, theta)

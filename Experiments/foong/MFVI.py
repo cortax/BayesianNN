@@ -66,7 +66,7 @@ def log_MFVI_experiment(setup, theta_ens, the_epoch, the_scores, log_scores,
     mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
 def draw_foong_experiment(setup, theta):
-	fig = setup.makeValidationPlot(theta)
+	fig = setup.makePlot(theta)
 	tempdir = tempfile.TemporaryDirectory()
 	fig.savefig(tempdir.name + '/validation.png')
 	mlflow.log_artifact(tempdir.name + '/validation.png')

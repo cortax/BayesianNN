@@ -25,6 +25,8 @@ class Setup(AbstractRegressionSetup):
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
 
+        self.plot = True
+
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
         self._preparare_data()
@@ -74,18 +76,18 @@ class Setup(AbstractRegressionSetup):
         return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train), dim=1)
 
     # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
-    def evaluate_metrics(self, theta):
-        theta = theta.to(self.device)
-        nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train)
-        nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation)
-        nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test)
+    # def evaluate_metrics(self, theta):
+    #     theta = theta.to(self.device)
+    #     nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train)
+    #     nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation)
+    #     nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test)
+    #
+    #     RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train)
+    #     RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation)
+    #     RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test)
+    #     return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
 
-        RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train)
-        RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation)
-        RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test)
-        return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
-
-    def makeValidationPlot(self, theta):
+    def makePlot(self, theta):
         x_lin = torch.linspace(-2.0, 2.0).unsqueeze(1)
         fig, ax = plt.subplots()
         fig.set_size_inches(11.7, 8.27)

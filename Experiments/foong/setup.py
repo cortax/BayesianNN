@@ -49,7 +49,7 @@ def get_linewidth(linewidth, axis):
     value_range = np.diff(axis.get_ylim())[0]
     return linewidth*ppi*length/value_range
 
-def plot_test(x_train, y_train, x_test,y_test,theta, model):
+def make_plot(x_train, y_train, x_test, y_test, theta, model):
     tempdir = tempfile.TemporaryDirectory()
     
     

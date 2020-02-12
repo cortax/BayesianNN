@@ -16,15 +16,10 @@ def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_l
     return best_theta, best_score, score
 
 
-def log_MAP_experiment(setup, ensemble_best_theta, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device):
-    xpname = setup.experiment_name + '/MAP'
-    mlflow.set_experiment(xpname)
-    expdata = mlflow.get_experiment_by_name(xpname)
-
-    with mlflow.start_run(experiment_id=expdata.experiment_id):
+def log_experiment(param_count, sigma_noise, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device):
         mlflow.set_tag('device', device)
-        mlflow.set_tag('sigma noise', setup.sigma_noise)
-        mlflow.set_tag('dimensions', setup.param_count)
+        mlflow.set_tag('sigma noise', sigma_noise)
+        mlflow.set_tag('dimensions', param_count)
 
         mlflow.log_param('ensemble_size', ensemble_size)
         mlflow.log_param('init_std', init_std)
@@ -40,9 +35,10 @@ def log_MAP_experiment(setup, ensemble_best_theta, ensemble_best_score, ensemble
                 for t in range(len(ensemble_score[map])):
                     mlflow.log_metric("training loss", float(ensemble_score[map][t]),t)
 
-        theta = torch.stack([torch.as_tensor( _).squeeze() for _ in ensemble_best_theta])
 
-        nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = setup.evaluate_metrics(theta)
+
+def log_exp_metrics(evaluate_metrics, theta):
+        nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta)
         mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
         mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
         mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
@@ -59,11 +55,12 @@ def log_MAP_experiment(setup, ensemble_best_theta, ensemble_best_score, ensemble
         mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
         mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
-        fig = setup.makeValidationPlot(theta)
-        tempdir = tempfile.TemporaryDirectory()
-        fig.savefig(tempdir.name+'/validation.png')
-        mlflow.log_artifact(tempdir.name+'/validation.png')
-        fig.close()
+def draw_experiment_plot(makePlot_fn, theta):
+    fig = makePlot_fn(theta)
+    tempdir = tempfile.TemporaryDirectory()
+    fig.savefig(tempdir.name + '/validation.png')
+    mlflow.log_artifact(tempdir.name + '/validation.png')
+    fig.close()
 
 def MAP(setup, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
     objective_fn = setup.logposterior
@@ -77,6 +74,7 @@ def MAP(setup, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, de
     log_MAP_experiment(setup, [best_theta], [best_score], [score], ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
 
 def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
+    global best_score
     objective_fn = setup.logposterior
     param_count = setup.param_count
     device = setup.device
@@ -89,7 +87,17 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
         ensemble_best_score.append(best_score)
         ensemble_score.append(score)
 
-    log_MAP_experiment(setup, ensemble_best_theta, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
+    xpname = setup.experiment_name + '/MAP'
+    mlflow.set_experiment(xpname)
+    expdata = mlflow.get_experiment_by_name(xpname)
+
+    theta = torch.stack([torch.as_tensor(_).squeeze() for _ in ensemble_best_theta])
+
+    with mlflow.start_run(experiment_id=expdata.experiment_id):
+        log_experiment(param_count,  setup.sigma_noise, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
+        log_exp_metrics(setup.evaluate_metrics,theta)
+        if setup.plot:
+            draw_experiment_plot(setup.makePlot, theta)
 
 if __name__ == "__main__":
     # example the commande de run 
@@ -119,10 +127,10 @@ if __name__ == "__main__":
 
     setup = Setup(args.device)
 
-    if args.ensemble_size > 1:
-        eMAP(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
-    else:
-        MAP(setup, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
+ #   if args.ensemble_size > 1:
+    eMAP(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
+ #   else:
+ #       MAP(setup, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
     
 
     
