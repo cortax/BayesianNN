@@ -44,7 +44,7 @@ class Setup(AbstractRegressionSetup):
         return logmvn01pdf(theta)
 
     # il faudra des méthodes normalize/inverse, car il la normalization est hard-coder
-    def _normalized_prediction(self, X, theta,device=self.device):
+    def _normalized_prediction(self, X, theta,device):
         """Predict raw inverse normalized values for M models on N data points of D-dimensions
         Arguments:
             X {[tensor]} -- Tensor of size NxD 
@@ -60,7 +60,7 @@ class Setup(AbstractRegressionSetup):
         return y_pred
 
     # TODO remonter à Experiments
-    def _loglikelihood(self, theta, X, y,device=self.device):
+    def _loglikelihood(self, theta, X, y,device):
         """
         parameters:
             theta (Tensor): M x param_count (models)
@@ -73,7 +73,7 @@ class Setup(AbstractRegressionSetup):
         return NormalLogLikelihood(y_pred, y, sigma_noise)
 
     def logposterior(self, theta):
-        return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train), dim=1)
+        return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device), dim=1)
 
     # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
     # def evaluate_metrics(self, theta):
