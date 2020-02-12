@@ -44,7 +44,7 @@ class Setup(AbstractRegressionSetup):
         return logmvn01pdf(theta)
 
     # il faudra des méthodes normalize/inverse, car il la normalization est hard-coder
-    def _normalized_prediction(self, X, theta):
+    def _normalized_prediction(self, X, theta,device=self.device):
         """Predict raw inverse normalized values for M models on N data points of D-dimensions
         Arguments:
             X {[tensor]} -- Tensor of size NxD 
@@ -56,11 +56,11 @@ class Setup(AbstractRegressionSetup):
         assert type(theta) is torch.Tensor
         y_pred = self._model(X, theta)
         if hasattr(self, '_scaler_y'):
-            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=self.device) + torch.tensor(self._scaler_y.mean_, device=self.device)
+            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device) + torch.tensor(self._scaler_y.mean_, device=device)
         return y_pred
 
     # TODO remonter à Experiments
-    def _loglikelihood(self, theta, X, y):
+    def _loglikelihood(self, theta, X, y,device=self.device):
         """
         parameters:
             theta (Tensor): M x param_count (models)
@@ -69,7 +69,7 @@ class Setup(AbstractRegressionSetup):
         output:
             LL (Tensor): M x N (models x data)
         """
-        y_pred = self._normalized_prediction(X, theta) # MxNx1 tensor
+        y_pred = self._normalized_prediction(X, theta,device) # MxNx1 tensor
         return NormalLogLikelihood(y_pred, y, sigma_noise)
 
     def logposterior(self, theta):
