@@ -79,9 +79,9 @@ if __name__ == "__main__":
                         help="number of initial samples to skip in the Markov chain")
     parser.add_argument("--thinning", type=int, default=None,
                         help="subsampling factor of the Markov chain")
-    parser.add_argument("--temperatures", type=str, default=None,
-                        help="temperature ladder in the form [t0, t1, t2, t3]")
-    parser.add_argument("--maintempindex", type=int, default=None,
+    parser.add_argument("--temperatures", type=str, default='1.0,.9,.8,.7',
+                        help="temperature ladder in the form t0, t1, t2, t3")
+    parser.add_argument("--maintempindex", type=int, default=0,
                         help="index of the temperature to use to make the chain (ex: 0 for t0)")
     parser.add_argument("--baseMHproposalNoise", type=float, default=0.01,
                         help="standard-deviation of the isotropic proposal")
@@ -96,10 +96,17 @@ if __name__ == "__main__":
     parser.add_argument("--device", type=str, default=None,
                         help="force device to be used")
     args = parser.parse_args()
+
+    if args.burnin is None:
+        args.burnin =int(0.2*args.numiter)
+
+
+    theta_ens_size=10000
+    if args.thinning is None:
+        args.thinning=max(1,int((args.numiter-args.burnin)/theta_ens_size))
+        #numiter-burnin=thinning theta_ens_size
+
     print(args)
-
-    if burnin is None and thinning is None:
-
 
     setup =get_setup(args.setup,args.device)
 
