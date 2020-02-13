@@ -98,7 +98,7 @@ parser.add_argument("--n_samples_ED", type=int, default=50,
                     help="number of samples for MC estimation of differential entropy")
 parser.add_argument("--n_samples_LP", type=int, default=100,
                     help="number of samples for MC estimation of expected logposterior")
-parser.add_argument("--max_iter", type=int, default=100000,
+parser.add_argument("--max_iter", type=int, default=5000,
                     help="maximum number of learning iterations")
 parser.add_argument("--learning_rate", type=float, default=0.08,
                     help="initial learning rate of the optimizer")

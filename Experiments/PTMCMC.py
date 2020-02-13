@@ -54,6 +54,7 @@ def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, tempera
 if __name__ == "__main__":
     # example the commande de run 
     #  python -m Experiments.foong.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
+    # python -m Experiments.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #  python -m Experiments.foong.PTMCMC --numiter=10000 --burnin=100 --thinning=10 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #numiter as big as possible
     #burnin about 10% - 50%
