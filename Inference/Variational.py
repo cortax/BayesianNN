@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+import math
 
 
 class MeanFieldVariationalDistribution(nn.Module):
@@ -7,25 +8,30 @@ class MeanFieldVariationalDistribution(nn.Module):
         super(MeanFieldVariationalDistribution, self).__init__()
         self.device = device
         self.nb_dim = nb_dim
-        self.mu = nn.Parameter(torch.Tensor(nb_dim).to(self.device), requires_grad=True)
+
         self.rho = nn.Parameter(torch.Tensor(nb_dim).to(self.device), requires_grad=True)
 
         if not torch.is_tensor(mu):
             mu = torch.tensor(mu)
-            
+            self.mu = nn.Parameter(torch.Tensor(nb_dim).to(self.device), requires_grad=True)
+            nn.init.constant_(self.mu, mu)
+        else:
+            self.mu = nn.Parameter(mu.to(self.device), requires_grad=True)
+
         if not torch.is_tensor(sigma):
             sigma = torch.tensor(sigma)
-        
-        rho = torch.log(torch.exp(sigma) - 1)
-        
-        nn.init.constant_(self.mu, mu)
-        nn.init.constant_(self.rho, rho)
-        
+            rho = torch.log(torch.exp(sigma) - 1)
+            nn.init.constant_(self.rho, rho)
+
+
+
+
+
     def set_mu(self, mu):
         if not torch.is_tensor(mu):
             mu = torch.tensor(mu).float()
         nn.init.constant_(self.mu, mu)
-        
+
     def set_rho(self, rho):
         if not torch.is_tensor(rho):
             rho = torch.tensor(rho).float()
@@ -58,9 +64,19 @@ class MeanFieldVariationalDistribution(nn.Module):
         self.mu.requires_grad_(b)
         self.rho.requires_grad_(b)
 
-    def log_prob(self, z):
-        S = torch.diag(self.sigma)
-        return torch.distributions.multivariate_normal.MultivariateNormal(self.mu, scale_tril=S).log_prob(z).unsqueeze(-1)
+    def log_prob(self, x):
+        S = self.sigma
+        mu = self.mu
+        dim=self.nb_dim
+        n_x=x.shape[0]
+        H=S.view(dim,1,1).inverse().view(1,1,dim)
+        d=((x-mu.view(1,dim))**2).view(n_x,dim)
+        const=0.5*S.log().sum()+0.5*dim*torch.tensor(2*math.pi).log()
+        return -0.5*(H*d).sum(2).squeeze()-const
+
+    # def log_prob(self, z):
+    #     S = torch.diag(self.sigma)
+    #     return torch.distributions.multivariate_normal.MultivariateNormal(self.mu, scale_tril=S).log_prob(z).unsqueeze(-1)
 
 
 class MeanFieldVariationInference():
