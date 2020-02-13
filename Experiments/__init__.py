@@ -15,7 +15,8 @@ from Tools import logmvn01pdf, NormalLogLikelihood
 def switch_setup(setup):
     return {
         'foong':  importlib.util.spec_from_file_location("foong", "Experiments/foong/__init__.py") ,
-        'boston': importlib.util.spec_from_file_location("boston", "Experiments/boston/__init__.py")
+        'boston': importlib.util.spec_from_file_location("boston", "Experiments/boston/__init__.py"),
+        'california': importlib.util.spec_from_file_location("california", "Experiments/california/__init__.py")
     }[setup]
 
 def get_setup(setup,device):
