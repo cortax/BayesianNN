@@ -2,9 +2,8 @@ import torch
 import argparse
 import mlflow
 
-from Experiments.foong import Setup
 from Inference.PointEstimate import AdamGradientDescent
-from Experiments import log_exp_metrics, draw_experiment, switch_setup
+from Experiments import log_exp_metrics, draw_experiment, get_setup
 
 
 def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
@@ -70,6 +69,8 @@ if __name__ == "__main__":
     # python -m Experiments.foong.MAP --max_iter=10000 --init_std=0.1 --learning_rate=0.1 --min_lr=0.0001 --patience=100 --lr_decay=0.9 --device=cpu --verbose=1
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--setup", type=str, default=None,
+                        help="data setup on which run the method")
     parser.add_argument("--ensemble_size", type=int, default=1,
                         help="number of models to use in the ensemble")
     parser.add_argument("--init_std", type=float, default=1.0,
@@ -91,7 +92,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    setup = Setup(args.device)
+    setup =get_setup(args.setup,args.device)
+
 
     eMAP(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.verbose)
 

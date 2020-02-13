@@ -2,10 +2,9 @@ import torch
 import argparse
 import mlflow
 
-from Experiments.foong import Setup
 from Inference.MCMC import PTMCMCSampler
 
-from Experiments import log_exp_metrics, draw_experiment
+from Experiments import log_exp_metrics, draw_experiment, get_setup
 
 
 def learning(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
@@ -54,7 +53,7 @@ def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, tempera
 if __name__ == "__main__":
     # example the commande de run 
     #  python -m Experiments.foong.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
-    # python -m Experiments.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
+    # python -m Experiments.PTMCMC --setup=foong --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #  python -m Experiments.foong.PTMCMC --numiter=10000 --burnin=100 --thinning=10 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #numiter as big as possible
     #burnin about 10% - 50%
@@ -70,6 +69,8 @@ if __name__ == "__main__":
 
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--setup", type=str, default=None,
+                        help="data setup on which run the method")
     parser.add_argument("--numiter", type=int, default=1000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burnin", type=int, default=0,
@@ -95,7 +96,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    setup = Setup(args.device)
+    setup =get_setup(args.setup,args.device)
 
     temperatures = [float(n) for n in args.temperatures.split(',')]
     theta_ens, _ ,  ladderAcceptanceRate, swapAcceptanceRate, _ =learning(setup.logposterior, setup.param_count, setup.device, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)

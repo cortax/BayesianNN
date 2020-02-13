@@ -1,8 +1,8 @@
 import argparse
 import mlflow
-from Experiments.foong import Setup
+
 from Inference.Variational import MeanFieldVariationInference, MeanFieldVariationalDistribution
-from Experiments import log_exp_metrics, draw_experiment
+from Experiments import log_exp_metrics, draw_experiment, get_setup
 import torch
 
 def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
@@ -76,6 +76,8 @@ if __name__ == "__main__":
     # python -m Experiments.foong.MFVI --ensemble_size=1 --max_iter=100 --init_std=0.1 --learning_rate=0.1 --min_lr=0.0001 --patience=100 --lr_decay=0.9 --device=cuda:0 --verbose=1 --n_ELBO_samples=100
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--setup", type=str, default=None,
+                        help="data setup on which run the method")
     parser.add_argument("--ensemble_size", type=int, default=1,
                         help="number of models to use in the ensemble")
     parser.add_argument("--max_iter", type=int, default=100000,
@@ -105,7 +107,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    setup = Setup(args.device)
+    setup =get_setup(args.setup,args.device)
 
     if args.ensemble_size > 1:
         pass

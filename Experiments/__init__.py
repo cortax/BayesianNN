@@ -8,11 +8,19 @@ import matplotlib.pyplot as plt
 import importlib.util
 
 
-def switch_setup(spec):
+
+def switch_setup(setup):
     return {
-        'foong':  importlib.util.spec_from_file_location("Experiments.foong"),#, "/path/to/file.py")
-        'boston': importlib.util.spec_from_file_location("Experiments.boston"),
-    }.get(setup, 'setup not found')
+        'foong':  importlib.util.spec_from_file_location("foong", "Experiments/foong/__init__.py") ,
+        'boston': importlib.util.spec_from_file_location("boston", "Experiments/foong/__init__.py")
+    }[setup]
+
+def get_setup(setup,device):
+    spec=switch_setup(setup)
+    setup = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(setup)
+    return setup.Setup(device)
+
 
 def log_exp_metrics(evaluate_metrics, theta_ens, device):
     nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device)

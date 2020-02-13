@@ -1,16 +1,15 @@
 import torch
 from torch import nn
-import tempfile
 import argparse
 import mlflow
 
 from Inference.GeNVI_method import GeNVariationalInference, GeNetEns
 from Experiments.foong import Setup
-from Experiments import log_exp_metrics, draw_experiment
+from Experiments import log_exp_metrics, draw_experiment, get_setup
 
 
 ## command line example
-# python -m Experiments.foong.GeNVI --verbose=True --max_iter=1000 --show_metrics=True
+# python -m Experiments.GeNVI --setup=foong --verbose=True --max_iter=10
 
 def GeNVI_learning(objective_fn,
                    ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b,
@@ -78,6 +77,8 @@ def log_GeNVI_experiment(setup, the_epoch, the_scores, log_scores,
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--setup", type=str, default=None,
+                    help="data setup on which run the method")
 parser.add_argument("--ensemble_size", type=int, default=1,
                     help="number of hypernets to train in the ensemble")
 parser.add_argument("--lat_dim", type=int, default=5,
