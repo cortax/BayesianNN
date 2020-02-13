@@ -1,9 +1,11 @@
 import torch
 import argparse
 import mlflow
-import tempfile
-from Experiments import switch_setup
+
+from Experiments.foong import Setup
 from Inference.MCMC import PTMCMCSampler
+
+from Experiments import log_exp_metrics, draw_experiment
 
 
 def learning(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
@@ -41,52 +43,13 @@ def log_exp_params(param_count, ladderAcceptanceRate, swapAcceptanceRate, numite
     mlflow.log_param('baseMHproposalNoise', baseMHproposalNoise)
     mlflow.log_param('std_init',std_init)
 
-def log_exp_metrics(evaluate_metrics,theta_ens):
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens)
-    mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
-    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
-    mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
 
-    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
-    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
-    mlflow.log_metric("SnLPP_test", float(nLPP_test[1].cpu().numpy()))
-
-    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
-    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
-    mlflow.log_metric("MSE_test", float(RSE_test[0].cpu().numpy()))
-
-    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
-    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
-    mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
-
-
-def draw_experiment_plot(makePlot_fn, theta):
-	fig = makePlot_fn(theta)
-	tempdir = tempfile.TemporaryDirectory()
-	fig.savefig(tempdir.name + '/validation.png')
-	mlflow.log_artifact(tempdir.name + '/validation.png')
-	fig.close()
 
 def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
     ensemble = learning(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize)
     return ensemble
 
 
-
-# def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
-#     objective_fn = setup.logposterior
-#     param_count = setup.param_count
-#     device = setup.device
-#     ensemble_best_theta = []
-#     ensemble_best_score = []
-#     ensemble_score = []
-#     for _ in range(ensemble_size):
-#         best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
-#         ensemble_best_theta.append(best_theta)
-#         ensemble_best_score.append(best_score)
-#         ensemble_score.append(score)
-
-#     log_experiment(setup, ensemble_best_theta, None, None, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, True)
 
 if __name__ == "__main__":
     # example the commande de run 
@@ -96,7 +59,6 @@ if __name__ == "__main__":
     #burnin about 10% - 50%
     #thinning given by ensemble_size
     #ensemble size for metrics 10'000
-    # 10'000*thinning=numiter-burnin
     #ensemble_size for plotting
     #maintempindex index of temperature 1.0
     #baseMHproposalNoise
@@ -107,8 +69,6 @@ if __name__ == "__main__":
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--setup", type=int, default=1000,
-                        help="data setup on which use the method")
     parser.add_argument("--numiter", type=int, default=1000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burnin", type=int, default=0,
@@ -134,8 +94,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    switch_setup(args.setup)
-
     setup = Setup(args.device)
 
     temperatures = [float(n) for n in args.temperatures.split(',')]
@@ -146,8 +104,12 @@ if __name__ == "__main__":
     expdata = mlflow.get_experiment_by_name(xpname)
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
-        theta = torch.cat(theta_ens)
+
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
-        log_exp_metrics(setup.evaluate_metrics,theta)
+        theta = torch.cat(theta_ens).cpu()
+        log_exp_metrics(setup.evaluate_metrics,theta,'cpu')
         if setup.plot:
-            draw_experiment_plot(setup.makePlot, theta)
+            theta=torch.cat(theta_ens[0:-1:10]).cpu()
+            draw_experiment(setup.makePlot, theta,'cpu')
+
+

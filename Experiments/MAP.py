@@ -4,7 +4,6 @@ import mlflow
 
 from Experiments.foong import Setup
 from Inference.PointEstimate import AdamGradientDescent
-
 from Experiments import log_exp_metrics, draw_experiment
 
 
@@ -39,18 +38,7 @@ def log_experiment(param_count, sigma_noise, ensemble_best_score, ensemble_score
 
 
 
-def MAP(setup, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
-    objective_fn = setup.logposterior
-    param_count = setup.param_count
-    device = setup.device
-    ensemble_size = 1
-    best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience,
-                                             lr_decay, device, verbose)
-
-
-    log_MAP_experiment(setup, [best_theta], [best_score], [score], ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
-
-def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
+def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, verbose):
     global best_score
     objective_fn = setup.logposterior
     param_count = setup.param_count
@@ -64,10 +52,10 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
         ensemble_best_score.append(best_score)
         ensemble_score.append(score)
 
+    #logging mlflow
     xpname = setup.experiment_name + '/MAP'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
-
 
     theta = torch.stack([torch.as_tensor(_).squeeze() for _ in ensemble_best_theta]).cpu()
 
@@ -98,17 +86,12 @@ if __name__ == "__main__":
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
     parser.add_argument("--device", type=str, default='cpu',
                         help="force device to be used")
-    parser.add_argument("--verbose", type=int, default=0,
+    parser.add_argument("--verbose", type=bool, default=0,
                         help="force device to be used")
     args = parser.parse_args()
     print(args)
 
     setup = Setup(args.device)
 
- #   if args.ensemble_size > 1:
-    eMAP(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
- #   else:
- #       MAP(setup, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
-    
+    eMAP(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.verbose)
 
-    

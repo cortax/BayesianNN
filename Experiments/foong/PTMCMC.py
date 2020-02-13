@@ -41,8 +41,8 @@ def log_exp_params(param_count, ladderAcceptanceRate, swapAcceptanceRate, numite
     mlflow.log_param('baseMHproposalNoise', baseMHproposalNoise)
     mlflow.log_param('std_init',std_init)
 
-def log_exp_metrics(evaluate_metrics,theta_ens):
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens)
+def log_exp_metrics(evaluate_metrics, theta_ens, device):
+    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device)
     mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
@@ -60,8 +60,9 @@ def log_exp_metrics(evaluate_metrics,theta_ens):
     mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
 
-def draw_experiment_plot(makePlot_fn, theta):
-	fig = makePlot_fn(theta)
+
+def draw_experiment(makePlot, theta,device):
+	fig = makePlot(theta,device)
 	tempdir = tempfile.TemporaryDirectory()
 	fig.savefig(tempdir.name + '/validation.png')
 	mlflow.log_artifact(tempdir.name + '/validation.png')
@@ -103,7 +104,6 @@ if __name__ == "__main__":
     #temperatureNoiseReductionFactor: temperature factor for jump lenght in MCMC sampling ## DO NOT TOUCH!
     #temperatures= 1., .9 ,.8, .7, .6 , .5... to try
 
-    #TODO log ladder acceptance  swapAcceptanceRate,
 
 
     parser = argparse.ArgumentParser()
@@ -142,8 +142,10 @@ if __name__ == "__main__":
     expdata = mlflow.get_experiment_by_name(xpname)
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
-        theta = torch.cat(theta_ens)
+
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
-        log_exp_metrics(setup.evaluate_metrics,theta)
+        theta = torch.cat(theta_ens).cpu()
+        log_exp_metrics(setup.evaluate_metrics,theta,'cpu')
         if setup.plot:
-            draw_experiment_plot(setup.makePlot, theta)
+            theta=torch.cat(theta_ens[0:-1:10]).cpu()
+            draw_experiment(setup.makePlot, theta,'cpu')

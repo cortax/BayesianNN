@@ -1,17 +1,17 @@
-import torch
 import argparse
 import mlflow
-import tempfile
 from Experiments.foong import Setup
 from Inference.Variational import MeanFieldVariationInference, MeanFieldVariationalDistribution
-
+from Experiments import log_exp_metrics, draw_experiment
+import torch
 
 def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
 
     optimizer = MeanFieldVariationInference(objective_fn, max_iter, n_ELBO_samples,
                                             learning_rate, min_lr, patience, lr_decay,  device, verbose)
 
-    q0 = MeanFieldVariationalDistribution(param_count,mu=0.0, sigma=0.0000001, device=device)
+    mu=init_std*torch.randn(param_count, device=device)
+    q0 = MeanFieldVariationalDistribution(param_count,mu=mu, sigma=0.0000001, device=device)
     the_epoch, the_scores = optimizer.run(q0)
     log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
     return q0, the_epoch, the_scores, log_scores
@@ -48,31 +48,6 @@ def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
         mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
         mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
 
-def log_exp_metrics(evaluate_metrics, theta_ens, device):
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device)
-    mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
-    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
-    mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
-
-    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
-    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
-    mlflow.log_metric("SnLPP_test", float(nLPP_test[1].cpu().numpy()))
-
-    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
-    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
-    mlflow.log_metric("MSE_test", float(RSE_test[0].cpu().numpy()))
-
-    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
-    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
-    mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
-
-def draw_experiment(makePlot, theta,device):
-	fig = makePlot(theta,device)
-	tempdir = tempfile.TemporaryDirectory()
-	fig.savefig(tempdir.name + '/validation.png')
-	mlflow.log_artifact(tempdir.name + '/validation.png')
-	fig.close()
-
 def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
     objective_fn = setup.logposterior
     param_count = setup.param_count
@@ -91,24 +66,10 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
                             max_iter, learning_rate, min_lr, patience, lr_decay,
                             device)
         log_exp_metrics(setup.evaluate_metrics, theta_ens,'cpu')
-        theta_ens = q.sample(1000).detach().cpu()
-        draw_experiment(setup.makePlot, theta_ens, 'cpu')
+        if setup.plot:
+            theta_ens = q.sample(1000).detach().cpu()
+            draw_experiment(setup.makePlot, theta_ens, 'cpu')
 
-
-# def eMFVI(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
-#     objective_fn = setup.logposterior
-#     param_count = setup.param_count
-#     device = setup.device
-#     ensemble_best_theta = []
-#     ensemble_best_score = []
-#     ensemble_score = []
-#     for _ in range(ensemble_size):
-#         best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
-#         ensemble_best_theta.append(best_theta)
-#         ensemble_best_score.append(best_score)
-#         ensemble_score.append(score)
-
-#     log_experiment(setup, ensemble_best_theta, None, None, ensemble_size, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose, True)
 
 if __name__ == "__main__":
     # example the commande de run 
