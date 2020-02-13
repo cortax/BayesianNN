@@ -30,12 +30,15 @@ def log_experiment(param_count, sigma_noise, ensemble_best_score, ensemble_score
         mlflow.log_param('max_iter', max_iter)
         mlflow.log_param('min_lr', min_lr)
 
-        for map in range(ensemble_size):
-            with mlflow.start_run(run_name=str(map),nested=True):
-                mlflow.log_metric("The logposterior", float(ensemble_best_score[map]))
-                for t in range(len(ensemble_score[map])):
-                    mlflow.log_metric("training loss", float(ensemble_score[map][t]),t)
+        ensemble_best_score_mean = torch.stack([torch.as_tensor(_).squeeze() for _ in ensemble_best_score]).mean()
+        mlflow.log_metric("average logposterior", float(ensemble_best_score_mean))
 
+        if ensemble_size <= 5:
+            for map in range(ensemble_size):
+                with mlflow.start_run(run_name=str(map),nested=True):
+                    mlflow.log_metric("The logposterior", float(ensemble_best_score[map]))
+                    for t in range(len(ensemble_score[map])):
+                        mlflow.log_metric("training loss", float(ensemble_score[map][t]),t)
 
 
 def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, verbose):
@@ -61,7 +64,6 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
 
     xpname = setup.experiment_name + '/MAP'
     mlflow.set_experiment(experiment_name = xpname)
-#    expdata = mlflow.get_experiment_by_name(xpname)
 
     theta = torch.stack([torch.as_tensor(_).squeeze() for _ in ensemble_best_theta]).cpu()
 

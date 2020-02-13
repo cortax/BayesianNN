@@ -7,6 +7,11 @@ from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 import torch
 
 
+# CLI
+# in root BayesianNN
+# python -m Experiments.MFVI --max_iter=5000 --init_std=1. --learning_rate=0.1 --min_lr=0.00001 --patience=100 --lr_decay=0.5 --device=cuda:0 --verbose=1 --n_ELBO_samples=100 --setup=foong
+
+
 def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
 
     optimizer = MeanFieldVariationInference(objective_fn, max_iter, n_ELBO_samples,
@@ -82,31 +87,31 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
 
 if __name__ == "__main__":
     # example the commande de run 
-    # python -m Experiments.foong.MFVI --ensemble_size=1 --max_iter=100 --init_std=0.1 --learning_rate=0.1 --min_lr=0.0001 --patience=100 --lr_decay=0.9 --device=cuda:0 --verbose=1 --n_ELBO_samples=100
+    # python -m Experiments.foong.MFVI --max_iter=100 --init_std=0.1 --learning_rate=0.1 --min_lr=0.0001 --patience=100 --lr_decay=0.9 --device=cuda:0 --verbose=1 --n_ELBO_samples=100
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--setup", type=str, default=None,
                         help="data setup on which run the method")
     parser.add_argument("--ensemble_size", type=int, default=1,
                         help="number of models to use in the ensemble")
-    parser.add_argument("--max_iter", type=int, default=100000,
+    parser.add_argument("--max_iter", type=int, default=10000,
                         help="maximum number of learning iterations")
-    parser.add_argument("--learning_rate", type=float, default=0.01,
+    parser.add_argument("--learning_rate", type=float, default=0.05,
                         help="initial learning rate of the optimizer")
-    parser.add_argument("--min_lr", type=float, default=0.0005,
+    parser.add_argument("--min_lr", type=float, default=0.000001,
                         help="minimum learning rate triggering the end of the optimization")
     parser.add_argument("--n_ELBO_samples", type=int, default=10,
                         help="number of Monte Carlo samples to compute ELBO")
     parser.add_argument("--patience", type=int, default=100,
                         help="scheduler patience")
-    parser.add_argument("--lr_decay", type=float, default=0.9,
+    parser.add_argument("--lr_decay", type=float, default=0.5,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
     parser.add_argument("--init_std", type=float, default=1.0,
                         help="parameter controling initialization of theta")
-    parser.add_argument("--optimize", type=int, default=0,
-                        help="number of optimization iterations to initialize the state")
-    parser.add_argument("--expansion", type=int, default=0,
-                        help="variational inference is done only on variance (0,1)")
+    # parser.add_argument("--optimize", type=int, default=0,
+    #                     help="number of optimization iterations to initialize the state")
+    # parser.add_argument("--expansion", type=int, default=0,
+    #                     help="variational inference is done only on variance (0,1)")
     parser.add_argument("--seed", type=int, default=None,
                         help="seed for random numbers")
     parser.add_argument("--device", type=str, default=None,
