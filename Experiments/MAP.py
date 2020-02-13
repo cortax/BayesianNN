@@ -6,6 +6,9 @@ import timeit
 from Inference.PointEstimate import AdamGradientDescent
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params_ens
 
+#
+#python -m Experiments.MAP --max_iter=4000 --ensemble_size=1000 --setup=foong
+
 
 def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
     optimizer = AdamGradientDescent(
@@ -85,15 +88,15 @@ if __name__ == "__main__":
                         help="number of models to use in the ensemble")
     parser.add_argument("--init_std", type=float, default=1.0,
                         help="parameter controling initialization of theta")
-    parser.add_argument("--max_iter", type=int, default=100000,
+    parser.add_argument("--max_iter", type=int, default=10000,
                         help="maximum number of learning iterations")
-    parser.add_argument("--learning_rate", type=float, default=0.03,
+    parser.add_argument("--learning_rate", type=float, default=0.05,
                         help="initial learning rate of the optimizer")
     parser.add_argument("--min_lr", type=float, default=0.00000001,
                         help="minimum learning rate triggering the end of the optimization")
-    parser.add_argument("--patience", type=int, default=10,
+    parser.add_argument("--patience", type=int, default=50,
                         help="scheduler patience")
-    parser.add_argument("--lr_decay", type=float, default=.1,
+    parser.add_argument("--lr_decay", type=float, default=.5,
                         help="scheduler multiplicative factor decreasing learning rate when patience reached")
     parser.add_argument("--device", type=str, default='cpu',
                         help="force device to be used")
