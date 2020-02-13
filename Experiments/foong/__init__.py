@@ -56,8 +56,8 @@ class Setup(AbstractRegressionSetup):
         plt.xlim(-2, 2) 
         plt.ylim(-4, 6)
         plt.grid(True, which='major', linewidth=0.5)
-        plt.title('Validation set')
-        plt.scatter(self._X_train.cpu(), self._y_train.cpu())
+#        plt.title('Validation set')
+
 
         my_lw=get_linewidth(0.2,ax)
         alpha = (.9 / torch.tensor(float(nb_samples_plot)).sqrt()).clamp(0.05, 1.)
@@ -67,6 +67,7 @@ class Setup(AbstractRegressionSetup):
                      color='springgreen', zorder=2)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=alpha, linewidth=1.0, color='green',zorder=3)
          #   plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
+        plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
         
 

@@ -46,11 +46,13 @@ def log_exp_metrics(evaluate_metrics, theta_ens, execution_time, device):
     mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
 
 def draw_experiment(makePlot, theta,device):
-	fig = makePlot(theta,device)
-	tempdir = tempfile.TemporaryDirectory()
-	fig.savefig(tempdir.name + '/plot_train.png',dpi=5*fig.dpi)
-	mlflow.log_artifact(tempdir.name + '/plot_train.png')
-	plt.close(fig)
+    fig = makePlot(theta,device)
+    tempdir = tempfile.TemporaryDirectory()
+    fig.savefig(tempdir.name + '/plot_train.png', dpi=3 * fig.dpi)
+    fig.savefig(tempdir.name + '/plot_train.svg', dpi=5 * fig.dpi)
+    mlflow.log_artifact(tempdir.name + '/plot_train.png')
+    mlflow.log_artifact(tempdir.name + '/plot_train.svg')
+    plt.close(fig)
 
 def save_model(model):
     tempdir = tempfile.TemporaryDirectory()

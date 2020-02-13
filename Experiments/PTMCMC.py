@@ -53,8 +53,7 @@ def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, tempera
 
 
 if __name__ == "__main__":
-    # example the commande de run 
-    #  python -m Experiments.foong.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
+    # example the commande de run
     # python -m Experiments.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --setup=boston
     #  python -m Experiments.foong.PTMCMC --numiter=10000 --burnin=100 --thinning=10 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #numiter as big as possible
@@ -70,10 +69,11 @@ if __name__ == "__main__":
 
 
 
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--setup", type=str, default=None,
                         help="data setup on which run the method")
-    parser.add_argument("--numiter", type=int, default=1000,
+    parser.add_argument("--numiter", type=int, default=100000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burnin", type=int, default=0,
                         help="number of initial samples to skip in the Markov chain")
@@ -97,6 +97,7 @@ if __name__ == "__main__":
                         help="force device to be used")
     args = parser.parse_args()
     print(args)
+
 
     setup =get_setup(args.setup,args.device)
 
