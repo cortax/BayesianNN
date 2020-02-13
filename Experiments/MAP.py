@@ -1,6 +1,7 @@
 import torch
 import argparse
 import mlflow
+import timeit
 
 from Inference.PointEstimate import AdamGradientDescent
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params_ens
@@ -45,11 +46,16 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
     ensemble_best_theta = []
     ensemble_best_score = []
     ensemble_score = []
+
+    start = timeit.default_timer()
     for _ in range(ensemble_size):
         best_theta, best_score, score = learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
         ensemble_best_theta.append(best_theta)
         ensemble_best_score.append(best_score)
         ensemble_score.append(score)
+    stop = timeit.default_timer()
+    execution_time = stop - start
+
 
     #logging mlflow
     xpname = setup.experiment_name + '/MAP'
@@ -60,7 +66,7 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
         log_experiment(param_count,  setup.sigma_noise, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
-        log_exp_metrics(setup.evaluate_metrics,theta,'cpu')
+        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
         save_params_ens(theta)
         if setup.plot:
             draw_experiment(setup.makePlot, theta, 'cpu')

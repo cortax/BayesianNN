@@ -25,7 +25,9 @@ def get_setup(setup,device):
     return setup.Setup(device)
 
 
-def log_exp_metrics(evaluate_metrics, theta_ens, device):
+def log_exp_metrics(evaluate_metrics, theta_ens, execution_time, device):
+    mlflow.set_tag('execution_time ', '{0:.2f}'.format(execution_time)+'s')
+
     nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device)
     mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
     mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))

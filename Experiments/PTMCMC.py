@@ -1,6 +1,8 @@
 import torch
 import argparse
 import mlflow
+import timeit
+
 
 from Inference.MCMC import PTMCMCSampler
 
@@ -99,7 +101,11 @@ if __name__ == "__main__":
     setup =get_setup(args.setup,args.device)
 
     temperatures = [float(n) for n in args.temperatures.split(',')]
+
+    start = timeit.default_timer()
     theta_ens, _ ,  ladderAcceptanceRate, swapAcceptanceRate, _ =learning(setup.logposterior, setup.param_count, setup.device, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)
+    stop = timeit.default_timer()
+    execution_time = stop - start
 
     xpname = setup.experiment_name + '/PTMCMC'
     mlflow.set_experiment(xpname)
@@ -109,7 +115,7 @@ if __name__ == "__main__":
 
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
         theta = torch.cat(theta_ens).cpu()
-        log_exp_metrics(setup.evaluate_metrics,theta,'cpu')
+        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
 
         save_params_ens(theta)
 

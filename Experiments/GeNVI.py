@@ -1,7 +1,7 @@
-import torch
 from torch import nn
 import argparse
 import mlflow
+import timeit
 
 from Inference.GeNVI_method import GeNVariationalInference, GeNetEns
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
@@ -124,6 +124,7 @@ if __name__ == "__main__":
 	activation = nn.ReLU()
 	init_b = .001
 
+	start = timeit.default_timer()
 	GeN, the_epoch, the_scores, log_scores = GeNVI_learning(setup.logposterior,
 	                                                        args.ensemble_size, args.lat_dim, args.layerwidth,
 	                                                        setup.param_count,
@@ -133,6 +134,8 @@ if __name__ == "__main__":
 	                                                        args.max_iter, args.learning_rate, args.min_lr,
 	                                                        args.patience, args.lr_decay,
 	                                                        args.device, args.verbose)
+	stop = timeit.default_timer()
+	execution_time = stop - start
 
 	xpname = setup.experiment_name + '/GeNVI'
 	mlflow.set_experiment(xpname)
@@ -146,8 +149,8 @@ if __name__ == "__main__":
 		                     args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
 		                     args.device)
 
-		theta_ens = GeN(1000).detach().cpu()
-		log_exp_metrics(setup.evaluate_metrics, theta_ens, 'cpu')
+		theta = GeN(1000).detach().cpu()
+		log_exp_metrics(setup.evaluate_metrics, theta, execution_time, 'cpu')
 
 		save_model(GeN)
 

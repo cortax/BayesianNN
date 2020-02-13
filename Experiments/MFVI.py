@@ -1,9 +1,11 @@
 import argparse
 import mlflow
+import timeit
 
 from Inference.Variational import MeanFieldVariationInference, MeanFieldVariationalDistribution
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 import torch
+
 
 def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
 
@@ -53,19 +55,24 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
     param_count = setup.param_count
     device = setup.device
     ensemble_size = 1
+
+    start = timeit.default_timer()
     q, the_epoch, the_scores, log_scores = learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose)
+    stop = timeit.default_timer()
+    execution_time = stop - start
 
     xpname = setup.experiment_name + '/MFVI'
     mlflow.set_experiment(xpname)
     expdata = mlflow.get_experiment_by_name(xpname)
 
     with mlflow.start_run(experiment_id=expdata.experiment_id):
-        theta_ens=q.sample(1000).detach().cpu()
+        theta=q.sample(1000).detach().cpu()
         log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
                             ensemble_size, init_std, n_ELBO_samples,
                             max_iter, learning_rate, min_lr, patience, lr_decay,
                             device)
-        log_exp_metrics(setup.evaluate_metrics, theta_ens,'cpu')
+        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
+
 
         save_model(q)
 
