@@ -75,9 +75,9 @@ if __name__ == "__main__":
                         help="data setup on which run the method")
     parser.add_argument("--numiter", type=int, default=100000,
                         help="number of iterations in the Markov chain")
-    parser.add_argument("--burnin", type=int, default=0,
+    parser.add_argument("--burnin", type=int, default=None,
                         help="number of initial samples to skip in the Markov chain")
-    parser.add_argument("--thinning", type=int, default=1,
+    parser.add_argument("--thinning", type=int, default=None,
                         help="subsampling factor of the Markov chain")
     parser.add_argument("--temperatures", type=str, default=None,
                         help="temperature ladder in the form [t0, t1, t2, t3]")
@@ -97,6 +97,8 @@ if __name__ == "__main__":
                         help="force device to be used")
     args = parser.parse_args()
     print(args)
+
+    if burnin is None and thinning is None:
 
 
     setup =get_setup(args.setup,args.device)
