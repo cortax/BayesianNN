@@ -119,9 +119,8 @@ if __name__ == "__main__":
 
     xpname = setup.experiment_name + '/PTMCMC'
     mlflow.set_experiment(xpname)
-    expdata = mlflow.get_experiment_by_name(xpname)
 
-    with mlflow.start_run(experiment_id=expdata.experiment_id):
+    with mlflow.start_run():
 
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
         theta = torch.cat(theta_ens).cpu()
@@ -130,7 +129,7 @@ if __name__ == "__main__":
         save_params_ens(theta)
 
         if setup.plot:
-            theta=torch.cat(theta_ens[0:-1:10]).cpu()
-            draw_experiment(setup.makePlot, theta,'cpu')
+            theta=torch.cat(theta_ens[0:-1:10])
+            draw_experiment(setup.makePlot, theta,args.device)
 
 

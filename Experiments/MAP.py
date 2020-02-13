@@ -58,18 +58,19 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
 
 
     #logging mlflow
+
     xpname = setup.experiment_name + '/MAP'
-    mlflow.set_experiment(xpname)
-    expdata = mlflow.get_experiment_by_name(xpname)
+    mlflow.set_experiment(experiment_name = xpname)
+#    expdata = mlflow.get_experiment_by_name(xpname)
 
     theta = torch.stack([torch.as_tensor(_).squeeze() for _ in ensemble_best_theta]).cpu()
 
-    with mlflow.start_run(experiment_id=expdata.experiment_id):
+    with mlflow.start_run():
         log_experiment(param_count,  setup.sigma_noise, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
-        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
+        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,device)
         save_params_ens(theta)
         if setup.plot:
-            draw_experiment(setup.makePlot, theta, 'cpu')
+            draw_experiment(setup.makePlot, theta, device)
 
 if __name__ == "__main__":
     # example the commande de run 

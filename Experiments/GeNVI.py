@@ -139,9 +139,8 @@ if __name__ == "__main__":
 
 	xpname = setup.experiment_name + '/GeNVI'
 	mlflow.set_experiment(xpname)
-	expdata = mlflow.get_experiment_by_name(xpname)
 
-	with mlflow.start_run(experiment_id=expdata.experiment_id):
+	with mlflow.start_run():
 		log_GeNVI_experiment(setup, the_epoch, the_scores, log_scores,
 		                     args.ensemble_size, args.lat_dim, args.layerwidth, setup.param_count, args.init_w,
 		                     args.EntropyE, args.n_samples_NNE, args.n_samples_KDE, args.n_samples_ED,
@@ -155,5 +154,5 @@ if __name__ == "__main__":
 		save_model(GeN)
 
 		if setup.plot:
-			theta_ens = GeN(1000).detach().cpu()
-			draw_experiment(setup.makePlot, theta_ens, 'cpu')
+			theta_ens = GeN(1000).detach()#.cpu()
+			draw_experiment(setup.makePlot, theta_ens, args.device)

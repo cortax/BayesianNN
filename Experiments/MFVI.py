@@ -50,7 +50,7 @@ def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
         mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
         mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
 
-def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patience, lr_decay, device, verbose):
+def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patience, lr_decay, verbose):
     objective_fn = setup.logposterior
     param_count = setup.param_count
     device = setup.device
@@ -63,9 +63,8 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
 
     xpname = setup.experiment_name + '/MFVI'
     mlflow.set_experiment(xpname)
-    expdata = mlflow.get_experiment_by_name(xpname)
 
-    with mlflow.start_run(experiment_id=expdata.experiment_id):
+    with mlflow.start_run():
         theta=q.sample(1000).detach().cpu()
         log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
                             ensemble_size, init_std, n_ELBO_samples,
@@ -77,8 +76,8 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
         save_model(q)
 
         if setup.plot:
-            theta_ens = q.sample(1000).detach().cpu()
-            draw_experiment(setup.makePlot, theta_ens, 'cpu')
+            theta_ens = q.sample(1000).detach()
+            draw_experiment(setup.makePlot, theta_ens, device)
 
 
 if __name__ == "__main__":
@@ -125,6 +124,6 @@ if __name__ == "__main__":
     else:
         MFVI(setup, args.max_iter, args.n_ELBO_samples,
              args.learning_rate, args.init_std, args.min_lr,
-             args.patience, args.lr_decay, args.device, args.verbose)
+             args.patience, args.lr_decay, args.verbose)
 
 
