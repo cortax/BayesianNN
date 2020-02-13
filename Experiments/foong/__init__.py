@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 from Experiments import AbstractRegressionSetup
 
 from Models import get_mlp
-from Tools import logmvn01pdf, NormalLogLikelihood
 
 import numpy as np
+
+from Tools import logmvn01pdf, NormalLogLikelihood
 
 experiment_name = 'Foong'
 data_path='Experiments/foong/data/'
@@ -40,52 +41,6 @@ class Setup(AbstractRegressionSetup):
         self._X_validation, self._y_validation = valid[0].to(self.device), valid[1].unsqueeze(-1).to(self.device)
         self._X_test, self._y_test = test[0].to(self.device), test[1].unsqueeze(-1).to(self.device)
 
-    def _logprior(self, theta):
-        return logmvn01pdf(theta)
-
-    # il faudra des méthodes normalize/inverse, car il la normalization est hard-coder
-    def _normalized_prediction(self, X, theta,device):
-        """Predict raw inverse normalized values for M models on N data points of D-dimensions
-        Arguments:
-            X {[tensor]} -- Tensor of size NxD 
-            theta {[type]} -- Tensor[M,:] of models
-        
-        Returns:
-            [tensor] -- MxNx1 tensor of predictions
-        """
-        assert type(theta) is torch.Tensor
-        y_pred = self._model(X.to(device), theta)
-        if hasattr(self, '_scaler_y'):
-            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device) + torch.tensor(self._scaler_y.mean_, device=device)
-        return y_pred
-
-    # TODO remonter à Experiments
-    def _loglikelihood(self, theta, X, y,device):
-        """
-        parameters:
-            theta (Tensor): M x param_count (models)
-            X (Tensor): N x input_dim
-            y (Tensor): N x 1
-        output:
-            LL (Tensor): M x N (models x data)
-        """
-        y_pred = self._normalized_prediction(X, theta,device) # MxNx1 tensor
-        return NormalLogLikelihood(y_pred, y.to(device), sigma_noise)
-
-    def logposterior(self, theta):
-        return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device), dim=1)
-
-    # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
-    # def evaluate_metrics(self, theta):
-    #     theta = theta.to(self.device)
-    #     nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train)
-    #     nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation)
-    #     nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test)
-    #
-    #     RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train)
-    #     RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation)
-    #     RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test)
-    #     return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
 
     def makePlot(self, theta,device):
         def get_linewidth(linewidth, axis):

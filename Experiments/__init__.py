@@ -6,6 +6,9 @@ import tempfile
 import mlflow
 import matplotlib.pyplot as plt
 import importlib.util
+import torch
+
+from Tools import logmvn01pdf, NormalLogLikelihood
 
 
 
@@ -49,8 +52,21 @@ def draw_experiment(makePlot, theta,device):
 
 class AbstractRegressionSetup(ABC):
     def __init__(self):
+        self.experiment_name=''
         self.plot = False
-        pass
+        self.param_count=None
+        self.device=None
+        self.sigma_noise=None
+
+
+    @abstractmethod
+    #TODO rename to objective_fn?
+    def logposterior(self):
+        raise NotImplementedError('subclasses must override logposterior()')
+
+    def makePlot(self):
+        if self.plot:
+            raise NotImplementedError('subclasses with plot=True must override makePlot()')
 
     def evaluate_metrics(self, theta,device):
         theta = theta.to(device)
@@ -62,6 +78,42 @@ class AbstractRegressionSetup(ABC):
         RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation.to(device),device)
         RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test.to(device),device)
         return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
+
+    def _logprior(self, theta):
+        return logmvn01pdf(theta)
+
+    def _normalized_prediction(self, X, theta, device):
+        """Predict raw inverse normalized values for M models on N data points of D-dimensions
+		Arguments:
+			X {[tensor]} -- Tensor of size NxD
+			theta {[type]} -- Tensor[M,:] of models
+
+		Returns:
+			[tensor] -- MxNx1 tensor of predictions
+		"""
+        assert type(theta) is torch.Tensor
+        y_pred = self._model(X.to(device), theta)
+        if hasattr(self, '_scaler_y'):
+            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device) + torch.tensor(self._scaler_y.mean_,
+                                                                                                device=device)
+        return y_pred
+
+    def _loglikelihood(self, theta, X, y, device):
+        """
+		parameters:
+			theta (Tensor): M x param_count (models)
+			X (Tensor): N x input_dim
+			y (Tensor): N x 1
+		output:
+			LL (Tensor): M x N (models x data)
+		"""
+        y_pred = self._normalized_prediction(X, theta, device)  # MxNx1 tensor
+        return NormalLogLikelihood(y_pred, y.to(device), self.sigma_noise)
+
+    def logposterior(self, theta):
+        return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),
+                                                 dim=1)
+
     # @abstractmethod
     # def evaluate(self):
     #     raise NotImplementedError('subclasses must override evaluate()')

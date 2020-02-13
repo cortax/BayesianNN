@@ -7,11 +7,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_boston
 
 from Models import get_mlp
-from Tools import logmvn01pdf, log_norm, NormalLogLikelihood
 from Preprocessing import fitStandardScalerNormalization, normalize
-from Metrics import avgNLL
 
-#exp_path="Experiments/boston/"
 experiment_name='Boston'
 
 input_dim = 13
@@ -60,56 +57,5 @@ class Setup(AbstractRegressionSetup):
         self._X_test = torch.tensor(self._X_test, device=self.device).float()
         self._y_test = torch.tensor(self._y_test, device=self.device).float()
 
-    def _logprior(self, theta):
-        return logmvn01pdf(theta)
-    
-        # il faudra des méthodes normalize/inverse, car il la normalization est hard-coder
-    def _normalized_prediction(self, X, theta):
-        """Predict raw inverse normalized values for M models on N data points of D-dimensions
-        Arguments:
-            X {[tensor]} -- Tensor of size NxD 
-            theta {[type]} -- Tensor[M,:] of models
-        
-        Returns:
-            [tensor] -- MxNx1 tensor of predictions
-        """
-        y_pred = self._model(X, theta)
-        if hasattr(self, '_scaler_y'):
-            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=self.device) + torch.tensor(self._scaler_y.mean_, device=self.device)
-        return y_pred
 
-    def _loglikelihood(self, theta, X, y):
-        """
-        parameters:
-            theta (Tensor): M x param_count (models)
-            X (Tensor): N x input_dim
-            y (Tensor): N x 1
-        output:
-            LL (Tensor): M x N (models x data)
-        """
-        y_pred = self._normalized_prediction(X, theta) # MxNx1 tensor
-        return NormalLogLikelihood(y_pred, y, sigma_noise) # MxN
-
-    def logposterior(self, theta):
-        return self._logprior(theta) + self._loglikelihood(theta, self._X_train, self._y_train).sum(dim=1)
-
-    # Il faudra ajouter les métrique in-between pour foong (spécifique donc ne pas remonter cette méthode)
-    # def evaluate_metrics(self, theta):
-    #     theta = theta.to(self.device)
-    #     avgNLL_train = avgNLL(self._loglikelihood, theta, self._X_train, self._y_train)
-    #     avgNLL_validation = avgNLL(self._loglikelihood, theta, self._X_validation, self._y_validation)
-    #     avgNLL_test = avgNLL(self._loglikelihood, theta, self._X_test, self._y_test)
-    #
-    #     return avgNLL_train, avgNLL_validation, avgNLL_test
-
-    def evaluate_metrics(self, theta):
-        theta = theta.to(self.device)
-        nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train)
-        nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation)
-        nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test)
-
-        RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train)
-        RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation)
-        RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test)
-        return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
         
