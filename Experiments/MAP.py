@@ -4,7 +4,7 @@ import mlflow
 
 from Experiments.foong import Setup
 from Inference.PointEstimate import AdamGradientDescent
-from Experiments import log_exp_metrics, draw_experiment
+from Experiments import log_exp_metrics, draw_experiment, switch_setup
 
 
 def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):

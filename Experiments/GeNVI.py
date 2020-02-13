@@ -92,7 +92,7 @@ parser.add_argument("--EntropyE", type=int, default=0,
                     help="k≥1 Nearest Neighbor Estimate, 0 is for KDE")
 parser.add_argument("--n_samples_NNE", type=int, default=500,
                     help="number of samples for NNE")
-parser.add_argument("--n_samples_KDE", type=int, default=500,
+parser.add_argument("--n_samples_KDE", type=int, default=1000,
                     help="number of samples for KDE")
 parser.add_argument("--n_samples_ED", type=int, default=50,
                     help="number of samples for MC estimation of differential entropy")
