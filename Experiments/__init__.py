@@ -15,7 +15,7 @@ from Tools import logmvn01pdf, NormalLogLikelihood
 def switch_setup(setup):
     return {
         'foong':  importlib.util.spec_from_file_location("foong", "Experiments/foong/__init__.py") ,
-        'boston': importlib.util.spec_from_file_location("boston", "Experiments/foong/__init__.py")
+        'boston': importlib.util.spec_from_file_location("boston", "Experiments/boston/__init__.py")
     }[setup]
 
 def get_setup(setup,device):
@@ -49,6 +49,17 @@ def draw_experiment(makePlot, theta,device):
 	fig.savefig(tempdir.name + '/plot_train.png',dpi=5*fig.dpi)
 	mlflow.log_artifact(tempdir.name + '/plot_train.png')
 	plt.close(fig)
+
+def save_model(model):
+    tempdir = tempfile.TemporaryDirectory()
+    torch.save({'state_dict': model.state_dict()}, tempdir.name + '/model.pt')
+    mlflow.log_artifact(tempdir.name + '/model.pt')
+
+def save_params_ens(theta):
+    tempdir = tempfile.TemporaryDirectory()
+    torch.save(theta, tempdir.name + '/theta.pt')
+    mlflow.log_artifact(tempdir.name + '/theta.pt')
+
 
 class AbstractRegressionSetup(ABC):
     def __init__(self):

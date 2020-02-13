@@ -60,10 +60,10 @@ class Setup(AbstractRegressionSetup):
         plt.scatter(self._X_train.cpu(), self._y_train.cpu())
 
         my_lw=get_linewidth(0.2,ax)
-        alpha = (.9 / torch.tensor(float(nb_samples_plot)).sqrt()).clamp(0.01, 1.)
+        alpha = (.9 / torch.tensor(float(nb_samples_plot)).sqrt()).clamp(0.05, 1.)
         for i in range(theta.shape[0]):
             y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0),device)
-            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.5*alpha, linewidth=my_lw,
+            plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.8*alpha, linewidth=my_lw,
                      color='springgreen', zorder=2)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=alpha, linewidth=1.0, color='green',zorder=3)
          #   plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')

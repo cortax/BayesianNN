@@ -4,7 +4,7 @@ import mlflow
 
 from Inference.MCMC import PTMCMCSampler
 
-from Experiments import log_exp_metrics, draw_experiment, get_setup
+from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params_ens
 
 
 def learning(objective_fn, param_count, device, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize):
@@ -53,7 +53,7 @@ def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, tempera
 if __name__ == "__main__":
     # example the commande de run 
     #  python -m Experiments.foong.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
-    # python -m Experiments.PTMCMC --setup=boston --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
+    # python -m Experiments.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --setup=boston
     #  python -m Experiments.foong.PTMCMC --numiter=10000 --burnin=100 --thinning=10 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #numiter as big as possible
     #burnin about 10% - 50%
@@ -110,6 +110,9 @@ if __name__ == "__main__":
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
         theta = torch.cat(theta_ens).cpu()
         log_exp_metrics(setup.evaluate_metrics,theta,'cpu')
+
+        save_params_ens(theta)
+
         if setup.plot:
             theta=torch.cat(theta_ens[0:-1:10]).cpu()
             draw_experiment(setup.makePlot, theta,'cpu')

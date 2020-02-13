@@ -2,7 +2,7 @@ import argparse
 import mlflow
 
 from Inference.Variational import MeanFieldVariationInference, MeanFieldVariationalDistribution
-from Experiments import log_exp_metrics, draw_experiment, get_setup
+from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 import torch
 
 def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
@@ -66,6 +66,9 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
                             max_iter, learning_rate, min_lr, patience, lr_decay,
                             device)
         log_exp_metrics(setup.evaluate_metrics, theta_ens,'cpu')
+
+        save_model(q)
+
         if setup.plot:
             theta_ens = q.sample(1000).detach().cpu()
             draw_experiment(setup.makePlot, theta_ens, 'cpu')
@@ -110,7 +113,7 @@ if __name__ == "__main__":
     setup =get_setup(args.setup,args.device)
 
     if args.ensemble_size > 1:
-        pass
+        raise NotImplementedError('ensemble MFVI not implemented')
         #eMFVI(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
     else:
         MFVI(setup, args.max_iter, args.n_ELBO_samples,

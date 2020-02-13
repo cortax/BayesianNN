@@ -4,8 +4,7 @@ import argparse
 import mlflow
 
 from Inference.GeNVI_method import GeNVariationalInference, GeNetEns
-from Experiments.foong import Setup
-from Experiments import log_exp_metrics, draw_experiment, get_setup
+from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 
 
 ## command line example
@@ -120,12 +119,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	print(args)
 
-	if args.device is None:
-		device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
-	else:
-		device = args.device
-
-	setup = Setup(device)
+	setup = get_setup(args.setup, args.device)
 
 	activation = nn.ReLU()
 	init_b = .001
@@ -138,7 +132,7 @@ if __name__ == "__main__":
 	                                                        args.n_samples_ED, args.n_samples_LP,
 	                                                        args.max_iter, args.learning_rate, args.min_lr,
 	                                                        args.patience, args.lr_decay,
-	                                                        device, args.verbose)
+	                                                        args.device, args.verbose)
 
 	xpname = setup.experiment_name + '/GeNVI'
 	mlflow.set_experiment(xpname)
@@ -150,10 +144,13 @@ if __name__ == "__main__":
 		                     args.EntropyE, args.n_samples_NNE, args.n_samples_KDE, args.n_samples_ED,
 		                     args.n_samples_LP,
 		                     args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
-		                     device)
+		                     args.device)
 
 		theta_ens = GeN(1000).detach().cpu()
 		log_exp_metrics(setup.evaluate_metrics, theta_ens, 'cpu')
+
+		save_model(GeN)
+
 		if setup.plot:
 			theta_ens = GeN(1000).detach().cpu()
 			draw_experiment(setup.makePlot, theta_ens, 'cpu')

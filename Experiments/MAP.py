@@ -3,7 +3,7 @@ import argparse
 import mlflow
 
 from Inference.PointEstimate import AdamGradientDescent
-from Experiments import log_exp_metrics, draw_experiment, get_setup
+from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params_ens
 
 
 def learning(objective_fn, max_iter, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
@@ -61,6 +61,7 @@ def eMAP(setup, ensemble_size, max_iter, learning_rate, init_std, min_lr, patien
     with mlflow.start_run(experiment_id=expdata.experiment_id):
         log_experiment(param_count,  setup.sigma_noise, ensemble_best_score, ensemble_score, ensemble_size, max_iter, learning_rate, init_std, min_lr, patience, lr_decay, device)
         log_exp_metrics(setup.evaluate_metrics,theta,'cpu')
+        save_params_ens(theta)
         if setup.plot:
             draw_experiment(setup.makePlot, theta, 'cpu')
 
