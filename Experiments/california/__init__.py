@@ -37,25 +37,7 @@ class Setup(AbstractRegressionSetup):
         self._X, _y = fetch_california_housing(return_X_y=True)
         self._y = np.expand_dims(_y, axis=1)
 
-    def _split_holdout_data(self):
-        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.20, random_state=seed)
-        self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
 
-    def _normalize_data(self):
-        self._scaler_X, self._scaler_y = fitStandardScalerNormalization(self._X_train, self._y_train)
-        self._X_train, self._y_train = normalize(self._X_train, self._y_train, self._scaler_X, self._scaler_y)
-        self._X_validation, self._y_validation = normalize(self._X_validation, self._y_validation, self._scaler_X, self._scaler_y)
-        self._X_test, self._y_test = normalize(self._X_test, self._y_test, self._scaler_X, self._scaler_y)
-
-    def _flip_data_to_torch(self):
-        self._X = torch.tensor(self._X, device=self.device).float()
-        self._y = torch.tensor(self._y, device=self.device).float()
-        self._X_train = torch.tensor(self._X_train, device=self.device).float()
-        self._y_train = torch.tensor(self._y_train, device=self.device).float()
-        self._X_validation = torch.tensor(self._X_validation, device=self.device).float()
-        self._y_validation = torch.tensor(self._y_validation, device=self.device).float()
-        self._X_test = torch.tensor(self._X_test, device=self.device).float()
-        self._y_test = torch.tensor(self._y_test, device=self.device).float()
 
 
         
