@@ -46,7 +46,7 @@ def NormalLogLikelihood(y_pred, y_data, sigma_noise):
     log_proba = log_norm(y_pred, y_data, sigma_noise)
     return log_proba.squeeze(-1)
 
-def logmvn01pdf(theta):
+def logmvn01pdf(theta, device):
     """
     Evaluation of log proba with density N(0,I_n)
 
@@ -57,8 +57,8 @@ def logmvn01pdf(theta):
     logproba (Tensor): size N, vector of log probabilities
     """
     dim = theta.shape[1]
-    S = torch.ones(dim).type_as(theta)
-    mu = torch.zeros(dim).type_as(theta)
+    S = torch.ones(dim).type_as(theta).to(device)
+    mu = torch.zeros(dim).type_as(theta).to(device)
     n_x = theta.shape[0]
 
     H = S.view(dim, 1, 1).inverse().view(1, 1, dim)

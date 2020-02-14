@@ -101,7 +101,7 @@ class AbstractRegressionSetup(ABC):
         return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
 
     def _logprior(self, theta):
-        return logmvn01pdf(theta)
+        return logmvn01pdf(theta, self.device)
 
     def _normalized_prediction(self, X, theta, device):
         """Predict raw inverse normalized values for M models on N data points of D-dimensions
