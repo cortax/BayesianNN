@@ -318,9 +318,9 @@ class GeNVariationalInference():
             scheduler.step(L.detach().clone().cpu().numpy())
 
             if self.verbose:
-                stats = 'Epoch [{}/{}], Loss: {}, Entropy: {}, Learning Rate: {}'.format(t + 1, max_iter, L, ED, lr)
+                stats = 'Epoch [{}/{}], Loss: {}, Entropy {}, Learning Rate: {}'.format(t, self.max_iter, L, ED, lr)
                 print(stats)
-                
+
             self.score_elbo.append(L.detach().clone().cpu())
             self.score_entropy.append(ED.detach().clone().cpu())
             self.score_logposterior.append(LP.detach().clone().cpu())
