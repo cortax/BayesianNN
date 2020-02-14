@@ -32,7 +32,7 @@ class AdamGradientDescent:
         self._best_theta = theta.detach().clone().cpu().numpy()
         self._best_score = np.inf
         score = []
-        for t in range(self.max_iter - 1):
+        for t in range(self.max_iter):
             optimizer.zero_grad()
 
             loss = -torch.mean(self.objective_fn(theta))
@@ -41,7 +41,7 @@ class AdamGradientDescent:
             lr = optimizer.param_groups[0]['lr']
 
             if self.verbose:
-                stats = 'Epoch [{}/{}], Loss: {}, Learning Rate: {}'.format(t, self.max_iter, loss, lr)
+                stats = 'Epoch [{}/{}], Loss: {}, Learning Rate: {}'.format(t+1, self.max_iter, loss, lr)
                 print(stats)
 
             score.append(loss.detach().clone().cpu().numpy())

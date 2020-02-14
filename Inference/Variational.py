@@ -124,7 +124,7 @@ class MeanFieldVariationInference():
         self.score_entropy = []
         self.score_logposterior = []
 
-        for t in range(self.max_iter - 1):
+        for t in range(self.max_iter):
             optimizer.zero_grad()
 
             theta = q.sample(self.n_ELBO_samples)
@@ -137,7 +137,7 @@ class MeanFieldVariationInference():
             lr = optimizer.param_groups[0]['lr']
 
             if self.verbose:
-                stats = 'Epoch [{}/{}], Loss: {}, Learning Rate: {}'.format(t, self.max_iter, loss, lr)
+                stats = 'Epoch [{}/{}], Loss: {}, Learning Rate: {}'.format(t+1, self.max_iter, loss, lr)
                 print(stats)
 
             #score.append(loss.detach().clone().cpu().numpy())
