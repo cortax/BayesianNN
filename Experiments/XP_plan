@@ -1,0 +1,46 @@
+%% MAP
+
+python -m Experiments.MAP --ensemble_size=1000 --max_iter=200 --init_std=1. --learning_rate=0.1 --patience=10  --lr_decay=0.1
+    --max_iter=500
+check MSE_train! est-ce meilleur que MSE_valid?
+
+python -m Experiments.MAP --ensemble_size=1000 --max_iter=2000 --init_std=1. --learning_rate=0.1 --patience=200  --lr_decay=0.5
+
+à comparer avec ci-dessus
+
+%% MFVI
+
+python -m Experiments.MFVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=100 --lr_decay=.5
+
+python -m Experiments.MFVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=500 --lr_decay=.5
+
+
+chercher bon lr et augmenter patience pour avoir CONVERGENCE EN ENTROPIE en le moins d'iter possible
+
+
+%% GeNVI
+
+python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=100 --lr_decay=.5
+
+python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=500 --lr_decay=.5
+
+(réduire --n_samples_KDE=1000)
+chercher bon lr et augmenter patience pour avoir CONVERGENCE EN ENTROPIE en le moins d'iter possible
+
+
+essayer ensuite k-nearest neighbour:
+    --EntropyE=1,2,3,4 (réduire --n_samples_NNE=500->100 si trop lent ou manque de mémoire)
+
+Puis, peut-être, dans un deuxième temps:
+    varier : --layerwidth=50
+    varier : --lat_dim=5
+
+Pas toucher: init_w
+
+%% PTMCMC
+
+Experiments.PTMCMC --baseMHproposalNoise=.01 
+
+look for acceptance rate = 40%-50% by tuning baseMHproposalNoise
+
+
