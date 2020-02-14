@@ -88,7 +88,7 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
 
         if setup.plot:
 #            theta_ens = q.sample(1000).detach()
-            draw_experiment(setup.makePlot, theta_ens, log_device)
+            draw_experiment(setup.makePlot, theta, log_device)
 
 
 if __name__ == "__main__":
