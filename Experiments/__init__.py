@@ -115,8 +115,8 @@ class AbstractRegressionSetup(ABC):
         assert type(theta) is torch.Tensor
         y_pred = self._model(X.to(device), theta)
         if hasattr(self, '_scaler_y'):
-            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device) + torch.tensor(self._scaler_y.mean_,
-                                                                                                device=device)
+            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device).float() + torch.tensor(self._scaler_y.mean_,
+                                                                                                device=device).float()
         return y_pred
 
     def _loglikelihood(self, theta, X, y, device):
