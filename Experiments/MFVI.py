@@ -70,12 +70,12 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
     mlflow.set_experiment(xpname)
 
     with mlflow.start_run():
-        theta=q.sample(1000).detach().cpu()
+        theta=q.sample(1000).detach()
         log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
                             ensemble_size, init_std, n_ELBO_samples,
                             max_iter, learning_rate, min_lr, patience, lr_decay,
                             device)
-        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
+        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,device)
 
 
         save_model(q)
