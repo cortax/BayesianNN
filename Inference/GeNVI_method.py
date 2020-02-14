@@ -184,7 +184,7 @@ def GeNVI(objective_fn,
         scheduler.step(L.detach().clone().cpu().numpy())
 
         if verbose:
-            stats = 'Epoch [{}/{}], Training Loss: {}, Learning Rate: {}'.format(t+1, max_iter, L, lr)
+            stats = 'Epoch [{}/{}], Loss: {}, Entropy: {}, Learning Rate: {}'.format(t+1, max_iter, L,ED, lr)
             print(stats)
 
         GeN._save_best_model(L, t, ED, LP)
