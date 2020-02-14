@@ -201,7 +201,7 @@ class GeNVariationalInference():
     def __init__(self, objective_fn,
                  kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
-                 device, verbose):
+                 device, verbose, temp_dir):
         self.objective_fn = objective_fn
         self.kNNE=kNNE
         self.n_samples_NNE=n_samples_NNE
@@ -218,7 +218,7 @@ class GeNVariationalInference():
 
         self._best_score=float('inf')
 
-        self.tempdir_name = ''#tempfile.TemporaryDirectory()
+        self.tempdir_name = temp_dir
 
 
 
@@ -289,11 +289,11 @@ class GeNVariationalInference():
                 'ELBO': score,
                 'ED':ED,
                 'LP':LP
-            }, self.tempdir_name+'best.pt')
+            }, self.tempdir_name+'/best.pt')
             self._best_score=score
 
     def _get_best_model(self, GeN):
-        best= torch.load(self.tempdir_name+'best.pt')
+        best= torch.load(self.tempdir_name+'/best.pt')
         GeN.load_state_dict(best['state_dict'])
         return best['epoch'], [best['ELBO'], best['ED'], best['LP']]
 

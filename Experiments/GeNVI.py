@@ -3,8 +3,12 @@ import argparse
 import mlflow
 import timeit
 
+from tempfile import TemporaryDirectory
+
 from Inference.GeNVI_method import GeNVariationalInference, GeNetEns
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
+
+import tempfile
 
 
 ## command line example
@@ -18,11 +22,13 @@ def GeNVI_learning(objective_fn,
 	GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count,
 	               activation, init_w, init_b, device)
 
-	optimizer = GeNVariationalInference(objective_fn,
-	                                    kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
-	                                    max_iter, learning_rate, min_lr, patience, lr_decay,
-	                                    device, verbose)
-	the_epoch, the_scores = optimizer.run(GeN)
+	with TemporaryDirectory() as temp_dir:
+		optimizer = GeNVariationalInference(objective_fn,
+		                                    kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
+		                                    max_iter, learning_rate, min_lr, patience, lr_decay,
+		                                    device, verbose, temp_dir)
+		the_epoch, the_scores = optimizer.run(GeN)
+
 	log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
 	return GeN, the_epoch, the_scores, log_scores
 

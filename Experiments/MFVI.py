@@ -1,10 +1,13 @@
 import argparse
 import mlflow
 import timeit
+from tempfile import TemporaryDirectory
+import torch
+
 
 from Inference.Variational import MeanFieldVariationInference, MeanFieldVariationalDistribution
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
-import torch
+
 
 
 # CLI
@@ -14,12 +17,14 @@ import torch
 
 def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, param_count, min_lr, patience, lr_decay, device, verbose):
 
-    optimizer = MeanFieldVariationInference(objective_fn, max_iter, n_ELBO_samples,
-                                            learning_rate, min_lr, patience, lr_decay,  device, verbose)
-
     mu=init_std*torch.randn(param_count, device=device)
     q0 = MeanFieldVariationalDistribution(param_count,mu=mu, sigma=0.0000001, device=device)
-    the_epoch, the_scores = optimizer.run(q0)
+
+    with TemporaryDirectory() as temp_dir:
+        optimizer = MeanFieldVariationInference(objective_fn, max_iter, n_ELBO_samples,
+                                                learning_rate, min_lr, patience, lr_decay,  device, verbose, temp_dir)
+        the_epoch, the_scores = optimizer.run(q0)
+
     log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
     return q0, the_epoch, the_scores, log_scores
 

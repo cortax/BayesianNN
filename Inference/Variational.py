@@ -80,7 +80,7 @@ class MeanFieldVariationalDistribution(nn.Module):
 
 
 class MeanFieldVariationInference():
-    def __init__(self, objective_fn, max_iter, n_ELBO_samples, learning_rate, min_lr, patience, lr_decay, device, verbose):
+    def __init__(self, objective_fn, max_iter, n_ELBO_samples, learning_rate, min_lr, patience, lr_decay, device, verbose,temp_dir):
         self.objective_fn = objective_fn
         self.max_iter = max_iter
         self.n_ELBO_samples = n_ELBO_samples
@@ -91,10 +91,9 @@ class MeanFieldVariationInference():
         self.device = device
         self.verbose = verbose
 
-        self.tempdir_name = ''
+        self.tempdir_name = temp_dir
 
 
-#        self._best_theta = None
         self._best_score = float('inf')
 
     def _save_best_model(self, q, epoch, score,  ED, LP):
