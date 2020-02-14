@@ -10,12 +10,17 @@ import torch
 
 from Tools import logmvn01pdf, NormalLogLikelihood
 
+from sklearn.model_selection import train_test_split
+from Preprocessing import fitStandardScalerNormalization, normalize
 
 
 def switch_setup(setup):
     return {
         'foong':  importlib.util.spec_from_file_location("foong", "Experiments/foong/__init__.py") ,
-        'boston': importlib.util.spec_from_file_location("boston", "Experiments/boston/__init__.py")
+        'boston': importlib.util.spec_from_file_location("boston", "Experiments/boston/__init__.py"),
+        'california': importlib.util.spec_from_file_location("california", "Experiments/california/__init__.py"),
+        'concrete': importlib.util.spec_from_file_location("concrete", "Experiments/concrete/__init__.py"),
+        'wine': importlib.util.spec_from_file_location("wine", "Experiments/winequality/__init__.py")
     }[setup]
 
 def get_setup(setup,device):
@@ -64,6 +69,7 @@ def save_params_ens(theta):
     torch.save(theta, tempdir.name + '/theta.pt')
     mlflow.log_artifact(tempdir.name + '/theta.pt')
 
+seed=37
 
 class AbstractRegressionSetup(ABC):
     def __init__(self):
@@ -109,8 +115,8 @@ class AbstractRegressionSetup(ABC):
         assert type(theta) is torch.Tensor
         y_pred = self._model(X.to(device), theta)
         if hasattr(self, '_scaler_y'):
-            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device) + torch.tensor(self._scaler_y.mean_,
-                                                                                                device=device)
+            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device).float() + torch.tensor(self._scaler_y.mean_,
+                                                                                                device=device).float()
         return y_pred
 
     def _loglikelihood(self, theta, X, y, device):
@@ -128,6 +134,25 @@ class AbstractRegressionSetup(ABC):
     def logposterior(self, theta):
         return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),
                                                  dim=1)
+    def _split_holdout_data(self):
+        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.20, random_state=seed)
+        self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
+
+    def _normalize_data(self):
+        self._scaler_X, self._scaler_y = fitStandardScalerNormalization(self._X_train, self._y_train)
+        self._X_train, self._y_train = normalize(self._X_train, self._y_train, self._scaler_X, self._scaler_y)
+        self._X_validation, self._y_validation = normalize(self._X_validation, self._y_validation, self._scaler_X, self._scaler_y)
+        self._X_test, self._y_test = normalize(self._X_test, self._y_test, self._scaler_X, self._scaler_y)
+
+    def _flip_data_to_torch(self):
+        self._X = torch.tensor(self._X, device=self.device).float()
+        self._y = torch.tensor(self._y, device=self.device).float()
+        self._X_train = torch.tensor(self._X_train, device=self.device).float()
+        self._y_train = torch.tensor(self._y_train, device=self.device).float()
+        self._X_validation = torch.tensor(self._X_validation, device=self.device).float()
+        self._y_validation = torch.tensor(self._y_validation, device=self.device).float()
+        self._X_test = torch.tensor(self._X_test, device=self.device).float()
+        self._y_test = torch.tensor(self._y_test, device=self.device).float()
 
     # @abstractmethod
     # def evaluate(self):

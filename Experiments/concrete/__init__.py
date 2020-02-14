@@ -3,15 +3,13 @@ import torch
 from torch import nn
 
 from Experiments import AbstractRegressionSetup
-from sklearn.model_selection import train_test_split
-from sklearn.datasets import load_boston
+
 
 from Models import get_mlp
-from Preprocessing import fitStandardScalerNormalization, normalize
 
-experiment_name='Boston'
+experiment_name='Concrete'
 
-input_dim = 13
+input_dim = 8
 nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
@@ -34,7 +32,7 @@ class Setup(AbstractRegressionSetup):
         self._flip_data_to_torch()
 
     def _preparare_data(self):
-        self._X, _y = load_boston(return_X_y=True)
+        self._X, _y = torch.load ('Experiments/concrete/data.pt')
         self._y = np.expand_dims(_y, axis=1)
 
 
