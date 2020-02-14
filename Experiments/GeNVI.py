@@ -148,8 +148,8 @@ if __name__ == "__main__":
 		                     args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
 		                     args.device)
 
-		theta = GeN(1000).detach().cpu()
-		log_exp_metrics(setup.evaluate_metrics, theta, execution_time, 'cpu')
+		theta = GeN(1000).detach()
+		log_exp_metrics(setup.evaluate_metrics, theta, execution_time, args.device)
 
 		save_model(GeN)
 
