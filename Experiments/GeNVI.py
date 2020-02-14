@@ -154,11 +154,12 @@ if __name__ == "__main__":
 		                     args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
 		                     args.device)
 
-		theta = GeN(1000).detach()
-		log_exp_metrics(setup.evaluate_metrics, theta, execution_time, args.device)
+		log_device = 'cpu'
+		theta = GeN(1000).detach().to(log_device)
+		log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
 
 		save_model(GeN)
 
 		if setup.plot:
-			theta_ens = GeN(1000).detach()#.cpu()
-			draw_experiment(setup.makePlot, theta_ens, args.device)
+#			theta_ens = GeN(1000).detach()#.cpu()
+			draw_experiment(setup.makePlot, theta_ens, log_device)
