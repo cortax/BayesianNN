@@ -42,7 +42,7 @@ class Setup(AbstractRegressionSetup):
         self._X_test, self._y_test = test[0].to(self.device), test[1].unsqueeze(-1).to(self.device)
 
 
-    def makePlot(self, theta,device):
+    def makePlot(self, theta, device):
         def get_linewidth(linewidth, axis):
             fig = axis.get_figure()
             ppi = 72  # matplolib points per inches
@@ -61,8 +61,9 @@ class Setup(AbstractRegressionSetup):
 
         my_lw=get_linewidth(0.2,ax)
         alpha = (.9 / torch.tensor(float(nb_samples_plot)).sqrt()).clamp(0.05, 1.)
+        theta=theta.detach().to(device)
         for i in range(theta.shape[0]):
-            y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0),device)
+            y_pred = self._normalized_prediction(x_lin, theta[i,:].unsqueeze(0), device)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=0.8*alpha, linewidth=my_lw,
                      color='springgreen', zorder=2)
             plt.plot(x_lin.detach().cpu().numpy(), y_pred.squeeze(0).detach().cpu().numpy(), alpha=alpha, linewidth=1.0, color='green',zorder=3)
