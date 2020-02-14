@@ -22,7 +22,8 @@ def switch_setup(setup):
         'concrete': importlib.util.spec_from_file_location("concrete", "Experiments/concrete/__init__.py"),
         'wine': importlib.util.spec_from_file_location("wine", "Experiments/winequality/__init__.py"),
         'kin8nm': importlib.util.spec_from_file_location("kin8nm", "Experiments/kin8nm/__init__.py"),
-        'powerplant': importlib.util.spec_from_file_location("powerplant", "Experiments/ccpowerplant/__init__.py")
+        'powerplant': importlib.util.spec_from_file_location("powerplant", "Experiments/ccpowerplant/__init__.py"),
+        'yacht': importlib.util.spec_from_file_location("yacht", "Experiments/yacht/__init__.py")
     }[setup]
 
 def get_setup(setup,device):
