@@ -19,9 +19,12 @@ Experiments/datasets.ipynb
 
 Experiments/datasets.py
 
-/Experiments/navalpropulsion/
 
 Experiments/kin8nm/kin8nm.csv
 
 Experiments/concrete/concrete.csv
 
+
+*.csv
+
+/Experiments/navalpropulsion/
