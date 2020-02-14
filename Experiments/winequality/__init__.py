@@ -4,17 +4,16 @@ from torch import nn
 
 from Experiments import AbstractRegressionSetup
 
-
 from Models import get_mlp
 
-experiment_name='Concrete'
+experiment_name='WineQuality'
 
-input_dim = 8
+input_dim = 11
 nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
 sigma_noise = 1.0
-seed = 42
+seed = 37
 
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device):
@@ -32,7 +31,7 @@ class Setup(AbstractRegressionSetup):
         self._flip_data_to_torch()
 
     def _preparare_data(self):
-        self._X, _y = torch.load ('Experiments/concrete/data.pt')
+        self._X, _y = torch.load ('Experiments/winequality/data.pt')
         self._y = np.expand_dims(_y, axis=1)
 
 
