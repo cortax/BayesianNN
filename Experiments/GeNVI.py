@@ -162,4 +162,4 @@ if __name__ == "__main__":
 
 		if setup.plot:
 #			theta_ens = GeN(1000).detach()#.cpu()
-			draw_experiment(setup.makePlot, theta_ens, log_device)
+			draw_experiment(setup.makePlot, theta, log_device)
