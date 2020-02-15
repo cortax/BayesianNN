@@ -1,0 +1,15 @@
+artifact_uri: file:///home/maala89/BayesianNN/mlruns/1/d981296b53334fa6a1158d23d4b60eb2/artifacts
+end_time: 1581805468768
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: d981296b53334fa6a1158d23d4b60eb2
+run_uuid: d981296b53334fa6a1158d23d4b60eb2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1581805466285
+status: 4
+tags: []
+user_id: maala89
