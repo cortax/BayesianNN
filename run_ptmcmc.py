@@ -8,12 +8,12 @@ if __name__ == "__main__":
     # Une colonne = un dataset foong, boston, wine, concrete, kin8nm, yacht, powerplant
     
     # (numiter, baseMHproposalNoise)
-    PTMCMCs_params = [(10000, 0.002) for i in range(7)]
+    PTMCMCs_params = [(10, 0.002) for i in range(7)]
     
     datasets = [("foong", PTMCMCs_params[0]), ("boston", PTMCMCs_params[1]), ("wine",PTMCMCs_params[2]), ("concrete", PTMCMCs_params[3]), ("kin8nm", PTMCMCs_params[4]), ("yacht", PTMCMCs_params[5]), ("powerplant", PTMCMCs_params[6])]
     
 
-    PTMCMCs = ["-m Experiments.PTMCMC --numiter=" + str(j[0]) +  " --optimize=10000 --baseMHproposalNoise=" + str(j[1]) + " --setup=" + i for i,j in datasets]
+    PTMCMCs = ["-m Experiments.PTMCMC --numiter=" + str(j[0]) +  " --optimize=100 --baseMHproposalNoise=" + str(j[1]) + " --setup=" + i for i,j in datasets]
     
     def run_dataset(algorithm):                                                             
         os.system('python {}'.format(algorithm))                                                                                                         
