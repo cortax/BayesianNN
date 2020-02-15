@@ -29,7 +29,7 @@ def GeNVI_learning(objective_fn,
 		                                    device, verbose, temp_dir)
 		the_epoch, the_scores = optimizer.run(GeN)
 
-	log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
+	log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior, optimizer.score_lr]
 	return GeN, the_epoch, the_scores, log_scores
 
 
@@ -77,8 +77,7 @@ def log_GeNVI_experiment(setup, the_epoch, the_scores, log_scores,
 		mlflow.log_metric("elbo", float(log_scores[0][t]), step=t)
 		mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
 		mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
-
-
+		mlflow.log_metric("learning_rate", float(log_scores[3][t]), step=t)
 
 
 parser = argparse.ArgumentParser()

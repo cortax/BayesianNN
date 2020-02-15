@@ -25,7 +25,7 @@ def learning(objective_fn, max_iter, n_ELBO_samples, learning_rate, init_std, pa
                                                 learning_rate, min_lr, patience, lr_decay,  device, verbose, temp_dir)
         the_epoch, the_scores = optimizer.run(q0)
 
-    log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior]
+    log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior, optimizer.score_lr]
     return q0, the_epoch, the_scores, log_scores
 
                    
@@ -59,6 +59,7 @@ def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
         mlflow.log_metric("elbo", float(log_scores[0][t]), step=t)
         mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
         mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
+        mlflow.log_metric("learning_rate", float(log_scores[3][t]), step=t)
 
 def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patience, lr_decay, verbose):
     objective_fn = setup.logposterior

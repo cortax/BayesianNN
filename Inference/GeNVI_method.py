@@ -305,6 +305,8 @@ class GeNVariationalInference():
         self.score_elbo = []
         self.score_entropy = []
         self.score_logposterior = []
+        self.score_lr = []
+
         for t in range(self.max_iter):
             optimizer.zero_grad()
 
@@ -324,6 +326,8 @@ class GeNVariationalInference():
             self.score_elbo.append(L.detach().clone().cpu())
             self.score_entropy.append(ED.detach().clone().cpu())
             self.score_logposterior.append(LP.detach().clone().cpu())
+            self.score_lr.append(lr)
+
 
             self._save_best_model(GeN, t,L.detach().clone(), ED.detach().clone(), LP.detach().clone())
 

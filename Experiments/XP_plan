@@ -20,9 +20,9 @@ chercher bon lr et augmenter patience pour avoir CONVERGENCE EN ENTROPIE en le m
 
 %% GeNVI
 
-python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=100 --lr_decay=.5
+python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05  --patience=100 --lr_decay=.5
 
-python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=500 --lr_decay=.5
+python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05  --patience=500 --lr_decay=.5
 
 (réduire --n_samples_KDE=1000)
 chercher bon lr et augmenter patience pour avoir CONVERGENCE EN ENTROPIE en le moins d'iter possible
@@ -39,8 +39,9 @@ Pas toucher: init_w
 
 %% PTMCMC
 
-Experiments.PTMCMC --baseMHproposalNoise=.01 
+Experiments.PTMCMC --baseMHproposalNoise=.01
 
 look for acceptance rate = 40%-50% by tuning baseMHproposalNoise
+
 
 

@@ -123,6 +123,7 @@ class MeanFieldVariationInference():
         self.score_elbo = []
         self.score_entropy = []
         self.score_logposterior = []
+        self.score_lr = []
 
         for t in range(self.max_iter):
             optimizer.zero_grad()
@@ -149,6 +150,7 @@ class MeanFieldVariationInference():
             self.score_elbo.append(loss.detach().clone().cpu())
             self.score_entropy.append(-LQ.detach().clone().cpu())
             self.score_logposterior.append(LP.detach().clone().cpu())
+            self.score_lr.append(lr)
 
             if lr < self.min_lr:
                 break
