@@ -48,7 +48,7 @@ class AdamGradientDescent:
             scheduler.step(loss.detach().clone().cpu().numpy())
             optimizer.step()
 
-            self._save_best_model(loss.detach().clone().cpu().numpy(), theta.detach().clone().cpu().numpy())
+            self._save_best_model(loss.detach().clone().cpu().numpy(), theta.detach().clone().cpu())
 
             if lr < self.min_lr:
                 break
