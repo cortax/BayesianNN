@@ -1,0 +1,98 @@
+%% MAP
+
+python -m Experiments.MAP --ensemble_size=1000 --max_iter=200 --init_std=1. --learning_rate=0.1 --patience=10  --lr_decay=0.1
+    --max_iter=500
+check MSE_train! est-ce meilleur que MSE_valid?
+
+python -m Experiments.MAP --ensemble_size=1000 --max_iter=2000 --init_std=1. --learning_rate=0.1 --patience=200  --lr_decay=0.5
+
+à comparer avec ci-dessus
+
+%% MFVI
+
+python -m Experiments.MFVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=100 --lr_decay=.5
+
+python -m Experiments.MFVI --max_iter=10000 --learning_rate=0.05 --n_ELBO_samples=100 --patience=500 --lr_decay=.5
+
+
+chercher bon lr et augmenter patience pour avoir CONVERGENCE EN ENTROPIE en le moins d'iter possible
+
+
+%% GeNVI
+
+python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05  --patience=100 --lr_decay=.5
+
+python -m Experiments.GeNVI --max_iter=10000 --learning_rate=0.05  --patience=500 --lr_decay=.5
+
+(réduire --n_samples_KDE=1000)
+chercher bon lr et augmenter patience pour avoir CONVERGENCE EN ENTROPIE en le moins d'iter possible
+
+
+essayer ensuite k-nearest neighbour:
+    --EntropyE=1,2,3,4 (réduire --n_samples_NNE=500->100 si trop lent ou manque de mémoire)
+
+Puis, peut-être, dans un deuxième temps:
+    varier : --layerwidth=50
+    varier : --lat_dim=5
+
+Pas toucher: init_w
+
+%% PTMCMC
+
+Experiments.PTMCMC --baseMHproposalNoise=.01
+
+look for acceptance rate = 40%-50% by tuning baseMHproposalNoise
+
+
+
+
+
+MFVI learning_rate:0.05 lr_decay:0.5    max_iter:10000  min_lr:1e-06    n_ELBO_samples:100  patience:500
+foong ok
+boston entropie chaotique, curse of dimensionality?
+wine ok
+concrete entropie chaotique pas de convergence, check lr
+kin8nm ok
+yacht entropie chaotique pas de convergence, check lr
+powerplant entropie chaotique pas de convergence
+
+python -m Experiments.MFVI --verbose=1 --max_iter=10000 --learning_rate=0.09 --n_ELBO_samples=50 --patience=300 --lr_decay=.5 --device=cuda:1 --setup=powerplant
+
+for boston, powerplant
+python -m Experiments.MFVI --verbose=1 --max_iter=20000 --learning_rate=0.05 --n_ELBO_samples=10 --patience=500 --lr_decay=.5 --device=cuda:1 --setup=powerplant
+
+
+
+GENVI
+
+learning_rate:0.05
+lr_decay:0.5
+max_iter:10000
+min_lr:1e-08
+n_samples_ED:50
+n_samples_KDE:1000
+n_samples_LP:100
+n_samples_NNE:500
+patience:500
+
+foong ok
+boston manque d'iter
+wine ok
+concrete manque d'iter
+kin8nm converge vers 5k
+yacht converge presque, manque un peu d'iter
+powerplant pas de convergence!
+
+
+
+
+
+
+%%%%%%%%%
+foong
+boston
+wine
+concrete
+kin8nm
+yacht
+powerplant

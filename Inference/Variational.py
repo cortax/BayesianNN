@@ -138,7 +138,7 @@ class MeanFieldVariationInference():
             lr = optimizer.param_groups[0]['lr']
 
             if self.verbose:
-                stats = 'Epoch [{}/{}], Loss: {}, Learning Rate: {}'.format(t+1, self.max_iter, loss, lr)
+                stats = 'Epoch [{}/{}], Loss: {}, Entropy {}, Learning Rate: {}'.format(t+1, self.max_iter, loss, -LQ, lr)
                 print(stats)
 
             #score.append(loss.detach().clone().cpu().numpy())
