@@ -98,7 +98,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.burnin is None:
-        args.burnin =int(0.2*args.numiter)
+        args.burnin =int(0.4*args.numiter)
 
 
     theta_ens_size=10000
