@@ -273,7 +273,7 @@ class GeNVariationalInference():
         nb_samples=theta.shape[0]
         dim=theta.shape[1]
         D=torch.cdist(theta,theta)
-        a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf')).to(device)
+        a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf')).to(self.device)
         d=torch.as_tensor(float(dim), device=self.device)
         K=torch.as_tensor(float(k), device=self.device)
         N=torch.as_tensor(float(nb_samples), device=self.device)
