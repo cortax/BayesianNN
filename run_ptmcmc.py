@@ -13,7 +13,7 @@ if __name__ == "__main__":
     datasets = [("foong", PTMCMCs_params[0]), ("boston", PTMCMCs_params[1]), ("wine",PTMCMCs_params[2]), ("concrete", PTMCMCs_params[3]), ("kin8nm", PTMCMCs_params[4]), ("yacht", PTMCMCs_params[5]), ("powerplant", PTMCMCs_params[6])]
     
 
-    PTMCMCs = ["-m Experiments.PTMCMC --numiter=" + str(j[0]) +  " --baseMHproposalNoise=" + str(j[1]) + " --setup=" + i for i,j in datasets]
+    PTMCMCs = ["-m Experiments.PTMCMC --numiter=" + str(j[0]) +  " --optimize=10000 --baseMHproposalNoise=" + str(j[1]) + " --setup=" + i for i,j in datasets]
     
     def run_dataset(algorithm):                                                             
         os.system('python {}'.format(algorithm))                                                                                                         
