@@ -97,5 +97,5 @@ boston
 wine
 concrete
 kin8nm  proposalNoise =.004
-yacht
-powerplant
+yacht proposalNoise =.0006
+powerplant 
