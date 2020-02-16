@@ -97,5 +97,10 @@ boston
 wine
 concrete
 kin8nm  proposalNoise =.004
+<<<<<<< Updated upstream
 yacht proposalNoise =.0006
 powerplant 
+=======
+yacht
+powerplant
+>>>>>>> Stashed changes
