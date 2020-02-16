@@ -12,7 +12,7 @@ import tempfile
 
 
 ## command line example
-# python -m Experiments.GeNVI --setup=foong --verbose=True --max_iter=10
+# python -m Experiments.GeNVI --setup=foong --verbose=True --max_iter=20000 --learning_rate=0.05 --lat_dim= --layerwidth=
 
 def GeNVI_learning(objective_fn,
                    ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b,
