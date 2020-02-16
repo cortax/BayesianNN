@@ -84,7 +84,7 @@ yacht converge presque, manque un peu d'iter
 powerplant pas de convergence!
 
 
-python -m Experiments.GeNVI --max_iter=20000 --learning_rate=.05 --patience=1000 --n_samples_ED=50 --n_samples_LP=50 --verbose=1 --device=cuda:1 --setup=powerplant
+nohup python -m Experiments.GeNVI --max_iter=20000 --learning_rate=.1 --patience=500 --n_samples_ED=50 --n_samples_LP=50 --verbose=1 --device=cuda:1 --setup=powerplant &
 
 
 
@@ -97,10 +97,8 @@ boston
 wine
 concrete
 kin8nm  proposalNoise =.004
-<<<<<<< Updated upstream
 yacht proposalNoise =.0006
 powerplant 
-=======
-yacht
-powerplant
->>>>>>> Stashed changes
+
+
+nohup python -m Experiments.PTMCMC --numiter=20000 --baseMHproposalNoise=0.0005 --optimize=10000 --setup=powerplant

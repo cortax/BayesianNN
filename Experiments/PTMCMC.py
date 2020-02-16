@@ -129,8 +129,8 @@ if __name__ == "__main__":
 
         save_params_ens(theta)
 
-        if setup.plot:
-            theta=theta[0:1000]
-            draw_experiment(setup.makePlot, theta, 'cpu')
-
+        # if setup.plot:
+        #     theta=theta[0:1000]
+        #     draw_experiment(setup.makePlot, theta, 'cpu')
+        #
 
