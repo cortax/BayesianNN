@@ -51,7 +51,7 @@ MFVI learning_rate:0.05 lr_decay:0.5    max_iter:10000  min_lr:1e-06    n_ELBO_s
 foong ok
 boston entropie chaotique, curse of dimensionality?
 wine ok
-concrete entropie chaotique pas de convergence, check lr
+concrete entropie chaotique pas de convergence, check lr  --max_iter=20000
 kin8nm ok
 yacht entropie chaotique pas de convergence, check lr
 powerplant entropie chaotique pas de convergence
@@ -84,15 +84,18 @@ yacht converge presque, manque un peu d'iter
 powerplant pas de convergence!
 
 
+python -m Experiments.GeNVI --max_iter=20000 --learning_rate=.05 --patience=1000 --n_samples_ED=50 --n_samples_LP=50 --verbose=1 --device=cuda:1 --setup=powerplant
 
 
 
 
 %%%%%%%%%
+
+PTMCM
 foong
 boston
 wine
 concrete
-kin8nm
+kin8nm  proposalNoise =.004
 yacht
 powerplant

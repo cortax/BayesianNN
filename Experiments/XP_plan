@@ -4,7 +4,7 @@ python -m Experiments.MAP --ensemble_size=1000 --max_iter=200 --init_std=1. --le
     --max_iter=500
 check MSE_train! est-ce meilleur que MSE_valid?
 
-python -m Experiments.MAP --ensemble_size=1000 --max_iter=2000 --init_std=1. --learning_rate=0.1 --patience=200  --lr_decay=0.5
+python -m Experiments.MAP --ensemble_size=1000 --max_iter=5000 --init_std=1. --learning_rate=0.1 --patience=200  --lr_decay=0.5
 
 à comparer avec ci-dessus
 
@@ -32,14 +32,14 @@ essayer ensuite k-nearest neighbour:
     --EntropyE=1,2,3,4 (réduire --n_samples_NNE=500->100 si trop lent ou manque de mémoire)
 
 Puis, peut-être, dans un deuxième temps:
-    varier : --layerwidth=50
-    varier : --lat_dim=5
+    varier : --layerwidth=50 , 100
+    varier : --lat_dim=5, 50, 100
 
 Pas toucher: init_w
 
 %% PTMCMC
 
-Experiments.PTMCMC --baseMHproposalNoise=.01
+python -m Experiments.PTMCMC --baseMHproposalNoise=.001 --optimize=10000 --numiter=50000 --setup=kin8nm
 
 look for acceptance rate = 40%-50% by tuning baseMHproposalNoise
 
