@@ -54,7 +54,7 @@ def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, tempera
 
 if __name__ == "__main__":
     # example the commande de run
-    # python -m Experiments.PTMCMC --numiter=100 --burnin=10 --thinning=2 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --setup=boston
+    # python -m Experiments.PTMCMC --numiter=20000 --baseMHproposalNoise=0.01 --optimize=10000 --setup=powerplant
     #  python -m Experiments.foong.PTMCMC --numiter=10000 --burnin=100 --thinning=10 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #numiter as big as possible
     #burnin about 10% - 50%
@@ -89,7 +89,7 @@ if __name__ == "__main__":
                         help="factor adapting the noise to the corresponding temperature")
     parser.add_argument("--std_init", type=float, default=1.0,
                         help="parameter controling initialization of theta")
-    parser.add_argument("--optimize", type=int, default=0,
+    parser.add_argument("--optimize", type=int, default=10000,
                         help="number of optimization iterations to initialize the state")
     parser.add_argument("--seed", type=int, default=None,
                         help="value insuring reproducibility")
@@ -130,6 +130,7 @@ if __name__ == "__main__":
         save_params_ens(theta)
 
         if setup.plot:
-            draw_experiment(setup.makePlot, theta,args.device)
+            theta=theta[0:1000]
+            draw_experiment(setup.makePlot, theta, 'cpu')
 
 
