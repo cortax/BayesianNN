@@ -121,7 +121,7 @@ if __name__ == "__main__":
     mlflow.set_experiment(xpname)
 
     with mlflow.start_run():
-        theta = torch.cat(theta_ens[0:-1:10])
+        theta = torch.cat(theta_ens[0:-1:10]).cpu()
 
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
         theta = torch.cat(theta_ens).cpu()
