@@ -15,7 +15,7 @@ def learning(objective_fn, param_count, device, numiter, burnin, thinning, tempe
         
     sampler.initChains(nbiter=optimize, std_init=std_init)
 
-    chains, ladderAcceptanceRate, swapAcceptanceRate, logProba = sampler.run(numiter)
+    chains, ladderAcceptanceRate, swapAcceptanceRate = sampler.run(numiter,burnin,thinning)
     ensemble = chains[maintempindex][burnin:-1:thinning]
 
     return ensemble, ladderAcceptanceRate, swapAcceptanceRate
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     with mlflow.start_run():
 
-        theta = torch.cat(theta_ens[0:-1:10]).cpu()
+        theta=theta_ens
 
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
         theta = torch.cat(theta_ens).cpu()

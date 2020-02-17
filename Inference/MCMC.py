@@ -13,9 +13,12 @@ class PTMCMCSampler():
         self.nb_chains = len(temperatures)
         
         self.state = [[] for i in range(self.nb_chains)]
+        self.current= [0 for i in range(self.nb_chains)]
+        self.last= [0 for i in range(self.nb_chains)]
+
         self._swapAcceptanceCount = [0 for i in range(self.nb_chains-1)]
         self._ladderAcceptanceCount = [0 for i in range(self.nb_chains)]
-        self.logProbaMatrix = [[] for i in range(self.nb_chains)]
+ #       self.logProbaMatrix = [[] for i in range(self.nb_chains)]
         
         self.temperatures = temperatures
         self.baseMHproposalNoise = baseMHproposalNoise
@@ -23,11 +26,11 @@ class PTMCMCSampler():
 
     def initChains(self, nbiter=1000, std_init=1.0, stateInit=None):
         if stateInit is not None:
-            self.state = [[stateInit[i]] for i in range(self.nb_chains)]
+            self.last = [stateInit[i] for i in range(self.nb_chains)]
         else:
-            self.state = [[self._MAP(nbiter, std_init)] for i in range(self.nb_chains)]
+            self.last = [self._MAP(nbiter, std_init) for _ in range(self.nb_chains)]
     
-        self.logProbaMatrix = [ [self.logposterior(self.state[j][-1])] for j in range(self.nb_chains)]
+        self.logProbaMatrix = [ [self.logposterior(self.last[j])] for j in range(self.nb_chains)]
         self._swapAcceptanceCount = [0 for i in range(self.nb_chains-1)]
         self._ladderAcceptanceCount = [0 for i in range(self.nb_chains)]
         
@@ -45,45 +48,49 @@ class PTMCMCSampler():
         else:
             return theta_current, 0
                        
-    def run(self, N):
+    def run(self, N, burnin, thinning):
         with torch.no_grad():                          
             for t in range(N):            
                 for j in range(self.nb_chains):
-                    theta_current = self.state[j][-1]
+                    theta_last = self.last[j]
                     T = self.temperatures[j]
-                    theta_current, accept = self._MetropolisHastings(theta_current, T)
-                    self.state[j].append(theta_current)
+                    theta_current, accept = self._MetropolisHastings(theta_last, T)
+                    self.current[j]=theta_current
                     #ChainTrack[j].append(ChainTrack[j][-1])
                     if accept:
                         self._ladderAcceptanceCount[j] += 1
 
                 for  j in range(self.nb_chains):
-                    self.logProbaMatrix[j].append(self.logposterior(self.state[j][-1]))
+                    self.logProbaMatrix[j]=self.logposterior(self.current[j]) # append new_state
 
-                stats = 'Epoch [{}/{}], Logproba: {}'.format(t, N, self.logProbaMatrix[j][-1][0])
+                stats = 'Epoch [{}/{}], Logproba: {}'.format(t, N, self.logProbaMatrix[j].squeeze())
                 print(stats)
 
                 for j in np.random.permutation(self.nb_chains-1):
                     T_left = self.temperatures[j]
                     T_right = self.temperatures[j+1]
 
-                    logA = self.logProbaMatrix[j][-1]/T_right + self.logProbaMatrix[j+1][-1]/T_left \
-                         - self.logProbaMatrix[j][-1]/T_left - self.logProbaMatrix[j+1][-1]/T_right
+                    logA = self.logProbaMatrix[j]/T_right + self.logProbaMatrix[j+1]/T_left \
+                         - self.logProbaMatrix[j]/T_left - self.logProbaMatrix[j+1]/T_right
 
                     A = torch.exp(logA).cpu()
 
                     if torch.distributions.uniform.Uniform(0.0,1.0).sample() < A:
-                        tmp = self.state[j][-1]
-                        self.state[j][-1] = self.state[j+1][-1]
-                        self.state[j+1][-1] = tmp
+                        tmp = self.current[j] #swap
+                        self.current[j] = self.current[j+1]
+                        self.current[j+1] = tmp #swap
 
                         self._swapAcceptanceCount[j] = self._swapAcceptanceCount[j]+1
-            
+
+                self.last=self.current
+                if (t - burnin) % thinning == 0:
+                    self.state[j].append(theta_current)  # append new_state
+
             x = self.state
-            logProba = self.logProbaMatrix
+#            logProba = self.logProbaMatrix
             ladderAcceptanceRate = torch.tensor(self._ladderAcceptanceCount).float()/N
             swapAcceptanceRate = torch.tensor(self._swapAcceptanceCount).float()/N
-            return x, ladderAcceptanceRate, swapAcceptanceRate, logProba
+            return x, ladderAcceptanceRate, swapAcceptanceRate #, logProba
 
     def _MAP(self, nbiter, std_init,device='cpu'):
         optimizer = AdamGradientDescent(self.logposterior, nbiter, .01, .00000001, 50, .5, device, True)

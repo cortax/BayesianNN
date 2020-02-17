@@ -114,12 +114,12 @@ def main(get_data,get_model,sigma_noise,experiment_name,nb_split,ensemble_size, 
 
             lr = optimizer.param_groups[0]['lr']
             scheduler.step(L.detach().clone().cpu().numpy())
-            
-            mlflow.log_metric("ELBO", float(L.detach().squeeze().clone().cpu().numpy()),t)
-            mlflow.log_metric("-log posterior", float(-LP.detach().squeeze().clone().cpu().numpy()),t)
-            mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
-            mlflow.log_metric("learning rate", float(lr),t)
-            mlflow.log_metric("epoch", t)
+
+            if t % 100 == 0:
+                mlflow.log_metric("ELBO", float(L.detach().squeeze().clone().cpu().numpy()),t)
+                mlflow.log_metric("-log posterior", float(-LP.detach().squeeze().clone().cpu().numpy()),t)
+                mlflow.log_metric("differential entropy", float(ED.detach().clone().cpu().numpy()),t)
+                mlflow.log_metric("learning rate", float(lr),t)
 
             
             if show_metrics:
