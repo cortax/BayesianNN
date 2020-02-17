@@ -5,7 +5,7 @@ if __name__ == "__main__":
 
    
     # (max_iter, learning_rate, patience, lat_dim, layerwidth, gpu)
-    GeNVIs_params = [(20000,0.05,500,100,100, 0), (20000,0.05,500,100,50, 1), (20000,0.05,500,200,50, 0), (20000,0.05,500,200,100, 1), (20000,0.05,500,20,50, 0), (20000,0.05,500,20,100, 1)]
+    GeNVIs_params = [(20000,0.05,500,1, 50, 0), (20000,0.05,500,2,50, 0), (20000,0.05,500,3,50, 0), (20000,0.05,500,4,50, 0), (20000,0.05,500,5,50, 0)]
 
     
     GeNVIs = ["-m Experiments.GeNVI --max_iter=" + str(i) + " --learning_rate=" + str(j) + " --patience=" + str(k) + " --verbose=1 --device=cuda:" + str(q) + " --setup=foong --lat_dim=" + str(l) + " --layerwidth=" + str(p) for i,j,k,l,p,q in GeNVIs_params]
@@ -14,9 +14,13 @@ if __name__ == "__main__":
     def run_dataset(algorithm):                                                             
         os.system('python {}'.format(algorithm))                                                                                                         
     
-    pool = Pool(processes=2) 
-    pool.map(run_dataset, GeNVIs[0:2])  
-    pool = Pool(processes=2) 
-    pool.map(run_dataset, GeNVIs[2:4])   
-    pool = Pool(processes=2) 
-    pool.map(run_dataset, GeNVIs[4:6])   
+    pool = Pool(processes=1) 
+    pool.map(run_dataset, GeNVIs[0:1])  
+    pool = Pool(processes=1) 
+    pool.map(run_dataset, GeNVIs[1:2])   
+    pool = Pool(processes=1) 
+    pool.map(run_dataset, GeNVIs[2:3])   
+    pool = Pool(processes=1) 
+    pool.map(run_dataset, GeNVIs[3:4])   
+    pool = Pool(processes=1) 
+    pool.map(run_dataset, GeNVIs[4:5])   
