@@ -323,10 +323,11 @@ class GeNVariationalInference():
                 stats = 'Epoch [{}/{}], Loss: {}, Entropy {}, Learning Rate: {}'.format(t, self.max_iter, L, ED, lr)
                 print(stats)
 
-            self.score_elbo.append(L.detach().clone().cpu())
-            self.score_entropy.append(ED.detach().clone().cpu())
-            self.score_logposterior.append(LP.detach().clone().cpu())
-            self.score_lr.append(lr)
+            if t % 100 ==0:
+                self.score_elbo.append(L.detach().clone().cpu())
+                self.score_entropy.append(ED.detach().clone().cpu())
+                self.score_logposterior.append(LP.detach().clone().cpu())
+                self.score_lr.append(lr)
 
 
             self._save_best_model(GeN, t,L.detach().clone(), ED.detach().clone(), LP.detach().clone())

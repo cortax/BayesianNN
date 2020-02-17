@@ -56,10 +56,10 @@ def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
     mlflow.log_metric("The logposterior", float(the_scores[2]))
 
     for t in range(len(log_scores[0])):
-        mlflow.log_metric("elbo", float(log_scores[0][t]), step=t)
-        mlflow.log_metric("entropy", float(log_scores[1][t]), step=t)
-        mlflow.log_metric("logposterior", float(log_scores[2][t]), step=t)
-        mlflow.log_metric("learning_rate", float(log_scores[3][t]), step=t)
+        mlflow.log_metric("elbo", float(log_scores[0][t]), step=100*t)
+        mlflow.log_metric("entropy", float(log_scores[1][t]), step=100*t)
+        mlflow.log_metric("logposterior", float(log_scores[2][t]), step=100*t)
+        mlflow.log_metric("learning_rate", float(log_scores[3][t]), step=100*t)
 
 def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patience, lr_decay, verbose):
     objective_fn = setup.logposterior
