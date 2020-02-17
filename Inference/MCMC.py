@@ -84,7 +84,8 @@ class PTMCMCSampler():
 
                 self.last=self.current
                 if (t - burnin) % thinning == 0:
-                    self.state[j].append(theta_current)  # append new_state
+                    for j in range(self.nb_chains):
+                        self.state[j].append(self.current[j])  # append new_state
 
             x = self.state
 #            logProba = self.logProbaMatrix

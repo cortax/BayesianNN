@@ -20,20 +20,20 @@ def learning(objective_fn, param_count, device, numiter, burnin, thinning, tempe
 
     return ensemble, ladderAcceptanceRate, swapAcceptanceRate
 
-def log_exp_params(param_count, ladderAcceptanceRate, swapAcceptanceRate, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device='cpu'):
+def log_exp_params(param_count, len_theta, ladderAcceptanceRate, swapAcceptanceRate, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device='cpu'):
 
     mlflow.set_tag('device', device)
     mlflow.set_tag('dimensions', param_count)
 
     mlflow.set_tag('temperatures', temperatures)
+    mlflow.set_tag('nb_theta', len_theta)
+
 
     ladderAcceptanceRate=[float('{0:.2f}'.format(_)) for _ in ladderAcceptanceRate.tolist()]
     mlflow.set_tag('ladderAcceptanceRate', ladderAcceptanceRate)
 
     swapAcceptanceRate=[float('{0:.2f}'.format(_)) for _ in swapAcceptanceRate.tolist()]
     mlflow.set_tag('swapAcceptanceRate', swapAcceptanceRate)
-
-
 
     mlflow.log_param('numiter', numiter)
     mlflow.log_param('burnin', burnin)
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         args.burnin =int(0.1*args.numiter)
 
 
-    theta_ens_size=1000
+    theta_ens_size=10000
     if args.thinning is None:
         args.thinning=max(1,int((args.numiter-args.burnin)/theta_ens_size))
         #numiter-burnin=thinning theta_ens_size
@@ -124,14 +124,14 @@ if __name__ == "__main__":
 
         theta=theta_ens
 
-        log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
+        log_exp_params(setup.param_count, len(theta_ens), ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
         theta = torch.cat(theta_ens).cpu()
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
 
         save_params_ens(theta)
 
-        # if setup.plot:
-        #     theta=theta[0:1000]
-        #     draw_experiment(setup.makePlot, theta, 'cpu')
+        if setup.plot:
+            theta=theta[0:-1:10]
+            draw_experiment(setup.makePlot, theta, 'cpu')
         #
 
