@@ -101,7 +101,7 @@ if __name__ == "__main__":
         args.burnin =int(0.1*args.numiter)
 
 
-    theta_ens_size=10000
+    theta_ens_size=1000
     if args.thinning is None:
         args.thinning=max(1,int((args.numiter-args.burnin)/theta_ens_size))
         #numiter-burnin=thinning theta_ens_size
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         save_params_ens(theta)
 
         if setup.plot:
-            theta=theta[0:-1:10]
+            #theta=theta[0:-1:10]
             draw_experiment(setup.makePlot, theta, 'cpu')
         #
 
