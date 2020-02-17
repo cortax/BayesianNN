@@ -60,11 +60,17 @@ class PTMCMCSampler():
                     if accept:
                         self._ladderAcceptanceCount[j] += 1
 
+
                 for  j in range(self.nb_chains):
                     self.logProbaMatrix[j]=self.logposterior(self.current[j]) # append new_state
 
-                stats = 'Epoch [{}/{}], Logproba: {}'.format(t, N, self.logProbaMatrix[j].squeeze())
-                print(stats)
+                if t % 100 ==0:
+                    ladderAcceptanceRate = torch.as_tensor(self._ladderAcceptanceCount).float() / (t+1)
+                    swapAcceptanceRate = torch.as_tensor(self._swapAcceptanceCount).float()/ (t+1)
+                    ladderAcceptanceRate= ladderAcceptanceRate.tolist()
+                    swapAcceptanceRate=swapAcceptanceRate.tolist()
+                    stats = 'Epoch [{0}/{0}]'.format(t+1, N )+'Acceptance: '+str(ladderAcceptanceRate)+ 'Swap: '+str(swapAcceptanceRate)
+                    print(stats)
 
                 for j in np.random.permutation(self.nb_chains-1):
                     T_left = self.temperatures[j]
@@ -89,8 +95,9 @@ class PTMCMCSampler():
 
             x = self.state
 #            logProba = self.logProbaMatrix
-            ladderAcceptanceRate = torch.tensor(self._ladderAcceptanceCount).float()/N
-            swapAcceptanceRate = torch.tensor(self._swapAcceptanceCount).float()/N
+            ladderAcceptanceRate = torch.as_tensor(self._ladderAcceptanceCount).float()/N
+            swapAcceptanceRate = torch.as_tensor(self._swapAcceptanceCount).float()/N
+
             return x, ladderAcceptanceRate, swapAcceptanceRate #, logProba
 
     def _MAP(self, nbiter, std_init,device='cpu'):
