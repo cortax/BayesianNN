@@ -5,6 +5,8 @@ if __name__ == "__main__":
 
 ################ EXPERIENCE 3 ####################
 
+# python -m Experiments.GeNVI --max_iter=20000  --learning_rate=0.05  --patience=500 --n_samples_ED=50 --n_samples_LP=100 --verbose=1 --device=cuda:1 --setup=powerplant
+
 # (max_iter, ensemble_size)
     MAPs_params = [(2000,1000) for i in range(7)]
     
