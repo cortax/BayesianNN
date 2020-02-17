@@ -69,7 +69,7 @@ class PTMCMCSampler():
                     swapAcceptanceRate = torch.as_tensor(self._swapAcceptanceCount).float()/ (t+1)
                     ladderAcceptanceRate= ladderAcceptanceRate.tolist()
                     swapAcceptanceRate=swapAcceptanceRate.tolist()
-                    stats = 'Epoch [{0}/{0}]'.format(t+1, N )+'Acceptance: '+str(ladderAcceptanceRate)+ 'Swap: '+str(swapAcceptanceRate)
+                    stats = 'Epoch [{}/{}]'.format(t+1, N )+'Acceptance: '+str(ladderAcceptanceRate)+ 'Swap: '+str(swapAcceptanceRate)
                     print(stats)
 
                 for j in np.random.permutation(self.nb_chains-1):
