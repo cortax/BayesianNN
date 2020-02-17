@@ -18,7 +18,7 @@ def learning(objective_fn, param_count, device, numiter, burnin, thinning, tempe
     chains, ladderAcceptanceRate, swapAcceptanceRate, logProba = sampler.run(numiter)
     ensemble = chains[maintempindex][burnin:-1:thinning]
 
-    return ensemble, chains, ladderAcceptanceRate, swapAcceptanceRate, logProba
+    return ensemble, ladderAcceptanceRate, swapAcceptanceRate
 
 def log_exp_params(param_count, ladderAcceptanceRate, swapAcceptanceRate, numiter, burnin, thinning, temperatures, maintempindex, baseMHproposalNoise, temperatureNoiseReductionFactor, std_init, optimize, device='cpu'):
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         args.burnin =int(0.4*args.numiter)
 
 
-    theta_ens_size=10000
+    theta_ens_size=1000
     if args.thinning is None:
         args.thinning=max(1,int((args.numiter-args.burnin)/theta_ens_size))
         #numiter-burnin=thinning theta_ens_size
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     temperatures = [float(n) for n in args.temperatures.split(',')]
 
     start = timeit.default_timer()
-    theta_ens, _ ,  ladderAcceptanceRate, swapAcceptanceRate, _ =learning(setup.logposterior, setup.param_count, setup.device, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)
+    theta_ens, ladderAcceptanceRate, swapAcceptanceRate =learning(setup.logposterior, setup.param_count, setup.device, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize)
     stop = timeit.default_timer()
     execution_time = stop - start
 
@@ -121,6 +121,7 @@ if __name__ == "__main__":
     mlflow.set_experiment(xpname)
 
     with mlflow.start_run():
+
         theta = torch.cat(theta_ens[0:-1:10]).cpu()
 
         log_exp_params(setup.param_count, ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
