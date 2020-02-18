@@ -12,9 +12,9 @@ class PTMCMCSampler():
         self.device = device
         self.nb_chains = len(temperatures)
         
-        self.state = [[] for i in range(self.nb_chains)]
-        self.current= [0 for i in range(self.nb_chains)]
-        self.last= [0 for i in range(self.nb_chains)]
+        self.state = []
+        self.current= torch.Tensor(self.nb_chains,theta_dim)
+        self.last= torch.Tensor(self.nb_chains,theta_dim)
 
         self._swapAcceptanceCount = [0 for i in range(self.nb_chains-1)]
         self._ladderAcceptanceCount = [0 for i in range(self.nb_chains)]
@@ -26,19 +26,23 @@ class PTMCMCSampler():
 
     def initChains(self, nbiter=1000, std_init=1.0, stateInit=None):
         if stateInit is not None:
-            self.last = [stateInit[i] for i in range(self.nb_chains)]
+            for i in range(self.nb_chains):
+                self.last[i] = stateInit[i]
         else:
-            self.last = [self._MAP(nbiter, std_init) for _ in range(self.nb_chains)]
-    
-        self.logProbaMatrix = [ [self.logposterior(self.last[j])] for j in range(self.nb_chains)]
+            for i in range(self.nb_chains):
+                self.last[i] = self._MAP(nbiter, std_init)
+
+        for i in range(self.nb_chains):
+            self.logProbaMatrix =self.logposterior(self.last)
+
         self._swapAcceptanceCount = [0 for i in range(self.nb_chains-1)]
         self._ladderAcceptanceCount = [0 for i in range(self.nb_chains)]
         
     def _MetropolisHastings(self, theta_current, T):
-        theta_proposal = theta_current + torch.empty([1,self.theta_dim], device=self.device).normal_(std=self.baseMHproposalNoise*T**self.temperatureNoiseReductionFactor)
+        theta_proposal = theta_current.unsqueeze(0) + torch.empty([1,self.theta_dim], device=self.device).normal_(std=self.baseMHproposalNoise*T**self.temperatureNoiseReductionFactor)
                    
         p_proposal = self.logposterior(theta_proposal)
-        p_current = self.logposterior(theta_current)
+        p_current = self.logposterior(theta_current.unsqueeze(0))
 
         logA = p_proposal/T - p_current/T
         A = logA.exp()
@@ -56,13 +60,10 @@ class PTMCMCSampler():
                     T = self.temperatures[j]
                     theta_current, accept = self._MetropolisHastings(theta_last, T)
                     self.current[j]=theta_current
-                    #ChainTrack[j].append(ChainTrack[j][-1])
                     if accept:
                         self._ladderAcceptanceCount[j] += 1
 
-
-                for  j in range(self.nb_chains):
-                    self.logProbaMatrix[j]=self.logposterior(self.current[j]) # append new_state
+                self.logProbaMatrix=self.logposterior(self.current)
 
                 if t % 100 ==0:
                     ladderAcceptanceRate = torch.as_tensor(self._ladderAcceptanceCount).float() / (t+1)
@@ -86,12 +87,12 @@ class PTMCMCSampler():
                         self.current[j] = self.current[j+1]
                         self.current[j+1] = tmp #swap
 
-                        self._swapAcceptanceCount[j] = self._swapAcceptanceCount[j]+1
+                        self._swapAcceptanceCount[j] +=1
 
                 self.last=self.current
                 if (t - burnin) % thinning == 0:
-                    for j in range(self.nb_chains):
-                        self.state[j].append(self.current[j])  # append new_state
+                    self.state.append(self.current[0])  # append new_state
+
 
             x = self.state
 #            logProba = self.logProbaMatrix

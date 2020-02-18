@@ -15,8 +15,8 @@ def learning(objective_fn, param_count, device, numiter, burnin, thinning, tempe
         
     sampler.initChains(nbiter=optimize, std_init=std_init)
 
-    chains, ladderAcceptanceRate, swapAcceptanceRate = sampler.run(numiter,burnin,thinning)
-    ensemble = chains[maintempindex][burnin:-1:thinning]
+    ensemble, ladderAcceptanceRate, swapAcceptanceRate = sampler.run(numiter,burnin,thinning)
+
 
     return ensemble, ladderAcceptanceRate, swapAcceptanceRate
 
@@ -125,7 +125,8 @@ if __name__ == "__main__":
         theta=theta_ens
 
         log_exp_params(setup.param_count, len(theta_ens), ladderAcceptanceRate, swapAcceptanceRate, args.numiter, args.burnin, args.thinning, temperatures, args.maintempindex, args.baseMHproposalNoise, args.temperatureNoiseReductionFactor, args.std_init, args.optimize, args.device)
-        theta = torch.cat(theta_ens).cpu()
+        theta = torch.stack(theta_ens)
+
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
 
         save_params_ens(theta)
