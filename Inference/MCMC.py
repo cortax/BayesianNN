@@ -12,7 +12,7 @@ class PTMCMCSampler():
         self.device = device
         self.nb_chains = len(temperatures)
         
-        self.state = []
+
         self.current= torch.Tensor(self.nb_chains,theta_dim)
         self.last= torch.Tensor(self.nb_chains,theta_dim)
 
@@ -53,6 +53,7 @@ class PTMCMCSampler():
             return theta_current, 0
                        
     def run(self, N, burnin, thinning):
+        self.state = []
         with torch.no_grad():                          
             for t in range(N):            
                 for j in range(self.nb_chains):
@@ -90,8 +91,11 @@ class PTMCMCSampler():
                         self._swapAcceptanceCount[j] +=1
 
                 self.last=self.current
+
+
                 if (t - burnin) % thinning == 0:
-                    self.state.append(self.current[0])  # append new_state
+                    self.state.append(self.current[0].clone().cpu())  # append new_state
+
 
 
             x = self.state
