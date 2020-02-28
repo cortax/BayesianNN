@@ -84,9 +84,9 @@ class AbstractRegressionSetup(ABC):
 
 
     @abstractmethod
-    #TODO rename to objective_fn?
-    def logposterior(self):
-        raise NotImplementedError('subclasses must override logposterior()')
+
+    # def logposterior(self):
+    #     raise NotImplementedError('subclasses must override logposterior()')
 
     def makePlot(self):
         if self.plot:
