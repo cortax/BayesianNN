@@ -83,7 +83,7 @@ class AbstractRegressionSetup(ABC):
         self.sigma_noise=None
 
 
-    @abstractmethod
+    #@abstractmethod
 
     # def logposterior(self):
     #     raise NotImplementedError('subclasses must override logposterior()')
