@@ -31,6 +31,7 @@ class Setup(AbstractRegressionSetup):
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
         self._preparare_data()
+        self.n_samples
 
     def _preparare_data(self):
         train = torch.load(data_path + 'foong_train.pt')
@@ -40,6 +41,7 @@ class Setup(AbstractRegressionSetup):
         self._X_train, self._y_train = train[0].to(self.device), train[1].unsqueeze(-1).to(self.device)
         self._X_validation, self._y_validation = valid[0].to(self.device), valid[1].unsqueeze(-1).to(self.device)
         self._X_test, self._y_test = test[0].to(self.device), test[1].unsqueeze(-1).to(self.device)
+        self.n_samples=self._X_train.shape[0]
 
 
     def makePlot(self, theta, device):
@@ -70,8 +72,16 @@ class Setup(AbstractRegressionSetup):
          #   plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
-        
 
-    
+    def _negloglikelihood(self, theta, X, y):
+        ll=torch.sum(self._loglikelihood(theta, X, y, self.device),dim=1)
+        return -ll
+    def loss(self,theta):
+        l=self._negloglikelihood(theta, self._X_train, self._y_train)
+        return l/self.n_samples
+
+    def logprior(self, theta):
+        return  self._logprior(theta)
+
 
         
