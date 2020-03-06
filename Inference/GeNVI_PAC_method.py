@@ -187,12 +187,12 @@ def NNE(theta,device,k=1):
 
 
 class GeNVariationalInference():
-    def __init__(self, loss,prior, n_data_samples,
+    def __init__(self, loss,logprior, n_data_samples,
                  kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
                  device, verbose, temp_dir, save_best=True):
         self.loss = loss
-        self.prior=prior
+        self.logprior=logprior
         self.n_data_samples=n_data_samples
         self.kNNE=kNNE
         self.n_samples_NNE=n_samples_NNE
@@ -257,11 +257,11 @@ class GeNVariationalInference():
             optimizer.zero_grad()
 
             C = torch.log(torch.exp(_C) + 1.)
-            delta=0.05
+            delta=0.01
 
             ED = self._entropy(GeN)
             nlloss = self.loss(GeN(self.n_data_samples)).mean()
-            kl=ED- self.prior(GeN(self.n_samples_ED)).mean()
+            kl=ED- self.logprior(GeN(self.n_samples_ED)).mean()
 
             L = (1 / (1 - torch.exp(-C))) * \
                   (1 - torch.exp(-C * nlloss - (1 / self.n_data_samples) * \
@@ -284,7 +284,6 @@ class GeNVariationalInference():
                 self.score_lr.append(lr)
 
                 if show_fn is not None:
-                    #print('show')
                     show_fn(GeN,500)
 
             if self.save_best:
