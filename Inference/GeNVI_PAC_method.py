@@ -242,7 +242,7 @@ class GeNVariationalInference():
 
     def run(self, GeN, show_fn=None):
         _C=torch.tensor(1., requires_grad=True)
-        optimizer = torch.optim.Adam([_ for _ in GeN.parameters()]+[_C], lr=self.learning_rate)
+        optimizer = torch.optim.Adam(list(GeN.parameters())+[_C], lr=self.learning_rate)
 
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
                                                                factor=self.lr_decay)
@@ -257,7 +257,7 @@ class GeNVariationalInference():
             optimizer.zero_grad()
 
             C = torch.log(torch.exp(_C) + 1.)
-            delta=0.01
+            delta=0.05
 
             ED = self._entropy(GeN)
             nlloss = self.loss(GeN(self.n_data_samples)).mean()
