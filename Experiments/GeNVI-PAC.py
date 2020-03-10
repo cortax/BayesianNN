@@ -29,7 +29,7 @@ def GeNVI_learning(loss,prior,n_samples,
 		                                    device, verbose, temp_dir)
 		the_epoch, the_scores = optimizer.run(GeN)
 
-	log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior, optimizer.score_lr]
+	log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_temp, optimizer.score_lr]
 	return GeN, the_epoch, the_scores, log_scores
 
 
@@ -71,12 +71,12 @@ def log_GeNVI_experiment(setup, the_epoch, the_scores, log_scores,
 
 	mlflow.log_metric("The elbo", float(the_scores[0]))
 	mlflow.log_metric("The entropy", float(the_scores[1]))
-	mlflow.log_metric("The logposterior", float(the_scores[2]))
+	mlflow.log_metric("The temp", float(the_scores[2]))
 
 	for t in range(len(log_scores[0])):
 		mlflow.log_metric("elbo", float(log_scores[0][t]), step=100*t)
 		mlflow.log_metric("entropy", float(log_scores[1][t]), step=100*t)
-		mlflow.log_metric("logposterior", float(log_scores[2][t]), step=100*t)
+		mlflow.log_metric("temp", float(log_scores[2][t]), step=100*t)
 		mlflow.log_metric("learning_rate", float(log_scores[3][t]), step=100*t)
 
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
 	stop = timeit.default_timer()
 	execution_time = stop - start
 
-	xpname = setup.experiment_name + '/GeNVI'
+	xpname = setup.experiment_name + '/GeNVI-PAC'
 	mlflow.set_experiment(xpname)
 
 	with mlflow.start_run():

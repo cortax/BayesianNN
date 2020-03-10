@@ -241,46 +241,46 @@ class GeNVariationalInference():
         return best['epoch'], [best['ELBO'], best['ED'], best['Temp']]
 
     def run(self, GeN, show_fn=None):
-        _C=torch.tensor(1., requires_grad=True)
+        _C=torch.tensor(0., requires_grad=True, device=self.device)
         optimizer = torch.optim.Adam(list(GeN.parameters())+[_C], lr=self.learning_rate)
-
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
                                                                factor=self.lr_decay)
 
 
         self.score_elbo = []
         self.score_entropy = []
-        self.score_logposterior = []
+        self.score_temp = []
         self.score_lr = []
-
+        logsigmoid=nn.LogSigmoid()
         for t in range(self.max_iter):
             optimizer.zero_grad()
 
             C = torch.log(torch.exp(_C) + 1.)
-            delta=0.05
+            delta = torch.tensor(0.05, device=self.device)
 
             ED = self._entropy(GeN)
-            nlloss = self.loss(GeN(self.n_data_samples)).mean()
-            kl=ED- self.logprior(GeN(self.n_samples_ED)).mean()
+            nlloss = self.loss(GeN(self.n_samples_LP)).mean()
+            kl = -ED - self.logprior(GeN(self.n_samples_ED)).mean()
 
-            L = (1 / (1 - torch.exp(-C))) * \
-                  (1 - torch.exp(-C * nlloss - (1 / self.n_data_samples) * \
-                  (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta))))
+            n = logsigmoid( -C * nlloss - \
+                   (1 / self.n_data_samples) * (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta)))
+            d = logsigmoid(-C)
+
+            L = (d-n)
 
             L.backward()
-
             lr = optimizer.param_groups[0]['lr']
 
             scheduler.step(L.detach().clone().cpu().numpy())
 
             if self.verbose:
-                stats = 'Epoch [{}/{}], Loss: {}, Entropy {}, Temp: {}, Learning Rate: {}'.format(t, self.max_iter, L, ED, C, lr)
+                stats = 'Epoch [{}/{}], Bound: {}, Entropy: {}, Temp: {}, Learning Rate: {}'.format(t, self.max_iter, L, ED, C, lr)
                 print(stats)
 
             if t % 100 ==0:
                 self.score_elbo.append(L.detach().clone().cpu())
                 self.score_entropy.append(ED.detach().clone().cpu())
-                self.score_logposterior.append(nlloss.detach().clone().cpu())
+                self.score_temp.append(C.detach().clone().cpu())
                 self.score_lr.append(lr)
 
                 if show_fn is not None:

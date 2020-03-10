@@ -77,8 +77,16 @@ class Setup(AbstractRegressionSetup):
         ll=torch.sum(self._loglikelihood(theta, X, y, self.device),dim=1)
         return -ll
     def loss(self,theta):
-        l=self._negloglikelihood(theta, self._X_train, self._y_train)
-        return l/self.n_samples
+
+
+        y_pred = self._normalized_prediction(self._X_train, theta, self.device)  # MxNx1 tensor
+        assert y_pred.shape[1] == self._y_train.shape[0]
+        assert y_pred.shape[2] == self._y_train.shape[1]
+        assert self._y_train.shape[1] == 1
+        B = y_pred.shape[0]
+        S = y_pred.shape[1]
+        d = (y_pred.view(B, S, 1) - self._y_train.view(1, S, 1)) ** 2
+        return d.mean(1)
 
     def logprior(self, theta):
         return  self._logprior(theta)
