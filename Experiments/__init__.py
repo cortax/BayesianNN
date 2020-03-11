@@ -1,5 +1,3 @@
-from abc import ABC, abstractmethod
-
 from Metrics import RSE, nLPP
 
 import tempfile
@@ -74,7 +72,7 @@ def save_params_ens(theta):
 
 seed=37
 
-class AbstractRegressionSetup(ABC):
+class AbstractRegressionSetup():
     def __init__(self):
         self.experiment_name=''
         self.plot = False

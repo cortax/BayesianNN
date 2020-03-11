@@ -12,7 +12,10 @@ import tempfile
 
 
 ## command line example
-# python -m Experiments.GeNVI --setup=foong --verbose=True --max_iter=20000 --learning_rate=0.05 --lat_dim= --layerwidth=
+'''
+nohup python -m Experiments.GeNVI-PAC --max_iter=20000 --learning_rate=.05 --min_lr=0.0000001 --patience=200 --n_samples_ED=50 --n_samples_KDE=1000 --n_samples_LP=100 --verbose=True --setup=foong &
+'''
+
 
 def GeNVI_learning(loss,prior,n_samples,
                    ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b,

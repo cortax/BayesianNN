@@ -263,7 +263,7 @@ class GeNVariationalInference():
             kl = -ED - self.logprior(GeN(self.n_samples_ED)).mean()
 
             n = logsigmoid( -C * nlloss - \
-                   (1 / self.n_data_samples) * (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta)))
+                   (1 / self.n_data_samples) *  (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta)))
             d = logsigmoid(-C)
 
             L = (d-n)
