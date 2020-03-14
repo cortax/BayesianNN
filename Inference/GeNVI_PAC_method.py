@@ -185,15 +185,23 @@ def NNE(theta,device,k=1):
     lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
     return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
 
+def log1mexp(x):
+    # log(1 - e^x)=log(e^0 - e^x) = log(e^min(x,0)(e^ -min(x,0) - e^ x-min(x,0))
+    # =min(x,0)+log(e^ -min(x,0) - e^ x-min(x,0)
+    m=torch.min(x,torch.zeros(1))
+    l=m +torch.log(torch.exp(-m)-torch.exp(x-m))
+    return l
 
-class GeNVariationalInference():
-    def __init__(self, loss,logprior, n_data_samples,
+class GeNPAC():
+    def __init__(self, loss,logprior, n_data_samples, C,
                  kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
                  device, verbose, temp_dir, save_best=True):
         self.loss = loss
         self.logprior=logprior
         self.n_data_samples=n_data_samples
+        self.C=torch.tensor(C)
+        
         self.kNNE=kNNE
         self.n_samples_NNE=n_samples_NNE
         self.n_samples_KDE=n_samples_KDE
@@ -240,8 +248,9 @@ class GeNVariationalInference():
         GeN.load_state_dict(best['state_dict'])
         return best['epoch'], [best['ELBO'], best['ED'], best['Temp']]
 
+    
     def run(self, GeN, show_fn=None):
-        _C=torch.tensor(0., requires_grad=True, device=self.device)
+        _C=torch.log(torch.exp(self.C)-1).clone().to(self.device).detach().requires_grad_(False)
         optimizer = torch.optim.Adam(list(GeN.parameters())+[_C], lr=self.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
                                                                factor=self.lr_decay)
@@ -251,10 +260,10 @@ class GeNVariationalInference():
         self.score_entropy = []
         self.score_temp = []
         self.score_lr = []
-        logsigmoid=nn.LogSigmoid()
+        
         for t in range(self.max_iter):
             optimizer.zero_grad()
-
+            
             C = torch.log(torch.exp(_C) + 1.)
             delta = torch.tensor(0.05, device=self.device)
 
@@ -262,11 +271,13 @@ class GeNVariationalInference():
             nlloss = self.loss(GeN(self.n_samples_LP)).mean()
             kl = -ED - self.logprior(GeN(self.n_samples_ED)).mean()
 
-            n = logsigmoid( -C * nlloss - \
-                   (1 / self.n_data_samples) *  (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta)))
-            d = logsigmoid(-C)
+            # log(e^0 + e^-x) = max(0,-x) + log(e^0-max(-x, 0) + e^(-x - max(-x,0)))
+            # log(1 - e^-x)=log(e^0 - e^-x) = log(e^min(-x,0)(e^ -min(-x,0) - e^ -x-min(-x,0))
 
-            L = (d-n)
+            n = -C * nlloss - (1 / self.n_data_samples) *  (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta))
+            #d = torch.log(1-torch.exp(-C))
+
+            L = -n
 
             L.backward()
             lr = optimizer.param_groups[0]['lr']
