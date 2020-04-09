@@ -5,7 +5,7 @@ import timeit
 
 from tempfile import TemporaryDirectory
 
-from Inference.GeNVI_PAC_method import GeNVariationalInference, GeNetEns
+from Inference.GeNVI_PAC_method import GeNPAC, GeNetEns
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 
 import tempfile
@@ -13,20 +13,20 @@ import tempfile
 
 ## command line example
 '''
-nohup python -m Experiments.GeNVI-PAC --max_iter=20000 --learning_rate=.05 --min_lr=0.0000001 --patience=200 --n_samples_ED=50 --n_samples_KDE=1000 --n_samples_LP=100 --verbose=True --setup=foong &
+nohup python -m Experiments.GeNVI-PAC --max_iter=10000 --learning_rate=.05 --min_lr=0.0000001 --patience=200 --n_samples_ED=50 --n_samples_KDE=1000 --n_samples_LP=100 --verbose=True --setup=foong &
 '''
 
 
-def GeNVI_learning(loss,prior,n_samples,
+def GeNVI_learning(loss,prior,n_samples,C,
                    ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b,
                    kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
                    max_iter, learning_rate, min_lr, patience, lr_decay,
                    device=None, verbose=False):
 	GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count,
 	               activation, init_w, init_b, device)
-
+    
 	with TemporaryDirectory() as temp_dir:
-		optimizer = GeNVariationalInference(loss,prior,n_samples,
+		optimizer = GeNPAC(loss,prior,n_samples,C,
 		                                    kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
 		                                    max_iter, learning_rate, min_lr, patience, lr_decay,
 		                                    device, verbose, temp_dir)
@@ -131,9 +131,11 @@ if __name__ == "__main__":
 
 	activation = nn.ReLU()
 	init_b = .001
+	C=2.0 ##Catoni's hyperparameter
 
 	start = timeit.default_timer()
-	GeN, the_epoch, the_scores, log_scores = GeNVI_learning(setup.loss,setup.logprior,setup.n_samples,
+
+	GeN, the_epoch, the_scores, log_scores = GeNVI_learning(setup.loss,setup.logprior,setup.n_samples, C,
 	                                                        args.ensemble_size, args.lat_dim, args.layerwidth,
 	                                                        setup.param_count,
 	                                                        activation, args.init_w, init_b,

@@ -183,24 +183,37 @@ def NNE(theta,device,k=1):
     N=torch.as_tensor(float(nb_samples), device=device)
     pi=torch.as_tensor(math.pi, device=device)
     lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
-    return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+    ret=torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+    return ret
 
-def log1mexp(x):
-    # log(1 - e^x)=log(e^0 - e^x) = log(e^min(x,0)(e^ -min(x,0) - e^ x-min(x,0))
-    # =min(x,0)+log(e^ -min(x,0) - e^ x-min(x,0)
-    m=torch.min(x,torch.zeros(1))
-    l=m +torch.log(torch.exp(-m)-torch.exp(x-m))
-    return l
+
+def log1m_exp(a):
+    if (a >= 0):
+        return float('nan');
+    elif a > -0.693147:
+        return torch.log(-torch.expm1(a)) #0.693147 is approximatelly equal to log(2)
+    else:
+        return torch.log1p(-torch.exp(a))
+
+def lograt1mexp(x,y):
+    ''' 
+   
+    '''
+    M=x#torch.max(x,y)
+    m=y#torch.min(x,y)
+    lor=y-x+log1m_exp(-x)-log1m_exp(-y)
+    return lor
 
 class GeNPAC():
-    def __init__(self, loss,logprior, n_data_samples, C,
+    def __init__(self, loss,logprior, n_data_samples, C, R,
                  kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
                  device, verbose, temp_dir, save_best=True):
         self.loss = loss
         self.logprior=logprior
         self.n_data_samples=n_data_samples
-        self.C=torch.tensor(C)
+        self.C=torch.tensor(C,device=device)
+        self.R=torch.tensor(R,device=device)
         
         self.kNNE=kNNE
         self.n_samples_NNE=n_samples_NNE
@@ -232,13 +245,14 @@ class GeNPAC():
 
 
 
-    def _save_best_model(self, GeN, epoch, score,ED,C):
+    def _save_best_model(self, GeN, epoch, score, loss, kl, C):
         if score < self._best_score:
             torch.save({
                 'epoch': epoch,
                 'state_dict': GeN.state_dict(),
-                'ELBO': score,
-                'ED':ED,
+                'Bound': score,
+                'Loss':loss,
+                'KL':kl,
                 'Temp':C
             }, self.tempdir_name+'/best.pt')
             self._best_score=score
@@ -246,13 +260,16 @@ class GeNPAC():
     def _get_best_model(self, GeN):
         best= torch.load(self.tempdir_name+'/best.pt')
         GeN.load_state_dict(best['state_dict'])
-        return best['epoch'], [best['ELBO'], best['ED'], best['Temp']]
+        return best['epoch'], [best['Bound'], best['Loss'], best['KL'],best['Temp']]
 
     
     def run(self, GeN, show_fn=None):
-        _C=torch.log(torch.exp(self.C)-1).clone().to(self.device).detach().requires_grad_(False)
-        optimizer = torch.optim.Adam(list(GeN.parameters())+[_C], lr=self.learning_rate)
+        _C=torch.log(torch.exp(self.C)-1).clone().to(self.device).detach().requires_grad_(True)
+        optimizer = torch.optim.Adam(list(GeN.parameters()), lr=self.learning_rate)
+        optimizer_temp=torch.optim.Adam([_C],lr=0.01)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
+                                                               factor=self.lr_decay)
+        scheduler_temp = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer_temp, patience=self.patience,
                                                                factor=self.lr_decay)
 
 
@@ -263,31 +280,34 @@ class GeNPAC():
         
         for t in range(self.max_iter):
             optimizer.zero_grad()
+            optimizer_temp.zero_grad()
             
             C = torch.log(torch.exp(_C) + 1.)
             delta = torch.tensor(0.05, device=self.device)
 
             ED = self._entropy(GeN)
-            nlloss = self.loss(GeN(self.n_samples_LP)).mean()
+            loss = self.loss(GeN(self.n_samples_LP),self.R).mean()
             kl = -ED - self.logprior(GeN(self.n_samples_ED)).mean()
 
             # log(e^0 + e^-x) = max(0,-x) + log(e^0-max(-x, 0) + e^(-x - max(-x,0)))
             # log(1 - e^-x)=log(e^0 - e^-x) = log(e^min(-x,0)(e^ -min(-x,0) - e^ -x-min(-x,0))
 
-            n = -C * nlloss - (1 / self.n_data_samples) *  (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta))
+            n = C * loss + (1 / self.n_data_samples) *  (kl + math.log(2 * math.sqrt(self.n_data_samples) / delta))
             #d = torch.log(1-torch.exp(-C))
 
-            L = -n
-
-            L.backward()
+            L =n
+            B=(1-torch.exp(-n))/(1-torch.exp(-C)) #torch.log1p(-torch.exp(-n))-torch.log1p(-torch.exp(-C))
+            
+            L.backward(retain_graph=True)
+            B.backward()
+            
+            
             lr = optimizer.param_groups[0]['lr']
+            lr_temp = optimizer_temp.param_groups[0]['lr']
 
             scheduler.step(L.detach().clone().cpu().numpy())
-
-            if self.verbose:
-                stats = 'Epoch [{}/{}], Bound: {}, Entropy: {}, Temp: {}, Learning Rate: {}'.format(t, self.max_iter, L, ED, C, lr)
-                print(stats)
-
+            scheduler_temp.step(B.detach().clone().cpu().numpy())
+            
             if t % 100 ==0:
                 self.score_elbo.append(L.detach().clone().cpu())
                 self.score_entropy.append(ED.detach().clone().cpu())
@@ -298,16 +318,26 @@ class GeNPAC():
                     show_fn(GeN,500)
 
             if self.save_best:
-                self._save_best_model(GeN, t,L.detach().clone(), ED.detach().clone(), C.detach().clone())
+                self._save_best_model(GeN, t,B.detach().clone(), loss.detach().clone(), kl.detach().clone(), C.detach().clone())
 
-            if lr < self.min_lr:
-                self._save_best_model(GeN, t, L.detach().clone(), ED.detach().clone(), C.detach().clone())
+            if lr_temp < self.min_lr:
+                self._save_best_model(GeN, t, B.detach().clone(), loss.detach().clone(), kl.detach().clone(), C.detach().clone())
                 break
 
             if t+1==self.max_iter:
-                self._save_best_model(GeN, t, L.detach().clone(), ED.detach().clone(), C.detach().clone())
-
+                self._save_best_model(GeN, t, B.detach().clone(), loss.detach().clone(), kl.detach().clone(), C.detach().clone())
+            
+            
+            
+         
+            
+            if self.verbose:
+                stats = 'Epoch [{}/{}], Bound: {}, Entropy: {}, Temp: {}, KL: {}, Loss: {}, Learning Rate: {}'.format(t, self.max_iter, B, ED, C, kl, loss,lr)
+                print(stats)
+            
             optimizer.step()
+            optimizer_temp.step()
+
 
         best_epoch, scores =self._get_best_model(GeN)
         return best_epoch, scores
