@@ -79,7 +79,7 @@ if __name__ == "__main__":
                         help="number of initial samples to skip in the Markov chain")
     parser.add_argument("--thinning", type=int, default=None,
                         help="subsampling factor of the Markov chain")
-    parser.add_argument("--temperatures", type=str, default='1.0,.9,.8,.7,.6,.5,.4,.3,.2,.1',
+    parser.add_argument("--temperatures", type=str, default='1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 8.0, 13.0, 21,0, 34.0, 55.0, 89.0, 150.0, 300.0, 600.0, 1000.0',
                         help="temperature ladder in the form t0, t1, t2, t3")
     parser.add_argument("--maintempindex", type=int, default=0,
                         help="index of the temperature to use to make the chain (ex: 0 for t0)")
