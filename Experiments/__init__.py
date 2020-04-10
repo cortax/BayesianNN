@@ -133,8 +133,8 @@ class AbstractRegressionSetup():
         return NormalLogLikelihood(y_pred, y.to(device), self.sigma_noise)
 
     def logposterior(self, theta):
-        return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),
-                                                 dim=1)
+        return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
+    
     def _split_holdout_data(self):
         X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.20, random_state=seed)
         self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)

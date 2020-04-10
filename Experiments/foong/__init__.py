@@ -73,12 +73,11 @@ class Setup(AbstractRegressionSetup):
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
 
-    def _negloglikelihood(self, theta, X, y):
-        ll=torch.sum(self._loglikelihood(theta, X, y, self.device),dim=1)
-        return -ll
+    def loglikelihood(self, theta):
+        ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
+        return ll
+    
     def loss(self,theta, R):
-
-
         y_pred = self._normalized_prediction(self._X_train, theta, self.device)  # MxNx1 tensor
         assert y_pred.shape[1] == self._y_train.shape[0]
         assert y_pred.shape[2] == self._y_train.shape[1]
@@ -90,6 +89,13 @@ class Setup(AbstractRegressionSetup):
 
     def logprior(self, theta):
         return  self._logprior(theta)
+    
+    def projection(self,theta,k):
+        X=torch.Tensor(k,input_dim).uniform_(-2.,2.).to(self.device)
+        theta_proj=self._normalized_prediction(X, theta, self.device).squeeze(2)
+        return theta_proj
+    
+        
 
 
         
