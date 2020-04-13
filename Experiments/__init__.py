@@ -79,6 +79,7 @@ class AbstractRegressionSetup():
         self.param_count=None
         self.device=None
         self.sigma_noise=None
+        self.n_train_samples=None
 
 
     #@abstractmethod
@@ -116,8 +117,7 @@ class AbstractRegressionSetup():
         assert type(theta) is torch.Tensor
         y_pred = self._model(X.to(device), theta)
         if hasattr(self, '_scaler_y'):
-            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device).float() + torch.tensor(self._scaler_y.mean_,
-                                                                                                device=device).float()
+            y_pred = y_pred * torch.tensor(self._scaler_y.scale_, device=device).float() + torch.tensor(self._scaler_y.mean_, device=device).float()
         return y_pred
 
     def _loglikelihood(self, theta, X, y, device):
@@ -138,6 +138,7 @@ class AbstractRegressionSetup():
     def _split_holdout_data(self):
         X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.20, random_state=seed)
         self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
+        
 
     def _normalize_data(self):
         self._scaler_X, self._scaler_y = fitStandardScalerNormalization(self._X_train, self._y_train)
@@ -154,7 +155,15 @@ class AbstractRegressionSetup():
         self._y_validation = torch.tensor(self._y_validation, device=self.device).float()
         self._X_test = torch.tensor(self._X_test, device=self.device).float()
         self._y_test = torch.tensor(self._y_test, device=self.device).float()
+        self.n_train_samples=self._X_train.shape[0]
 
+    def logPredPrior(self, theta_pred):
+        v=torch.tensor(1., device=self.device)
+        if hasattr(self, '_scaler_y'):
+            v=torch.as_tensor(self._scaler_y.scale_).float().to(self.device)
+        return logmvn01pdf(theta_pred, self.device, v=v)
+        
+    
     # @abstractmethod
     # def evaluate(self):
     #     raise NotImplementedError('subclasses must override evaluate()')

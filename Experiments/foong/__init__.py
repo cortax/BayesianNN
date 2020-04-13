@@ -25,13 +25,13 @@ class Setup(AbstractRegressionSetup):
         super(Setup).__init__()
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
-
+        
         self.plot = True
 
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
         self._preparare_data()
-        self.n_samples
+        
 
     def _preparare_data(self):
         train = torch.load(data_path + 'foong_train.pt')
@@ -41,7 +41,7 @@ class Setup(AbstractRegressionSetup):
         self._X_train, self._y_train = train[0].to(self.device), train[1].unsqueeze(-1).to(self.device)
         self._X_validation, self._y_validation = valid[0].to(self.device), valid[1].unsqueeze(-1).to(self.device)
         self._X_test, self._y_test = test[0].to(self.device), test[1].unsqueeze(-1).to(self.device)
-        self.n_samples=self._X_train.shape[0]
+        self.n_train_samples=self._X_train.shape[0]
 
 
     def makePlot(self, theta, device):
