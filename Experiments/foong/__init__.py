@@ -93,6 +93,7 @@ class Setup(AbstractRegressionSetup):
     def projection(self,theta,k):
         X=torch.Tensor(k,input_dim).uniform_(-2.,2.).to(self.device)
         theta_proj=self._normalized_prediction(X, theta, self.device).squeeze(2)
+        #theta_proj=self._normalized_prediction(self._X_train, theta, self.device).squeeze(2)
         return theta_proj
     
         

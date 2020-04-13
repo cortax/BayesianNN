@@ -145,57 +145,6 @@ def get_entropy(kNNE,n_samples_ED,n_samples_KDE,n_samples_NNE,device):
 
 
 
-def GeNVI(objective_fn,
-          GeN, kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
-          max_iter, learning_rate, min_lr, patience, lr_decay,
-          device=None, verbose=False):
-
-    """
-    GeNVI method
-
-        objective_fn : S X DIM -> S
-
-        GeN (nn.Module) with methods:
-            forward(N): sample of size  N X DIM
-            sample(N): ensemble sample of size   ENS X N X DIM
-            # TODO: add description
-            _save_best_model
-            _get_best_model
-
-    """
-
-    entropy = get_entropy(kNNE, n_samples_ED, n_samples_KDE, n_samples_NNE, device)
-
-
-    optimizer = torch.optim.Adam(GeN.parameters(), lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=patience, factor=lr_decay)
-
-    for t in range(max_iter):
-        optimizer.zero_grad()
-
-        ED = entropy(GeN)
-        LP = objective_fn(GeN(n_samples_LP)).mean()
-        L = -ED - LP
-        L.backward()
-
-        lr = optimizer.param_groups[0]['lr']
-
-
-        scheduler.step(L.detach().clone().cpu().numpy())
-
-        if verbose:
-            stats = 'Epoch [{}/{}], Loss: {}, Entropy: {}, Learning Rate: {}'.format(t+1, max_iter, L,ED, lr)
-            print(stats)
-
-        GeN._save_best_model(L, t, ED, LP)
-
-        if lr < min_lr:
-            break
-
-        optimizer.step()
-
-    return
-
 
 def KDE(x, x_kde,device):
     """
@@ -278,12 +227,6 @@ class GeNPredVI():
 
 
         self.tempdir_name = temp_dir
-
-
-
- 
-
-
 
     def _save_best_model(self, GeN, epoch, score,ED,LP):
         if score < self._best_score:
