@@ -21,7 +21,7 @@ sigma_noise = 0.1
 seed = 42
 
 class Setup(AbstractRegressionSetup):  
-    def __init__(self, device, layerwidth=layerwidth):
+    def __init__(self, device, layerwidth=layerwidth, nblayers=nblayers):
         super(Setup).__init__()
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
