@@ -54,7 +54,7 @@ def PTMCMC(objective_fn, param_count, device, numiter, burnin, thinning, tempera
 
 if __name__ == "__main__":
     # example the commande de run
-    # python -m Experiments.PTMCMC --numiter=20000 --baseMHproposalNoise=0.01 --optimize=10000 --setup=powerplant
+    # python -m Experiments.PTMCMC --numiter=20000 --baseMHproposalNoise=0.01 --optimize=10000 --setup=foong
     #  python -m Experiments.foong.PTMCMC --numiter=10000 --burnin=100 --thinning=10 --temperatures=1.0,0.5,0.1 --maintempindex=0 --baseMHproposalNoise=0.01 --temperatureNoiseReductionFactor=0.5 --std_init=1.0 --optimize=0 --device=cpu
     #numiter as big as possible
     #burnin about 10% - 50%
@@ -79,7 +79,7 @@ if __name__ == "__main__":
                         help="number of initial samples to skip in the Markov chain")
     parser.add_argument("--thinning", type=int, default=None,
                         help="subsampling factor of the Markov chain")
-    parser.add_argument("--temperatures", type=str, default='1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 8.0, 13.0, 21,0, 34.0, 55.0, 89.0, 150.0, 300.0, 600.0, 1000.0',
+    parser.add_argument("--temperatures", type=str, default='1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0, 150.0, 300.0, 600.0, 1000.0',
                         help="temperature ladder in the form t0, t1, t2, t3")
     parser.add_argument("--maintempindex", type=int, default=0,
                         help="index of the temperature to use to make the chain (ex: 0 for t0)")
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         args.burnin =int(0.1*args.numiter)
 
 
-    theta_ens_size=10000
+    theta_ens_size=1000
     if args.thinning is None:
         args.thinning=max(1,int((args.numiter-args.burnin)/theta_ens_size))
         #numiter-burnin=thinning theta_ens_size
