@@ -6,11 +6,12 @@ from Inference.PointEstimate import AdamGradientDescent
 
 
 class PTMCMCSampler():
-    def __init__(self, logposterior, theta_dim, baseMHproposalNoise=1.0, temperatureNoiseReductionFactor=1.0, temperatures=[1], device='cpu'):
+    def __init__(self, logposterior, theta_dim, baseMHproposalNoise=1.0, temperatureNoiseReductionFactor=1.0, temperatures=[1], device='cpu', order_init=True):
         self.logposterior = logposterior
         self.theta_dim = theta_dim
         self.device = device
         self.nb_chains = len(temperatures)
+        self.order_init=order_init
         
 
         self.current= torch.Tensor(self.nb_chains,theta_dim)
@@ -32,9 +33,19 @@ class PTMCMCSampler():
             for i in range(self.nb_chains):
                 self.last[i] = self._MAP(nbiter, std_init)
 
+        #ordering initial maps increasingly according to -logposterior        
+        if self.order_init:
+            lp=-self.logposterior(self.last)
+            index=lp.argsort()
+            self.last=self.last[index,:]
+        
+        print(self.logposterior(self.last))
+                
         for i in range(self.nb_chains):
             self.logProbaMatrix =self.logposterior(self.last)
+        
 
+        
         self._swapAcceptanceCount = [0 for i in range(self.nb_chains-1)]
         self._ladderAcceptanceCount = [0 for i in range(self.nb_chains)]
         
@@ -71,7 +82,7 @@ class PTMCMCSampler():
                     swapAcceptanceRate = torch.as_tensor(self._swapAcceptanceCount).float()/ (t+1)
                     ladderAcceptanceRate= ladderAcceptanceRate.tolist()
                     swapAcceptanceRate=swapAcceptanceRate.tolist()
-                    stats = 'Epoch [{}/{}]'.format(t+1, N )+'Acceptance: '+str(ladderAcceptanceRate)+ 'Swap: '+str(swapAcceptanceRate)
+                    stats = 'Epoch: [{}/{}]'.format(t+1, N )+'\n Acceptance: '+str(ladderAcceptanceRate)+ '\n Swap: '+str(swapAcceptanceRate)
                     print(stats)
 
                 for j in np.random.permutation(self.nb_chains-1):
