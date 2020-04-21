@@ -14,6 +14,8 @@ class GeNet(nn.Module):
                 self.hnet=nn.Sequential(
                         nn.Linear(lat_dim,nb_neur),
                         activation,
+                        #nn.Linear(nb_neur,nb_neur),
+                        #activation,
                         nn.Linear(nb_neur,output_dim)
                         ).to(device)
                 

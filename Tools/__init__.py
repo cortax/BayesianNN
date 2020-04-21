@@ -66,4 +66,62 @@ def logmvn01pdf(theta, device,v=1.):
     const = 0.5*S.log().sum()+0.5*dim*torch.tensor(2*math.pi).log()
     return -0.5*(H*d).sum(2).squeeze()-const
 
+def NNE(theta,k=1):
+        """
+        Parameters:
+            theta (Tensor): Samples, NbExemples X NbDimensions   
+            k (Int): ordinal number
 
+        Returns:
+            (Float) k-Nearest Neighbour Estimation of the entropy of theta  
+
+        """
+        nb_samples=theta.shape[0]
+        dim=theta.shape[1]
+        D=torch.cdist(theta,theta)
+        a = torch.topk(D, k=k+1, dim=0, largest=False, sorted=True)[0][k].clamp(torch.finfo().eps,float('inf')).to(device)
+        d=torch.as_tensor(float(dim),device=device)
+        K=torch.as_tensor(float(k),device=device)
+        N=torch.as_tensor(float(nb_samples),device=device)
+        pi=torch.as_tensor(math.pi,device=device)
+        lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
+        return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
+
+def KL(theta0,theta1,k=1):
+        """
+        Parameters:
+            theta0 (Tensor): Samples, P X NbDimensions   
+            theta1 (Tensor): Samples, R X NbDimensions   
+            k (Int): positive ordinal number 
+
+        Returns:
+            (Float) k-Nearest Neighbour Estimation of the KL from theta0 to theta1  
+
+        Kullback-Leibler Divergence Estimation of Continuous Distributions Fernando Pérez-Cruz
+        """
+        
+        n0=theta0.shape[0]
+        n1=theta1.shape[0]
+        dim0=theta0.shape[1]
+        dim1=theta1.shape[1]
+        assert dim0 == dim1
+        
+   
+        
+        D0=torch.cdist(theta0,theta0)
+        D1=torch.cdist(theta0,theta1)
+        
+
+        a0 = torch.topk(D0, k=k+1, dim=1, largest=False, sorted=True)[0][:,k]#.clamp(torch.finfo().eps,float('inf')).to(device)
+        a1 = torch.topk(D1, k=k, dim=1, largest=False, sorted=True)[0][:,k-1]#.clamp(torch.finfo().eps,float('inf')).to(device)
+        
+        assert a0.shape == a1.shape
+        
+        d=torch.as_tensor(float(dim0),device=device)
+        N0=torch.as_tensor(float(n0),device=device)
+        N1=torch.as_tensor(float(n1),device=device)
+        
+        Mnn=(torch.log(a1)-torch.log(a0)).mean()
+        return dim0*Mnn + N1.log()-(N0-1).log()
+
+        
