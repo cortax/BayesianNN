@@ -79,20 +79,20 @@ if __name__ == "__main__":
                         help="number of initial samples to skip in the Markov chain")
     parser.add_argument("--thinning", type=int, default=None,
                         help="subsampling factor of the Markov chain")
-    parser.add_argument("--temperatures", type=str, default='1.0, 1.25, 1.5, 1.8, 1.95, 2.15, 2.3, 2.6, 3., 3.2, 3.5, 4.1, 4.8, 5.5, 6.4, 7.7, 9., 11., 13.7, 17.5, 24., 35., 48.0, 81.2, 137.7, 233.6, 396.8, 674.1, 1145.6',
+    parser.add_argument("--temperatures", type=str, default='1.0, 1.1, 1.4, 1.5, 1.6, 1.85, 1.95, 2.15, 2.3, 2.6, 3., 3.2, 3.6, 4., 4.4, 4.8, 5.5, 6.4, 7.7, 9., 11., 13.7, 17.5, 24., 35., 48.0, 81.2, 137.7, 233.6, 396.8, 674.1, 1145.6',
                         #'1.0, 1.4, 2., 3., 4.6, ,7.2 ,  6.5, 8.5 , 10.3, 14.0, 19.0, 26., 35., 48.0, 81.2, 137.7, 233.6, 396.8, 674.1, 1145.6',
                         #'1.0, 1.3, 1.8,| 2.6, 3.9,| 5.5,| 7.2,| 10.3,| 14.0, 19.0,| 26., 35., 48.0, 81.2, 137.7, 233.6, 396.8, 674.1, 1145.6'
                         #Fibonacci '1.0, 2.0, 3.0, 5.0, 7.0, 12.0, 19.0, 31.0, 50.0, 81.0, 131.0, 212.0, 343.0, 555.0',
                         help="temperature ladder in the form t0, t1, t2, t3")
     parser.add_argument("--maintempindex", type=int, default=0,
                         help="index of the temperature to use to make the chain (ex: 0 for t0)")
-    parser.add_argument("--baseMHproposalNoise", type=float, default=0.002,
+    parser.add_argument("--baseMHproposalNoise", type=float, default=0.0019,
                         help="standard-deviation of the isotropic proposal")
     parser.add_argument("--temperatureNoiseReductionFactor", type=float, default=0.5,
                         help="factor adapting the noise to the corresponding temperature")
     parser.add_argument("--std_init", type=float, default=1.0,
                         help="parameter controling initialization of theta")
-    parser.add_argument("--optimize", type=int, default=10000,
+    parser.add_argument("--optimize", type=int, default=20000,
                         help="number of optimization iterations to initialize the state")
     parser.add_argument("--seed", type=int, default=None,
                         help="value insuring reproducibility")
