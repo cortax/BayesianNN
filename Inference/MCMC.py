@@ -74,6 +74,8 @@ class PTMCMCSampler():
                     self.current[j]=theta_current
                     if accept:
                         self._ladderAcceptanceCount[j] += 1
+                    else:   
+                        self.current[j]=self.last[j]
 
                 self.logProbaMatrix=self.logposterior(self.current)
 
@@ -101,8 +103,8 @@ class PTMCMCSampler():
 
                         self._swapAcceptanceCount[j] +=1
 
+         
                 self.last=self.current
-
 
                 if (t - burnin) % thinning == 0:
                     self.state.append(self.current[0].clone().cpu())  # append new_state
