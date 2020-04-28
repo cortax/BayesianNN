@@ -96,6 +96,14 @@ class Setup(AbstractRegressionSetup):
         #theta_proj=self._normalized_prediction(self._X_train, theta, self.device).squeeze(2)
         return theta_proj
     
+    def prediction(self,X,theta):
+        y_pred=self._normalized_prediction(X, theta, self.device).squeeze(2)
+        #theta_proj=self._normalized_prediction(self._X_train, theta, self.device).squeeze(2)
+        return y_pred
+    
+    
+    def train_data(self):
+        return self._X_train, self._y_train
         
 
 
