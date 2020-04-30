@@ -87,7 +87,7 @@ def NNE(theta,k=1):
         lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)
         return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
 
-def KL(theta0,theta1,k=1):
+def KL(theta0,theta1,k=1,device='cpu'):
         """
         Parameters:
             theta0 (Tensor): Samples, P X NbDimensions   

@@ -2,7 +2,10 @@ import torch
 from torch import nn
 import math
 
+from tqdm import trange
 
+
+from Tools import KL
 
 
 class GeNet(nn.Module):
@@ -203,12 +206,12 @@ def NNE(theta,device,k_MC,k=1):
 
 
 class GeNPredVI():
-    def __init__(self, loglikelihood, logprior, projection, k_MC,
+    def __init__(self, loglikelihood, prior, projection, k_MC,
                  kNNE, n_samples_NNE, n_samples_KDE, n_samples_ED, n_samples_LP,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
                  device, verbose, temp_dir, save_best=True):
         self.loglikelihood=loglikelihood
-        self.logprior=logprior
+        self.prior=prior
         self.projection=projection
         self.k_MC=k_MC
         self.kNNE=kNNE
@@ -248,56 +251,54 @@ class GeNPredVI():
 
     def run(self, GeN, show_fn=None):
         optimizer = torch.optim.Adam(GeN.parameters(), lr=self.learning_rate)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
-                                                               factor=self.lr_decay)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience, factor=self.lr_decay)
 
         self.score_elbo = []
         self.score_entropy = []
         self.score_logposterior = []
         self.score_lr = []
 
-        for t in range(self.max_iter):
-            optimizer.zero_grad()
-            
-            theta_proj=self.projection(GeN(self.n_samples_NNE),self.k_MC)
-            ED=NNE(theta_proj,self.device,self.k_MC,k=1)
-            
-            LP= self.logprior(theta_proj).mean()
-            
-            
-            LL = self.loglikelihood(GeN(self.n_samples_LP)).mean()
-            L = -ED - LP - LL
-            L.backward()
+        with trange(self.max_iter) as tr:
+            for t in tr:
+                optimizer.zero_grad()
 
-            lr = optimizer.param_groups[0]['lr']
+                theta_proj=self.projection(GeN(self.n_samples_NNE),self.k_MC)
 
-            scheduler.step(L.detach().clone().cpu().numpy())
+                theta_prior_proj=self.projection(self.prior(self.n_samples_NNE),self.k_MC)
 
-            if self.verbose:
-                stats = 'Epoch [{}/{}], Loss: {}, Entropy {}, Learning Rate: {}'.format(t, self.max_iter, L, ED, lr)
-                print(stats)
+                K=KL(theta_proj, theta_prior_proj,k=self.kNNE,device=self.device)
 
-            if t % 100 ==0:
-                self.score_elbo.append(L.detach().clone().cpu())
-                self.score_entropy.append(ED.detach().clone().cpu())
-                self.score_logposterior.append(LP.detach().clone().cpu())
-                self.score_lr.append(lr)
+                LL = self.loglikelihood(GeN(self.n_samples_LP)).mean()
+                L = K - LL
+                L.backward()
 
-                if show_fn is not None:
-                    #print('show')
-                    show_fn(GeN,500)
+                lr = optimizer.param_groups[0]['lr']
 
-            if self.save_best:
-                self._save_best_model(GeN, t,L.detach().clone(), ED.detach().clone(), LP.detach().clone())
+                scheduler.step(L.detach().clone().cpu().numpy())
 
-            if lr < self.min_lr:
-                self._save_best_model(GeN, t, L.detach().clone(), ED.detach().clone(), LP.detach().clone())
-                break
+                tr.set_postfix(ELBO=L.detach().cpu().float(), LogLike=LL.detach().cpu().float(), KL=K.detach().cpu().float(), lr=lr)
 
-            if t+1==self.max_iter:
-                self._save_best_model(GeN, t, L.detach().clone(), ED.detach().clone(), LP.detach().clone())
+                if t % 100 ==0:
+                    self.score_elbo.append(L.detach().clone().cpu())
+                    self.score_entropy.append(K.detach().clone().cpu())
+                    self.score_logposterior.append(LL.detach().clone().cpu())
+                    self.score_lr.append(lr)
 
-            optimizer.step()
+                    if show_fn is not None:
+                        #print('show')
+                        show_fn(GeN,500)
+
+                if self.save_best:
+                    self._save_best_model(GeN, t,L.detach().clone(), K.detach().clone(), LL.detach().clone())
+
+                if lr < self.min_lr:
+                    self._save_best_model(GeN, t, L.detach().clone(), K.detach().clone(), LL.detach().clone())
+                    break
+
+                if t+1==self.max_iter:
+                    self._save_best_model(GeN, t, L.detach().clone(), K.detach().clone(), LL.detach().clone())
+
+                optimizer.step()
 
         best_epoch, scores =self._get_best_model(GeN)
         return best_epoch, scores

@@ -34,8 +34,8 @@ class Setup(AbstractRegressionSetup):
         
 
     def _preparare_data(self):
-        train = torch.load(data_path + 'foong_train_out.pt')
-        valid = torch.load(data_path + 'foong_validation_out.pt')
+        train = torch.load(data_path + 'foong_train_sparse.pt')
+        valid = torch.load(data_path + 'foong_validation_sparse.pt')
         test = torch.load(data_path + 'foong_test.pt')
         
         self._X_train, self._y_train = train[0].to(self.device), train[1].unsqueeze(-1).to(self.device)

@@ -15,6 +15,8 @@ from Preprocessing import fitStandardScalerNormalization, normalize
 def switch_setup(setup):
     return {
         'foong':  importlib.util.spec_from_file_location("foong", "Experiments/foong/__init__.py") ,
+        'foong_sparse':  importlib.util.spec_from_file_location("foong_sparse", "Experiments/foong_sparse/__init__.py") ,
+        'foong_mixed':  importlib.util.spec_from_file_location("foong_mixed", "Experiments/foong_mixed/__init__.py") ,
         'boston': importlib.util.spec_from_file_location("boston", "Experiments/boston/__init__.py"),
         'california': importlib.util.spec_from_file_location("california", "Experiments/california/__init__.py"),
         'concrete': importlib.util.spec_from_file_location("concrete", "Experiments/concrete/__init__.py"),

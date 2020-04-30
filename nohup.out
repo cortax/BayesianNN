@@ -1,0 +1,1069 @@
+Traceback (most recent call last):
+  File "/home/yann/anaconda3/lib/python3.7/runpy.py", line 183, in _run_module_as_main
+    mod_name, mod_spec, code = _get_module_details(mod_name, _Error)
+  File "/home/yann/anaconda3/lib/python3.7/runpy.py", line 109, in _get_module_details
+    __import__(pkg_name)
+  File "/home/yann/BayesianNN/Experiments/__init__.py", line 11, in <module>
+    from sklearn.model_selection import train_test_split
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/sklearn/__init__.py", line 82, in <module>
+    from .base import clone
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/sklearn/base.py", line 20, in <module>
+    from .utils import _IS_32BIT
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/sklearn/utils/__init__.py", line 27, in <module>
+    from .fixes import np_version
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/sklearn/utils/fixes.py", line 18, in <module>
+    import scipy.stats
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/scipy/stats/__init__.py", line 384, in <module>
+    from .stats import *
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/scipy/stats/stats.py", line 185, in <module>
+    from . import distributions
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/scipy/stats/distributions.py", line 13, in <module>
+    from . import _continuous_distns
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/scipy/stats/_continuous_distns.py", line 17, in <module>
+    from scipy import interpolate
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/scipy/interpolate/__init__.py", line 167, in <module>
+    from .interpolate import *
+  File "/home/yann/anaconda3/lib/python3.7/site-packages/scipy/interpolate/interpolate.py", line 23, in <module>
+    from .polyint import _Interpolator1D
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 670, in _load_unlocked
+  File "<frozen importlib._bootstrap>", line 589, in module_from_spec
+  File "<frozen importlib._bootstrap>", line 560, in _init_module_attrs
+  File "<frozen importlib._bootstrap>", line 426, in has_location
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/home/yann/anaconda3/envs/myenv/lib/python3.8/runpy.py", line 193, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/yann/anaconda3/envs/myenv/lib/python3.8/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/yann/BayesianNN/Experiments/HMC.py", line 5, in <module>
+    from tqdm import tqdm, trange
+ModuleNotFoundError: No module named 'tqdm'
+Epoch [1/1000], Loss: 13138.4267578125, Learning Rate: 0.01
+Epoch [2/1000], Loss: 6227.412109375, Learning Rate: 0.01
+Epoch [3/1000], Loss: 2191.20263671875, Learning Rate: 0.01
+Epoch [4/1000], Loss: 680.142822265625, Learning Rate: 0.01
+Epoch [5/1000], Loss: 961.6552734375, Learning Rate: 0.01
+Epoch [6/1000], Loss: 2046.8472900390625, Learning Rate: 0.01
+Epoch [7/1000], Loss: 3057.203369140625, Learning Rate: 0.01
+Epoch [8/1000], Loss: 3494.83642578125, Learning Rate: 0.01
+Epoch [9/1000], Loss: 3274.129150390625, Learning Rate: 0.01
+Epoch [10/1000], Loss: 2594.7734375, Learning Rate: 0.01
+Epoch [11/1000], Loss: 1752.9271240234375, Learning Rate: 0.01
+Epoch [12/1000], Loss: 1013.6380004882812, Learning Rate: 0.01
+Epoch [13/1000], Loss: 552.5859985351562, Learning Rate: 0.01
+Epoch [14/1000], Loss: 431.82550048828125, Learning Rate: 0.01
+Epoch [15/1000], Loss: 598.487060546875, Learning Rate: 0.01
+Epoch [16/1000], Loss: 913.6658935546875, Learning Rate: 0.01
+Epoch [17/1000], Loss: 1212.9873046875, Learning Rate: 0.01
+Epoch [18/1000], Loss: 1373.058349609375, Learning Rate: 0.01
+Epoch [19/1000], Loss: 1347.76318359375, Learning Rate: 0.01
+Epoch [20/1000], Loss: 1164.682861328125, Learning Rate: 0.01
+Epoch [21/1000], Loss: 897.5240478515625, Learning Rate: 0.01
+Epoch [22/1000], Loss: 632.8054809570312, Learning Rate: 0.01
+Epoch [23/1000], Loss: 441.483154296875, Learning Rate: 0.01
+Epoch [24/1000], Loss: 360.47235107421875, Learning Rate: 0.01
+Epoch [25/1000], Loss: 386.39727783203125, Learning Rate: 0.01
+Epoch [26/1000], Loss: 481.96185302734375, Learning Rate: 0.01
+Epoch [27/1000], Loss: 592.5458984375, Learning Rate: 0.01
+Epoch [28/1000], Loss: 667.2176513671875, Learning Rate: 0.01
+Epoch [29/1000], Loss: 676.3297729492188, Learning Rate: 0.01
+Epoch [30/1000], Loss: 619.1986694335938, Learning Rate: 0.01
+Epoch [31/1000], Loss: 519.962890625, Learning Rate: 0.01
+Epoch [32/1000], Loss: 414.8085632324219, Learning Rate: 0.01
+Epoch [33/1000], Loss: 336.6810302734375, Learning Rate: 0.01
+Epoch [34/1000], Loss: 303.5650939941406, Learning Rate: 0.01
+Epoch [35/1000], Loss: 314.1778564453125, Learning Rate: 0.01
+Epoch [36/1000], Loss: 351.58807373046875, Learning Rate: 0.01
+Epoch [37/1000], Loss: 392.1259765625, Learning Rate: 0.01
+Epoch [38/1000], Loss: 415.33233642578125, Learning Rate: 0.01
+Epoch [39/1000], Loss: 411.049072265625, Learning Rate: 0.01
+Epoch [40/1000], Loss: 381.5791015625, Learning Rate: 0.01
+Epoch [41/1000], Loss: 338.9292907714844, Learning Rate: 0.01
+Epoch [42/1000], Loss: 298.8017883300781, Learning Rate: 0.01
+Epoch [43/1000], Loss: 273.8699951171875, Learning Rate: 0.01
+Epoch [44/1000], Loss: 268.9751281738281, Learning Rate: 0.01
+Epoch [45/1000], Loss: 280.0730285644531, Learning Rate: 0.01
+Epoch [46/1000], Loss: 297.1501159667969, Learning Rate: 0.01
+Epoch [47/1000], Loss: 309.45660400390625, Learning Rate: 0.01
+Epoch [48/1000], Loss: 310.33453369140625, Learning Rate: 0.01
+Epoch [49/1000], Loss: 299.4105529785156, Learning Rate: 0.01
+Epoch [50/1000], Loss: 281.60162353515625, Learning Rate: 0.01
+Epoch [51/1000], Loss: 264.034423828125, Learning Rate: 0.01
+Epoch [52/1000], Loss: 252.62472534179688, Learning Rate: 0.01
+Epoch [53/1000], Loss: 249.77952575683594, Learning Rate: 0.01
+Epoch [54/1000], Loss: 253.90896606445312, Learning Rate: 0.01
+Epoch [55/1000], Loss: 260.6771240234375, Learning Rate: 0.01
+Epoch [56/1000], Loss: 265.29534912109375, Learning Rate: 0.01
+Epoch [57/1000], Loss: 264.7801208496094, Learning Rate: 0.01
+Epoch [58/1000], Loss: 259.12335205078125, Learning Rate: 0.01
+Epoch [59/1000], Loss: 250.8701171875, Learning Rate: 0.01
+Epoch [60/1000], Loss: 243.47573852539062, Learning Rate: 0.01
+Epoch [61/1000], Loss: 239.4497528076172, Learning Rate: 0.01
+Epoch [62/1000], Loss: 239.28732299804688, Learning Rate: 0.01
+Epoch [63/1000], Loss: 241.5961456298828, Learning Rate: 0.01
+Epoch [64/1000], Loss: 244.11138916015625, Learning Rate: 0.01
+Epoch [65/1000], Loss: 244.92396545410156, Learning Rate: 0.01
+Epoch [66/1000], Loss: 243.31451416015625, Learning Rate: 0.01
+Epoch [67/1000], Loss: 239.90017700195312, Learning Rate: 0.01
+Epoch [68/1000], Loss: 236.13516235351562, Learning Rate: 0.01
+Epoch [69/1000], Loss: 233.46798706054688, Learning Rate: 0.01
+Epoch [70/1000], Loss: 232.59478759765625, Learning Rate: 0.01
+Epoch [71/1000], Loss: 233.19447326660156, Learning Rate: 0.01
+Epoch [72/1000], Loss: 234.24850463867188, Learning Rate: 0.01
+Epoch [73/1000], Loss: 234.70155334472656, Learning Rate: 0.01
+Epoch [74/1000], Loss: 234.0331573486328, Learning Rate: 0.01
+Epoch [75/1000], Loss: 232.43495178222656, Learning Rate: 0.01
+Epoch [76/1000], Loss: 230.56968688964844, Learning Rate: 0.01
+Epoch [77/1000], Loss: 229.13645935058594, Learning Rate: 0.01
+Epoch [78/1000], Loss: 228.50196838378906, Learning Rate: 0.01
+Epoch [79/1000], Loss: 228.56520080566406, Learning Rate: 0.01
+Epoch [80/1000], Loss: 228.88148498535156, Learning Rate: 0.01
+Epoch [81/1000], Loss: 228.9497528076172, Learning Rate: 0.01
+Epoch [82/1000], Loss: 228.49801635742188, Learning Rate: 0.01
+Epoch [83/1000], Loss: 227.6038360595703, Learning Rate: 0.01
+Epoch [84/1000], Loss: 226.59646606445312, Learning Rate: 0.01
+Epoch [85/1000], Loss: 225.8212432861328, Learning Rate: 0.01
+Epoch [86/1000], Loss: 225.4365234375, Learning Rate: 0.01
+Epoch [87/1000], Loss: 225.35716247558594, Learning Rate: 0.01
+Epoch [88/1000], Loss: 225.3498992919922, Learning Rate: 0.01
+Epoch [89/1000], Loss: 225.1915283203125, Learning Rate: 0.01
+Epoch [90/1000], Loss: 224.78977966308594, Learning Rate: 0.01
+Epoch [91/1000], Loss: 224.21258544921875, Learning Rate: 0.01
+Epoch [92/1000], Loss: 223.62464904785156, Learning Rate: 0.01
+Epoch [93/1000], Loss: 223.17665100097656, Learning Rate: 0.01
+Epoch [94/1000], Loss: 222.91641235351562, Learning Rate: 0.01
+Epoch [95/1000], Loss: 222.77464294433594, Learning Rate: 0.01
+Epoch [96/1000], Loss: 222.62583923339844, Learning Rate: 0.01
+Epoch [97/1000], Loss: 222.37632751464844, Learning Rate: 0.01
+Epoch [98/1000], Loss: 222.0147247314453, Learning Rate: 0.01
+Epoch [99/1000], Loss: 221.603271484375, Learning Rate: 0.01
+Epoch [100/1000], Loss: 221.2250518798828, Learning Rate: 0.01
+Epoch [101/1000], Loss: 220.93138122558594, Learning Rate: 0.01
+Epoch [102/1000], Loss: 220.71656799316406, Learning Rate: 0.01
+Epoch [103/1000], Loss: 220.5305633544922, Learning Rate: 0.01
+Epoch [104/1000], Loss: 220.3155517578125, Learning Rate: 0.01
+Epoch [105/1000], Loss: 220.0438232421875, Learning Rate: 0.01
+Epoch [106/1000], Loss: 219.73118591308594, Learning Rate: 0.01
+Epoch [107/1000], Loss: 219.41921997070312, Learning Rate: 0.01
+Epoch [108/1000], Loss: 219.1432342529297, Learning Rate: 0.01
+Epoch [109/1000], Loss: 218.91098022460938, Learning Rate: 0.01
+Epoch [110/1000], Loss: 218.7018280029297, Learning Rate: 0.01
+Epoch [111/1000], Loss: 218.48678588867188, Learning Rate: 0.01
+Epoch [112/1000], Loss: 218.2469482421875, Learning Rate: 0.01
+Epoch [113/1000], Loss: 217.9837188720703, Learning Rate: 0.01
+Epoch [114/1000], Loss: 217.71458435058594, Learning Rate: 0.01
+Epoch [115/1000], Loss: 217.45916748046875, Learning Rate: 0.01
+Epoch [116/1000], Loss: 217.2260284423828, Learning Rate: 0.01
+Epoch [117/1000], Loss: 217.00796508789062, Learning Rate: 0.01
+Epoch [118/1000], Loss: 216.78976440429688, Learning Rate: 0.01
+Epoch [119/1000], Loss: 216.55982971191406, Learning Rate: 0.01
+Epoch [120/1000], Loss: 216.31752014160156, Learning Rate: 0.01
+Epoch [121/1000], Loss: 216.0709991455078, Learning Rate: 0.01
+Epoch [122/1000], Loss: 215.83047485351562, Learning Rate: 0.01
+Epoch [123/1000], Loss: 215.60047912597656, Learning Rate: 0.01
+Epoch [124/1000], Loss: 215.37844848632812, Learning Rate: 0.01
+Epoch [125/1000], Loss: 215.15682983398438, Learning Rate: 0.01
+Epoch [126/1000], Loss: 214.9296875, Learning Rate: 0.01
+Epoch [127/1000], Loss: 214.69578552246094, Learning Rate: 0.01
+Epoch [128/1000], Loss: 214.45941162109375, Learning Rate: 0.01
+Epoch [129/1000], Loss: 214.22592163085938, Learning Rate: 0.01
+Epoch [130/1000], Loss: 213.99749755859375, Learning Rate: 0.01
+Epoch [131/1000], Loss: 213.7726287841797, Learning Rate: 0.01
+Epoch [132/1000], Loss: 213.54791259765625, Learning Rate: 0.01
+Epoch [133/1000], Loss: 213.31982421875, Learning Rate: 0.01
+Epoch [134/1000], Loss: 213.0884246826172, Learning Rate: 0.01
+Epoch [135/1000], Loss: 212.85589599609375, Learning Rate: 0.01
+Epoch [136/1000], Loss: 212.62454223632812, Learning Rate: 0.01
+Epoch [137/1000], Loss: 212.39566040039062, Learning Rate: 0.01
+Epoch [138/1000], Loss: 212.1681671142578, Learning Rate: 0.01
+Epoch [139/1000], Loss: 211.9401397705078, Learning Rate: 0.01
+Epoch [140/1000], Loss: 211.71029663085938, Learning Rate: 0.01
+Epoch [141/1000], Loss: 211.47840881347656, Learning Rate: 0.01
+Epoch [142/1000], Loss: 211.24610900878906, Learning Rate: 0.01
+Epoch [143/1000], Loss: 211.01437377929688, Learning Rate: 0.01
+Epoch [144/1000], Loss: 210.7833709716797, Learning Rate: 0.01
+Epoch [145/1000], Loss: 210.5530242919922, Learning Rate: 0.01
+Epoch [146/1000], Loss: 210.32192993164062, Learning Rate: 0.01
+Epoch [147/1000], Loss: 210.08944702148438, Learning Rate: 0.01
+Epoch [148/1000], Loss: 209.8557891845703, Learning Rate: 0.01
+Epoch [149/1000], Loss: 209.62200927734375, Learning Rate: 0.01
+Epoch [150/1000], Loss: 209.3887481689453, Learning Rate: 0.01
+Epoch [151/1000], Loss: 209.15538024902344, Learning Rate: 0.01
+Epoch [152/1000], Loss: 208.92181396484375, Learning Rate: 0.01
+Epoch [153/1000], Loss: 208.687744140625, Learning Rate: 0.01
+Epoch [154/1000], Loss: 208.45278930664062, Learning Rate: 0.01
+Epoch [155/1000], Loss: 208.2171173095703, Learning Rate: 0.01
+Epoch [156/1000], Loss: 207.98133850097656, Learning Rate: 0.01
+Epoch [157/1000], Loss: 207.74530029296875, Learning Rate: 0.01
+Epoch [158/1000], Loss: 207.50946044921875, Learning Rate: 0.01
+Epoch [159/1000], Loss: 207.27322387695312, Learning Rate: 0.01
+Epoch [160/1000], Loss: 207.0363006591797, Learning Rate: 0.01
+Epoch [161/1000], Loss: 206.79876708984375, Learning Rate: 0.01
+Epoch [162/1000], Loss: 206.5609130859375, Learning Rate: 0.01
+Epoch [163/1000], Loss: 206.32302856445312, Learning Rate: 0.01
+Epoch [164/1000], Loss: 206.08474731445312, Learning Rate: 0.01
+Epoch [165/1000], Loss: 205.8462677001953, Learning Rate: 0.01
+Epoch [166/1000], Loss: 205.6075439453125, Learning Rate: 0.01
+Epoch [167/1000], Loss: 205.36813354492188, Learning Rate: 0.01
+Epoch [168/1000], Loss: 205.12850952148438, Learning Rate: 0.01
+Epoch [169/1000], Loss: 204.888427734375, Learning Rate: 0.01
+Epoch [170/1000], Loss: 204.64833068847656, Learning Rate: 0.01
+Epoch [171/1000], Loss: 204.40798950195312, Learning Rate: 0.01
+Epoch [172/1000], Loss: 204.16725158691406, Learning Rate: 0.01
+Epoch [173/1000], Loss: 203.92625427246094, Learning Rate: 0.01
+Epoch [174/1000], Loss: 203.6849365234375, Learning Rate: 0.01
+Epoch [175/1000], Loss: 203.44314575195312, Learning Rate: 0.01
+Epoch [176/1000], Loss: 203.20135498046875, Learning Rate: 0.01
+Epoch [177/1000], Loss: 202.95948791503906, Learning Rate: 0.01
+Epoch [178/1000], Loss: 202.717041015625, Learning Rate: 0.01
+Epoch [179/1000], Loss: 202.47454833984375, Learning Rate: 0.01
+Epoch [180/1000], Loss: 202.23171997070312, Learning Rate: 0.01
+Epoch [181/1000], Loss: 201.9888153076172, Learning Rate: 0.01
+Epoch [182/1000], Loss: 201.7454833984375, Learning Rate: 0.01
+Epoch [183/1000], Loss: 201.50201416015625, Learning Rate: 0.01
+Epoch [184/1000], Loss: 201.25845336914062, Learning Rate: 0.01
+Epoch [185/1000], Loss: 201.01461791992188, Learning Rate: 0.01
+Epoch [186/1000], Loss: 200.7704620361328, Learning Rate: 0.01
+Epoch [187/1000], Loss: 200.52635192871094, Learning Rate: 0.01
+Epoch [188/1000], Loss: 200.2821044921875, Learning Rate: 0.01
+Epoch [189/1000], Loss: 200.03761291503906, Learning Rate: 0.01
+Epoch [190/1000], Loss: 199.7930145263672, Learning Rate: 0.01
+Epoch [191/1000], Loss: 199.54818725585938, Learning Rate: 0.01
+Epoch [192/1000], Loss: 199.3032989501953, Learning Rate: 0.01
+Epoch [193/1000], Loss: 199.05824279785156, Learning Rate: 0.01
+Epoch [194/1000], Loss: 198.81304931640625, Learning Rate: 0.01
+Epoch [195/1000], Loss: 198.5679168701172, Learning Rate: 0.01
+Epoch [196/1000], Loss: 198.32241821289062, Learning Rate: 0.01
+Epoch [197/1000], Loss: 198.07704162597656, Learning Rate: 0.01
+Epoch [198/1000], Loss: 197.8314208984375, Learning Rate: 0.01
+Epoch [199/1000], Loss: 197.58587646484375, Learning Rate: 0.01
+Epoch [200/1000], Loss: 197.34014892578125, Learning Rate: 0.01
+Epoch [201/1000], Loss: 197.0944061279297, Learning Rate: 0.01
+Epoch [202/1000], Loss: 196.8488006591797, Learning Rate: 0.01
+Epoch [203/1000], Loss: 196.6029052734375, Learning Rate: 0.01
+Epoch [204/1000], Loss: 196.35708618164062, Learning Rate: 0.01
+Epoch [205/1000], Loss: 196.11126708984375, Learning Rate: 0.01
+Epoch [206/1000], Loss: 195.865234375, Learning Rate: 0.01
+Epoch [207/1000], Loss: 195.61959838867188, Learning Rate: 0.01
+Epoch [208/1000], Loss: 195.37356567382812, Learning Rate: 0.01
+Epoch [209/1000], Loss: 195.12771606445312, Learning Rate: 0.01
+Epoch [210/1000], Loss: 194.88204956054688, Learning Rate: 0.01
+Epoch [211/1000], Loss: 194.63624572753906, Learning Rate: 0.01
+Epoch [212/1000], Loss: 194.3905792236328, Learning Rate: 0.01
+Epoch [213/1000], Loss: 194.14480590820312, Learning Rate: 0.01
+Epoch [214/1000], Loss: 193.89920043945312, Learning Rate: 0.01
+Epoch [215/1000], Loss: 193.65379333496094, Learning Rate: 0.01
+Epoch [216/1000], Loss: 193.40826416015625, Learning Rate: 0.01
+Epoch [217/1000], Loss: 193.16282653808594, Learning Rate: 0.01
+Epoch [218/1000], Loss: 192.91770935058594, Learning Rate: 0.01
+Epoch [219/1000], Loss: 192.6724853515625, Learning Rate: 0.01
+Epoch [220/1000], Loss: 192.42745971679688, Learning Rate: 0.01
+Epoch [221/1000], Loss: 192.1826171875, Learning Rate: 0.01
+Epoch [222/1000], Loss: 191.93798828125, Learning Rate: 0.01
+Epoch [223/1000], Loss: 191.693359375, Learning Rate: 0.01
+Epoch [224/1000], Loss: 191.44883728027344, Learning Rate: 0.01
+Epoch [225/1000], Loss: 191.20457458496094, Learning Rate: 0.01
+Epoch [226/1000], Loss: 190.9604949951172, Learning Rate: 0.01
+Epoch [227/1000], Loss: 190.71673583984375, Learning Rate: 0.01
+Epoch [228/1000], Loss: 190.472900390625, Learning Rate: 0.01
+Epoch [229/1000], Loss: 190.2294464111328, Learning Rate: 0.01
+Epoch [230/1000], Loss: 189.98611450195312, Learning Rate: 0.01
+Epoch [231/1000], Loss: 189.74327087402344, Learning Rate: 0.01
+Epoch [232/1000], Loss: 189.50027465820312, Learning Rate: 0.01
+Epoch [233/1000], Loss: 189.25759887695312, Learning Rate: 0.01
+Epoch [234/1000], Loss: 189.0152587890625, Learning Rate: 0.01
+Epoch [235/1000], Loss: 188.77320861816406, Learning Rate: 0.01
+Epoch [236/1000], Loss: 188.53158569335938, Learning Rate: 0.01
+Epoch [237/1000], Loss: 188.29000854492188, Learning Rate: 0.01
+Epoch [238/1000], Loss: 188.04876708984375, Learning Rate: 0.01
+Epoch [239/1000], Loss: 187.8077850341797, Learning Rate: 0.01
+Epoch [240/1000], Loss: 187.56715393066406, Learning Rate: 0.01
+Epoch [241/1000], Loss: 187.32676696777344, Learning Rate: 0.01
+Epoch [242/1000], Loss: 187.0868377685547, Learning Rate: 0.01
+Epoch [243/1000], Loss: 186.84706115722656, Learning Rate: 0.01
+Epoch [244/1000], Loss: 186.60775756835938, Learning Rate: 0.01
+Epoch [245/1000], Loss: 186.36883544921875, Learning Rate: 0.01
+Epoch [246/1000], Loss: 186.13011169433594, Learning Rate: 0.01
+Epoch [247/1000], Loss: 185.891845703125, Learning Rate: 0.01
+Epoch [248/1000], Loss: 185.65394592285156, Learning Rate: 0.01
+Epoch [249/1000], Loss: 185.41639709472656, Learning Rate: 0.01
+Epoch [250/1000], Loss: 185.1792449951172, Learning Rate: 0.01
+Epoch [251/1000], Loss: 184.94244384765625, Learning Rate: 0.01
+Epoch [252/1000], Loss: 184.70611572265625, Learning Rate: 0.01
+Epoch [253/1000], Loss: 184.47019958496094, Learning Rate: 0.01
+Epoch [254/1000], Loss: 184.23455810546875, Learning Rate: 0.01
+Epoch [255/1000], Loss: 183.99948120117188, Learning Rate: 0.01
+Epoch [256/1000], Loss: 183.76475524902344, Learning Rate: 0.01
+Epoch [257/1000], Loss: 183.53053283691406, Learning Rate: 0.01
+Epoch [258/1000], Loss: 183.2967529296875, Learning Rate: 0.01
+Epoch [259/1000], Loss: 183.06329345703125, Learning Rate: 0.01
+Epoch [260/1000], Loss: 182.830322265625, Learning Rate: 0.01
+Epoch [261/1000], Loss: 182.59799194335938, Learning Rate: 0.01
+Epoch [262/1000], Loss: 182.3660125732422, Learning Rate: 0.01
+Epoch [263/1000], Loss: 182.13441467285156, Learning Rate: 0.01
+Epoch [264/1000], Loss: 181.9034423828125, Learning Rate: 0.01
+Epoch [265/1000], Loss: 181.67279052734375, Learning Rate: 0.01
+Epoch [266/1000], Loss: 181.4426727294922, Learning Rate: 0.01
+Epoch [267/1000], Loss: 181.21304321289062, Learning Rate: 0.01
+Epoch [268/1000], Loss: 180.98403930664062, Learning Rate: 0.01
+Epoch [269/1000], Loss: 180.7553253173828, Learning Rate: 0.01
+Epoch [270/1000], Loss: 180.5273895263672, Learning Rate: 0.01
+Epoch [271/1000], Loss: 180.2998809814453, Learning Rate: 0.01
+Epoch [272/1000], Loss: 180.07281494140625, Learning Rate: 0.01
+Epoch [273/1000], Loss: 179.84616088867188, Learning Rate: 0.01
+Epoch [274/1000], Loss: 179.6201934814453, Learning Rate: 0.01
+Epoch [275/1000], Loss: 179.39488220214844, Learning Rate: 0.01
+Epoch [276/1000], Loss: 179.16976928710938, Learning Rate: 0.01
+Epoch [277/1000], Loss: 178.94544982910156, Learning Rate: 0.01
+Epoch [278/1000], Loss: 178.72145080566406, Learning Rate: 0.01
+Epoch [279/1000], Loss: 178.4981231689453, Learning Rate: 0.01
+Epoch [280/1000], Loss: 178.27542114257812, Learning Rate: 0.01
+Epoch [281/1000], Loss: 178.0531463623047, Learning Rate: 0.01
+Epoch [282/1000], Loss: 177.83151245117188, Learning Rate: 0.01
+Epoch [283/1000], Loss: 177.61044311523438, Learning Rate: 0.01
+Epoch [284/1000], Loss: 177.38980102539062, Learning Rate: 0.01
+Epoch [285/1000], Loss: 177.16983032226562, Learning Rate: 0.01
+Epoch [286/1000], Loss: 176.9503173828125, Learning Rate: 0.01
+Epoch [287/1000], Loss: 176.73143005371094, Learning Rate: 0.01
+Epoch [288/1000], Loss: 176.51309204101562, Learning Rate: 0.01
+Epoch [289/1000], Loss: 176.2954864501953, Learning Rate: 0.01
+Epoch [290/1000], Loss: 176.07815551757812, Learning Rate: 0.01
+Epoch [291/1000], Loss: 175.86160278320312, Learning Rate: 0.01
+Epoch [292/1000], Loss: 175.64559936523438, Learning Rate: 0.01
+Epoch [293/1000], Loss: 175.43019104003906, Learning Rate: 0.01
+Epoch [294/1000], Loss: 175.2152557373047, Learning Rate: 0.01
+Epoch [295/1000], Loss: 175.00100708007812, Learning Rate: 0.01
+Epoch [296/1000], Loss: 174.78717041015625, Learning Rate: 0.01
+Epoch [297/1000], Loss: 174.57394409179688, Learning Rate: 0.01
+Epoch [298/1000], Loss: 174.36143493652344, Learning Rate: 0.01
+Epoch [299/1000], Loss: 174.14947509765625, Learning Rate: 0.01
+Epoch [300/1000], Loss: 173.93807983398438, Learning Rate: 0.01
+Epoch [301/1000], Loss: 173.727294921875, Learning Rate: 0.01
+Epoch [302/1000], Loss: 173.51699829101562, Learning Rate: 0.01
+Epoch [303/1000], Loss: 173.3074493408203, Learning Rate: 0.01
+Epoch [304/1000], Loss: 173.09823608398438, Learning Rate: 0.01
+Epoch [305/1000], Loss: 172.8897247314453, Learning Rate: 0.01
+Epoch [306/1000], Loss: 172.68173217773438, Learning Rate: 0.01
+Epoch [307/1000], Loss: 172.4744110107422, Learning Rate: 0.01
+Epoch [308/1000], Loss: 172.26773071289062, Learning Rate: 0.01
+Epoch [309/1000], Loss: 172.06146240234375, Learning Rate: 0.01
+Epoch [310/1000], Loss: 171.85589599609375, Learning Rate: 0.01
+Epoch [311/1000], Loss: 171.65089416503906, Learning Rate: 0.01
+Epoch [312/1000], Loss: 171.44644165039062, Learning Rate: 0.01
+Epoch [313/1000], Loss: 171.2425537109375, Learning Rate: 0.01
+Epoch [314/1000], Loss: 171.03909301757812, Learning Rate: 0.01
+Epoch [315/1000], Loss: 170.8364715576172, Learning Rate: 0.01
+Epoch [316/1000], Loss: 170.6343994140625, Learning Rate: 0.01
+Epoch [317/1000], Loss: 170.43276977539062, Learning Rate: 0.01
+Epoch [318/1000], Loss: 170.2318115234375, Learning Rate: 0.01
+Epoch [319/1000], Loss: 170.03140258789062, Learning Rate: 0.01
+Epoch [320/1000], Loss: 169.83154296875, Learning Rate: 0.01
+Epoch [321/1000], Loss: 169.63223266601562, Learning Rate: 0.01
+Epoch [322/1000], Loss: 169.43356323242188, Learning Rate: 0.01
+Epoch [323/1000], Loss: 169.23541259765625, Learning Rate: 0.01
+Epoch [324/1000], Loss: 169.03778076171875, Learning Rate: 0.01
+Epoch [325/1000], Loss: 168.84072875976562, Learning Rate: 0.01
+Epoch [326/1000], Loss: 168.64434814453125, Learning Rate: 0.01
+Epoch [327/1000], Loss: 168.4484405517578, Learning Rate: 0.01
+Epoch [328/1000], Loss: 168.25314331054688, Learning Rate: 0.01
+Epoch [329/1000], Loss: 168.05831909179688, Learning Rate: 0.01
+Epoch [330/1000], Loss: 167.8641357421875, Learning Rate: 0.01
+Epoch [331/1000], Loss: 167.6705780029297, Learning Rate: 0.01
+Epoch [332/1000], Loss: 167.4774169921875, Learning Rate: 0.01
+Epoch [333/1000], Loss: 167.28489685058594, Learning Rate: 0.01
+Epoch [334/1000], Loss: 167.09286499023438, Learning Rate: 0.01
+Epoch [335/1000], Loss: 166.90139770507812, Learning Rate: 0.01
+Epoch [336/1000], Loss: 166.71054077148438, Learning Rate: 0.01
+Epoch [337/1000], Loss: 166.52005004882812, Learning Rate: 0.01
+Epoch [338/1000], Loss: 166.33026123046875, Learning Rate: 0.01
+Epoch [339/1000], Loss: 166.14096069335938, Learning Rate: 0.01
+Epoch [340/1000], Loss: 165.95223999023438, Learning Rate: 0.01
+Epoch [341/1000], Loss: 165.76412963867188, Learning Rate: 0.01
+Epoch [342/1000], Loss: 165.57627868652344, Learning Rate: 0.01
+Epoch [343/1000], Loss: 165.38914489746094, Learning Rate: 0.01
+Epoch [344/1000], Loss: 165.20257568359375, Learning Rate: 0.01
+Epoch [345/1000], Loss: 165.0164031982422, Learning Rate: 0.01
+Epoch [346/1000], Loss: 164.83108520507812, Learning Rate: 0.01
+Epoch [347/1000], Loss: 164.64605712890625, Learning Rate: 0.01
+Epoch [348/1000], Loss: 164.46148681640625, Learning Rate: 0.01
+Epoch [349/1000], Loss: 164.27743530273438, Learning Rate: 0.01
+Epoch [350/1000], Loss: 164.09390258789062, Learning Rate: 0.01
+Epoch [351/1000], Loss: 163.91104125976562, Learning Rate: 0.01
+Epoch [352/1000], Loss: 163.72848510742188, Learning Rate: 0.01
+Epoch [353/1000], Loss: 163.54664611816406, Learning Rate: 0.01
+Epoch [354/1000], Loss: 163.36529541015625, Learning Rate: 0.01
+Epoch [355/1000], Loss: 163.1844024658203, Learning Rate: 0.01
+Epoch [356/1000], Loss: 163.0040283203125, Learning Rate: 0.01
+Epoch [357/1000], Loss: 162.82418823242188, Learning Rate: 0.01
+Epoch [358/1000], Loss: 162.644775390625, Learning Rate: 0.01
+Epoch [359/1000], Loss: 162.46591186523438, Learning Rate: 0.01
+Epoch [360/1000], Loss: 162.28759765625, Learning Rate: 0.01
+Epoch [361/1000], Loss: 162.10971069335938, Learning Rate: 0.01
+Epoch [362/1000], Loss: 161.9323272705078, Learning Rate: 0.01
+Epoch [363/1000], Loss: 161.75537109375, Learning Rate: 0.01
+Epoch [364/1000], Loss: 161.57907104492188, Learning Rate: 0.01
+Epoch [365/1000], Loss: 161.403076171875, Learning Rate: 0.01
+Epoch [366/1000], Loss: 161.2276153564453, Learning Rate: 0.01
+Epoch [367/1000], Loss: 161.05264282226562, Learning Rate: 0.01
+Epoch [368/1000], Loss: 160.8783721923828, Learning Rate: 0.01
+Epoch [369/1000], Loss: 160.7042694091797, Learning Rate: 0.01
+Epoch [370/1000], Loss: 160.53091430664062, Learning Rate: 0.01
+Epoch [371/1000], Loss: 160.3578338623047, Learning Rate: 0.01
+Epoch [372/1000], Loss: 160.18536376953125, Learning Rate: 0.01
+Epoch [373/1000], Loss: 160.0133514404297, Learning Rate: 0.01
+Epoch [374/1000], Loss: 159.84178161621094, Learning Rate: 0.01
+Epoch [375/1000], Loss: 159.67068481445312, Learning Rate: 0.01
+Epoch [376/1000], Loss: 159.5000457763672, Learning Rate: 0.01
+Epoch [377/1000], Loss: 159.32986450195312, Learning Rate: 0.01
+Epoch [378/1000], Loss: 159.1602783203125, Learning Rate: 0.01
+Epoch [379/1000], Loss: 158.99099731445312, Learning Rate: 0.01
+Epoch [380/1000], Loss: 158.82228088378906, Learning Rate: 0.01
+Epoch [381/1000], Loss: 158.6540069580078, Learning Rate: 0.01
+Epoch [382/1000], Loss: 158.48626708984375, Learning Rate: 0.01
+Epoch [383/1000], Loss: 158.31875610351562, Learning Rate: 0.01
+Epoch [384/1000], Loss: 158.15182495117188, Learning Rate: 0.01
+Epoch [385/1000], Loss: 157.98526000976562, Learning Rate: 0.01
+Epoch [386/1000], Loss: 157.8194580078125, Learning Rate: 0.01
+Epoch [387/1000], Loss: 157.65386962890625, Learning Rate: 0.01
+Epoch [388/1000], Loss: 157.48863220214844, Learning Rate: 0.01
+Epoch [389/1000], Loss: 157.32412719726562, Learning Rate: 0.01
+Epoch [390/1000], Loss: 157.159912109375, Learning Rate: 0.01
+Epoch [391/1000], Loss: 156.99615478515625, Learning Rate: 0.01
+Epoch [392/1000], Loss: 156.8328857421875, Learning Rate: 0.01
+Epoch [393/1000], Loss: 156.66989135742188, Learning Rate: 0.01
+Epoch [394/1000], Loss: 156.50759887695312, Learning Rate: 0.01
+Epoch [395/1000], Loss: 156.34555053710938, Learning Rate: 0.01
+Epoch [396/1000], Loss: 156.1841278076172, Learning Rate: 0.01
+Epoch [397/1000], Loss: 156.02301025390625, Learning Rate: 0.01
+Epoch [398/1000], Loss: 155.86236572265625, Learning Rate: 0.01
+Epoch [399/1000], Loss: 155.70211791992188, Learning Rate: 0.01
+Epoch [400/1000], Loss: 155.54232788085938, Learning Rate: 0.01
+Epoch [401/1000], Loss: 155.38296508789062, Learning Rate: 0.01
+Epoch [402/1000], Loss: 155.2240447998047, Learning Rate: 0.01
+Epoch [403/1000], Loss: 155.06549072265625, Learning Rate: 0.01
+Epoch [404/1000], Loss: 154.907470703125, Learning Rate: 0.01
+Epoch [405/1000], Loss: 154.74990844726562, Learning Rate: 0.01
+Epoch [406/1000], Loss: 154.59268188476562, Learning Rate: 0.01
+Epoch [407/1000], Loss: 154.43597412109375, Learning Rate: 0.01
+Epoch [408/1000], Loss: 154.27963256835938, Learning Rate: 0.01
+Epoch [409/1000], Loss: 154.1235809326172, Learning Rate: 0.01
+Epoch [410/1000], Loss: 153.96812438964844, Learning Rate: 0.01
+Epoch [411/1000], Loss: 153.8131103515625, Learning Rate: 0.01
+Epoch [412/1000], Loss: 153.65847778320312, Learning Rate: 0.01
+Epoch [413/1000], Loss: 153.50421142578125, Learning Rate: 0.01
+Epoch [414/1000], Loss: 153.35031127929688, Learning Rate: 0.01
+Epoch [415/1000], Loss: 153.1969451904297, Learning Rate: 0.01
+Epoch [416/1000], Loss: 153.0439453125, Learning Rate: 0.01
+Epoch [417/1000], Loss: 152.89144897460938, Learning Rate: 0.01
+Epoch [418/1000], Loss: 152.73928833007812, Learning Rate: 0.01
+Epoch [419/1000], Loss: 152.58749389648438, Learning Rate: 0.01
+Epoch [420/1000], Loss: 152.4362030029297, Learning Rate: 0.01
+Epoch [421/1000], Loss: 152.2853240966797, Learning Rate: 0.01
+Epoch [422/1000], Loss: 152.13473510742188, Learning Rate: 0.01
+Epoch [423/1000], Loss: 151.98471069335938, Learning Rate: 0.01
+Epoch [424/1000], Loss: 151.83497619628906, Learning Rate: 0.01
+Epoch [425/1000], Loss: 151.68576049804688, Learning Rate: 0.01
+Epoch [426/1000], Loss: 151.536865234375, Learning Rate: 0.01
+Epoch [427/1000], Loss: 151.388427734375, Learning Rate: 0.01
+Epoch [428/1000], Loss: 151.2403564453125, Learning Rate: 0.01
+Epoch [429/1000], Loss: 151.09280395507812, Learning Rate: 0.01
+Epoch [430/1000], Loss: 150.9453887939453, Learning Rate: 0.01
+Epoch [431/1000], Loss: 150.79852294921875, Learning Rate: 0.01
+Epoch [432/1000], Loss: 150.6521453857422, Learning Rate: 0.01
+Epoch [433/1000], Loss: 150.50616455078125, Learning Rate: 0.01
+Epoch [434/1000], Loss: 150.36044311523438, Learning Rate: 0.01
+Epoch [435/1000], Loss: 150.21527099609375, Learning Rate: 0.01
+Epoch [436/1000], Loss: 150.0703125, Learning Rate: 0.01
+Epoch [437/1000], Loss: 149.92584228515625, Learning Rate: 0.01
+Epoch [438/1000], Loss: 149.78192138671875, Learning Rate: 0.01
+Epoch [439/1000], Loss: 149.63812255859375, Learning Rate: 0.01
+Epoch [440/1000], Loss: 149.49484252929688, Learning Rate: 0.01
+Epoch [441/1000], Loss: 149.35208129882812, Learning Rate: 0.01
+Epoch [442/1000], Loss: 149.209716796875, Learning Rate: 0.01
+Epoch [443/1000], Loss: 149.0675811767578, Learning Rate: 0.01
+Epoch [444/1000], Loss: 148.92587280273438, Learning Rate: 0.01
+Epoch [445/1000], Loss: 148.78448486328125, Learning Rate: 0.01
+Epoch [446/1000], Loss: 148.6436767578125, Learning Rate: 0.01
+Epoch [447/1000], Loss: 148.503173828125, Learning Rate: 0.01
+Epoch [448/1000], Loss: 148.36312866210938, Learning Rate: 0.01
+Epoch [449/1000], Loss: 148.2232666015625, Learning Rate: 0.01
+Epoch [450/1000], Loss: 148.08395385742188, Learning Rate: 0.01
+Epoch [451/1000], Loss: 147.94497680664062, Learning Rate: 0.01
+Epoch [452/1000], Loss: 147.8065185546875, Learning Rate: 0.01
+Epoch [453/1000], Loss: 147.66836547851562, Learning Rate: 0.01
+Epoch [454/1000], Loss: 147.53050231933594, Learning Rate: 0.01
+Epoch [455/1000], Loss: 147.39309692382812, Learning Rate: 0.01
+Epoch [456/1000], Loss: 147.25604248046875, Learning Rate: 0.01
+Epoch [457/1000], Loss: 147.119384765625, Learning Rate: 0.01
+Epoch [458/1000], Loss: 146.98312377929688, Learning Rate: 0.01
+Epoch [459/1000], Loss: 146.84715270996094, Learning Rate: 0.01
+Epoch [460/1000], Loss: 146.71182250976562, Learning Rate: 0.01
+Epoch [461/1000], Loss: 146.57656860351562, Learning Rate: 0.01
+Epoch [462/1000], Loss: 146.44192504882812, Learning Rate: 0.01
+Epoch [463/1000], Loss: 146.3074951171875, Learning Rate: 0.01
+Epoch [464/1000], Loss: 146.1734619140625, Learning Rate: 0.01
+Epoch [465/1000], Loss: 146.0399169921875, Learning Rate: 0.01
+Epoch [466/1000], Loss: 145.90676879882812, Learning Rate: 0.01
+Epoch [467/1000], Loss: 145.7738037109375, Learning Rate: 0.01
+Epoch [468/1000], Loss: 145.64144897460938, Learning Rate: 0.01
+Epoch [469/1000], Loss: 145.50936889648438, Learning Rate: 0.01
+Epoch [470/1000], Loss: 145.37759399414062, Learning Rate: 0.01
+Epoch [471/1000], Loss: 145.24624633789062, Learning Rate: 0.01
+Epoch [472/1000], Loss: 145.11526489257812, Learning Rate: 0.01
+Epoch [473/1000], Loss: 144.9846649169922, Learning Rate: 0.01
+Epoch [474/1000], Loss: 144.85440063476562, Learning Rate: 0.01
+Epoch [475/1000], Loss: 144.72450256347656, Learning Rate: 0.01
+Epoch [476/1000], Loss: 144.5950927734375, Learning Rate: 0.01
+Epoch [477/1000], Loss: 144.46609497070312, Learning Rate: 0.01
+Epoch [478/1000], Loss: 144.33724975585938, Learning Rate: 0.01
+Epoch [479/1000], Loss: 144.20889282226562, Learning Rate: 0.01
+Epoch [480/1000], Loss: 144.08102416992188, Learning Rate: 0.01
+Epoch [481/1000], Loss: 143.95338439941406, Learning Rate: 0.01
+Epoch [482/1000], Loss: 143.82598876953125, Learning Rate: 0.01
+Epoch [483/1000], Loss: 143.69918823242188, Learning Rate: 0.01
+Epoch [484/1000], Loss: 143.57269287109375, Learning Rate: 0.01
+Epoch [485/1000], Loss: 143.44642639160156, Learning Rate: 0.01
+Epoch [486/1000], Loss: 143.32064819335938, Learning Rate: 0.01
+Epoch [487/1000], Loss: 143.1953125, Learning Rate: 0.01
+Epoch [488/1000], Loss: 143.07025146484375, Learning Rate: 0.01
+Epoch [489/1000], Loss: 142.94544982910156, Learning Rate: 0.01
+Epoch [490/1000], Loss: 142.82107543945312, Learning Rate: 0.01
+Epoch [491/1000], Loss: 142.6971435546875, Learning Rate: 0.01
+Epoch [492/1000], Loss: 142.57357788085938, Learning Rate: 0.01
+Epoch [493/1000], Loss: 142.4503173828125, Learning Rate: 0.01
+Epoch [494/1000], Loss: 142.32742309570312, Learning Rate: 0.01
+Epoch [495/1000], Loss: 142.20486450195312, Learning Rate: 0.01
+Epoch [496/1000], Loss: 142.08273315429688, Learning Rate: 0.01
+Epoch [497/1000], Loss: 141.96084594726562, Learning Rate: 0.01
+Epoch [498/1000], Loss: 141.83944702148438, Learning Rate: 0.01
+Epoch [499/1000], Loss: 141.7184600830078, Learning Rate: 0.01
+Epoch [500/1000], Loss: 141.59762573242188, Learning Rate: 0.01
+Epoch [501/1000], Loss: 141.4773406982422, Learning Rate: 0.01
+Epoch [502/1000], Loss: 141.35726928710938, Learning Rate: 0.01
+Epoch [503/1000], Loss: 141.23760986328125, Learning Rate: 0.01
+Epoch [504/1000], Loss: 141.1183319091797, Learning Rate: 0.01
+Epoch [505/1000], Loss: 140.99945068359375, Learning Rate: 0.01
+Epoch [506/1000], Loss: 140.88067626953125, Learning Rate: 0.01
+Epoch [507/1000], Loss: 140.76254272460938, Learning Rate: 0.01
+Epoch [508/1000], Loss: 140.64471435546875, Learning Rate: 0.01
+Epoch [509/1000], Loss: 140.527099609375, Learning Rate: 0.01
+Epoch [510/1000], Loss: 140.40988159179688, Learning Rate: 0.01
+Epoch [511/1000], Loss: 140.2930908203125, Learning Rate: 0.01
+Epoch [512/1000], Loss: 140.17672729492188, Learning Rate: 0.01
+Epoch [513/1000], Loss: 140.06048583984375, Learning Rate: 0.01
+Epoch [514/1000], Loss: 139.94473266601562, Learning Rate: 0.01
+Epoch [515/1000], Loss: 139.82931518554688, Learning Rate: 0.01
+Epoch [516/1000], Loss: 139.7141571044922, Learning Rate: 0.01
+Epoch [517/1000], Loss: 139.5995330810547, Learning Rate: 0.01
+Epoch [518/1000], Loss: 139.48519897460938, Learning Rate: 0.01
+Epoch [519/1000], Loss: 139.37112426757812, Learning Rate: 0.01
+Epoch [520/1000], Loss: 139.2573699951172, Learning Rate: 0.01
+Epoch [521/1000], Loss: 139.14404296875, Learning Rate: 0.01
+Epoch [522/1000], Loss: 139.031005859375, Learning Rate: 0.01
+Epoch [523/1000], Loss: 138.91836547851562, Learning Rate: 0.01
+Epoch [524/1000], Loss: 138.80612182617188, Learning Rate: 0.01
+Epoch [525/1000], Loss: 138.69400024414062, Learning Rate: 0.01
+Epoch [526/1000], Loss: 138.58251953125, Learning Rate: 0.01
+Epoch [527/1000], Loss: 138.47113037109375, Learning Rate: 0.01
+Epoch [528/1000], Loss: 138.36033630371094, Learning Rate: 0.01
+Epoch [529/1000], Loss: 138.2496795654297, Learning Rate: 0.01
+Epoch [530/1000], Loss: 138.13937377929688, Learning Rate: 0.01
+Epoch [531/1000], Loss: 138.029541015625, Learning Rate: 0.01
+Epoch [532/1000], Loss: 137.91995239257812, Learning Rate: 0.01
+Epoch [533/1000], Loss: 137.81068420410156, Learning Rate: 0.01
+Epoch [534/1000], Loss: 137.7017364501953, Learning Rate: 0.01
+Epoch [535/1000], Loss: 137.59317016601562, Learning Rate: 0.01
+Epoch [536/1000], Loss: 137.48504638671875, Learning Rate: 0.01
+Epoch [537/1000], Loss: 137.3770751953125, Learning Rate: 0.01
+Epoch [538/1000], Loss: 137.26950073242188, Learning Rate: 0.01
+Epoch [539/1000], Loss: 137.162353515625, Learning Rate: 0.01
+Epoch [540/1000], Loss: 137.05548095703125, Learning Rate: 0.01
+Epoch [541/1000], Loss: 136.94891357421875, Learning Rate: 0.01
+Epoch [542/1000], Loss: 136.8426971435547, Learning Rate: 0.01
+Epoch [543/1000], Loss: 136.73681640625, Learning Rate: 0.01
+Epoch [544/1000], Loss: 136.63124084472656, Learning Rate: 0.01
+Epoch [545/1000], Loss: 136.52603149414062, Learning Rate: 0.01
+Epoch [546/1000], Loss: 136.421142578125, Learning Rate: 0.01
+Epoch [547/1000], Loss: 136.31661987304688, Learning Rate: 0.01
+Epoch [548/1000], Loss: 136.21237182617188, Learning Rate: 0.01
+Epoch [549/1000], Loss: 136.10838317871094, Learning Rate: 0.01
+Epoch [550/1000], Loss: 136.00485229492188, Learning Rate: 0.01
+Epoch [551/1000], Loss: 135.901611328125, Learning Rate: 0.01
+Epoch [552/1000], Loss: 135.79873657226562, Learning Rate: 0.01
+Epoch [553/1000], Loss: 135.6961669921875, Learning Rate: 0.01
+Epoch [554/1000], Loss: 135.59385681152344, Learning Rate: 0.01
+Epoch [555/1000], Loss: 135.49185180664062, Learning Rate: 0.01
+Epoch [556/1000], Loss: 135.390380859375, Learning Rate: 0.01
+Epoch [557/1000], Loss: 135.2891387939453, Learning Rate: 0.01
+Epoch [558/1000], Loss: 135.18814086914062, Learning Rate: 0.01
+Epoch [559/1000], Loss: 135.0874786376953, Learning Rate: 0.01
+Epoch [560/1000], Loss: 134.98721313476562, Learning Rate: 0.01
+Epoch [561/1000], Loss: 134.88723754882812, Learning Rate: 0.01
+Epoch [562/1000], Loss: 134.7874755859375, Learning Rate: 0.01
+Epoch [563/1000], Loss: 134.6881866455078, Learning Rate: 0.01
+Epoch [564/1000], Loss: 134.58908081054688, Learning Rate: 0.01
+Epoch [565/1000], Loss: 134.49053955078125, Learning Rate: 0.01
+Epoch [566/1000], Loss: 134.39205932617188, Learning Rate: 0.01
+Epoch [567/1000], Loss: 134.29409790039062, Learning Rate: 0.01
+Epoch [568/1000], Loss: 134.19625854492188, Learning Rate: 0.01
+Epoch [569/1000], Loss: 134.0989990234375, Learning Rate: 0.01
+Epoch [570/1000], Loss: 134.00173950195312, Learning Rate: 0.01
+Epoch [571/1000], Loss: 133.90505981445312, Learning Rate: 0.01
+Epoch [572/1000], Loss: 133.80859375, Learning Rate: 0.01
+Epoch [573/1000], Loss: 133.71243286132812, Learning Rate: 0.01
+Epoch [574/1000], Loss: 133.61660766601562, Learning Rate: 0.01
+Epoch [575/1000], Loss: 133.52105712890625, Learning Rate: 0.01
+Epoch [576/1000], Loss: 133.42593383789062, Learning Rate: 0.01
+Epoch [577/1000], Loss: 133.33111572265625, Learning Rate: 0.01
+Epoch [578/1000], Loss: 133.2365264892578, Learning Rate: 0.01
+Epoch [579/1000], Loss: 133.142333984375, Learning Rate: 0.01
+Epoch [580/1000], Loss: 133.04844665527344, Learning Rate: 0.01
+Epoch [581/1000], Loss: 132.95474243164062, Learning Rate: 0.01
+Epoch [582/1000], Loss: 132.86154174804688, Learning Rate: 0.01
+Epoch [583/1000], Loss: 132.76841735839844, Learning Rate: 0.01
+Epoch [584/1000], Loss: 132.67587280273438, Learning Rate: 0.01
+Epoch [585/1000], Loss: 132.58352661132812, Learning Rate: 0.01
+Epoch [586/1000], Loss: 132.49148559570312, Learning Rate: 0.01
+Epoch [587/1000], Loss: 132.39968872070312, Learning Rate: 0.01
+Epoch [588/1000], Loss: 132.30833435058594, Learning Rate: 0.01
+Epoch [589/1000], Loss: 132.21731567382812, Learning Rate: 0.01
+Epoch [590/1000], Loss: 132.12643432617188, Learning Rate: 0.01
+Epoch [591/1000], Loss: 132.03590393066406, Learning Rate: 0.01
+Epoch [592/1000], Loss: 131.94581604003906, Learning Rate: 0.01
+Epoch [593/1000], Loss: 131.85598754882812, Learning Rate: 0.01
+Epoch [594/1000], Loss: 131.76641845703125, Learning Rate: 0.01
+Epoch [595/1000], Loss: 131.67718505859375, Learning Rate: 0.01
+Epoch [596/1000], Loss: 131.58828735351562, Learning Rate: 0.01
+Epoch [597/1000], Loss: 131.4996337890625, Learning Rate: 0.01
+Epoch [598/1000], Loss: 131.41131591796875, Learning Rate: 0.01
+Epoch [599/1000], Loss: 131.32330322265625, Learning Rate: 0.01
+Epoch [600/1000], Loss: 131.23568725585938, Learning Rate: 0.01
+Epoch [601/1000], Loss: 131.1483154296875, Learning Rate: 0.01
+Epoch [602/1000], Loss: 131.06124877929688, Learning Rate: 0.01
+Epoch [603/1000], Loss: 130.97442626953125, Learning Rate: 0.01
+Epoch [604/1000], Loss: 130.8880615234375, Learning Rate: 0.01
+Epoch [605/1000], Loss: 130.8019561767578, Learning Rate: 0.01
+Epoch [606/1000], Loss: 130.7161865234375, Learning Rate: 0.01
+Epoch [607/1000], Loss: 130.63067626953125, Learning Rate: 0.01
+Epoch [608/1000], Loss: 130.5452880859375, Learning Rate: 0.01
+Epoch [609/1000], Loss: 130.4604034423828, Learning Rate: 0.01
+Epoch [610/1000], Loss: 130.3759307861328, Learning Rate: 0.01
+Epoch [611/1000], Loss: 130.2916259765625, Learning Rate: 0.01
+Epoch [612/1000], Loss: 130.20762634277344, Learning Rate: 0.01
+Epoch [613/1000], Loss: 130.12393188476562, Learning Rate: 0.01
+Epoch [614/1000], Loss: 130.04066467285156, Learning Rate: 0.01
+Epoch [615/1000], Loss: 129.95755004882812, Learning Rate: 0.01
+Epoch [616/1000], Loss: 129.87472534179688, Learning Rate: 0.01
+Epoch [617/1000], Loss: 129.79246520996094, Learning Rate: 0.01
+Epoch [618/1000], Loss: 129.71035766601562, Learning Rate: 0.01
+Epoch [619/1000], Loss: 129.62850952148438, Learning Rate: 0.01
+Epoch [620/1000], Loss: 129.54702758789062, Learning Rate: 0.01
+Epoch [621/1000], Loss: 129.46571350097656, Learning Rate: 0.01
+Epoch [622/1000], Loss: 129.3848876953125, Learning Rate: 0.01
+Epoch [623/1000], Loss: 129.3042755126953, Learning Rate: 0.01
+Epoch [624/1000], Loss: 129.22396850585938, Learning Rate: 0.01
+Epoch [625/1000], Loss: 129.14407348632812, Learning Rate: 0.01
+Epoch [626/1000], Loss: 129.06431579589844, Learning Rate: 0.01
+Epoch [627/1000], Loss: 128.98492431640625, Learning Rate: 0.01
+Epoch [628/1000], Loss: 128.90591430664062, Learning Rate: 0.01
+Epoch [629/1000], Loss: 128.82708740234375, Learning Rate: 0.01
+Epoch [630/1000], Loss: 128.74868774414062, Learning Rate: 0.01
+Epoch [631/1000], Loss: 128.67062377929688, Learning Rate: 0.01
+Epoch [632/1000], Loss: 128.59274291992188, Learning Rate: 0.01
+Epoch [633/1000], Loss: 128.51513671875, Learning Rate: 0.01
+Epoch [634/1000], Loss: 128.43785095214844, Learning Rate: 0.01
+Epoch [635/1000], Loss: 128.361083984375, Learning Rate: 0.01
+Epoch [636/1000], Loss: 128.28445434570312, Learning Rate: 0.01
+Epoch [637/1000], Loss: 128.20806884765625, Learning Rate: 0.01
+Epoch [638/1000], Loss: 128.13206481933594, Learning Rate: 0.01
+Epoch [639/1000], Loss: 128.05636596679688, Learning Rate: 0.01
+Epoch [640/1000], Loss: 127.98101806640625, Learning Rate: 0.01
+Epoch [641/1000], Loss: 127.90584564208984, Learning Rate: 0.01
+Epoch [642/1000], Loss: 127.83100891113281, Learning Rate: 0.01
+Epoch [643/1000], Loss: 127.75655364990234, Learning Rate: 0.01
+Epoch [644/1000], Loss: 127.6823959350586, Learning Rate: 0.01
+Epoch [645/1000], Loss: 127.6084213256836, Learning Rate: 0.01
+Epoch [646/1000], Loss: 127.5347671508789, Learning Rate: 0.01
+Epoch [647/1000], Loss: 127.46146392822266, Learning Rate: 0.01
+Epoch [648/1000], Loss: 127.38862609863281, Learning Rate: 0.01
+Epoch [649/1000], Loss: 127.31578826904297, Learning Rate: 0.01
+Epoch [650/1000], Loss: 127.24343872070312, Learning Rate: 0.01
+Epoch [651/1000], Loss: 127.17139434814453, Learning Rate: 0.01
+Epoch [652/1000], Loss: 127.09956359863281, Learning Rate: 0.01
+Epoch [653/1000], Loss: 127.0280990600586, Learning Rate: 0.01
+Epoch [654/1000], Loss: 126.95684814453125, Learning Rate: 0.01
+Epoch [655/1000], Loss: 126.88584899902344, Learning Rate: 0.01
+Epoch [656/1000], Loss: 126.81529235839844, Learning Rate: 0.01
+Epoch [657/1000], Loss: 126.74498748779297, Learning Rate: 0.01
+Epoch [658/1000], Loss: 126.67501831054688, Learning Rate: 0.01
+Epoch [659/1000], Loss: 126.60525512695312, Learning Rate: 0.01
+Epoch [660/1000], Loss: 126.53567504882812, Learning Rate: 0.01
+Epoch [661/1000], Loss: 126.46662902832031, Learning Rate: 0.01
+Epoch [662/1000], Loss: 126.39783477783203, Learning Rate: 0.01
+Epoch [663/1000], Loss: 126.3292236328125, Learning Rate: 0.01
+Epoch [664/1000], Loss: 126.2610092163086, Learning Rate: 0.01
+Epoch [665/1000], Loss: 126.19292449951172, Learning Rate: 0.01
+Epoch [666/1000], Loss: 126.12533569335938, Learning Rate: 0.01
+Epoch [667/1000], Loss: 126.05799102783203, Learning Rate: 0.01
+Epoch [668/1000], Loss: 125.9907455444336, Learning Rate: 0.01
+Epoch [669/1000], Loss: 125.92393493652344, Learning Rate: 0.01
+Epoch [670/1000], Loss: 125.85733032226562, Learning Rate: 0.01
+Epoch [671/1000], Loss: 125.7911148071289, Learning Rate: 0.01
+Epoch [672/1000], Loss: 125.72516632080078, Learning Rate: 0.01
+Epoch [673/1000], Loss: 125.65940856933594, Learning Rate: 0.01
+Epoch [674/1000], Loss: 125.5940170288086, Learning Rate: 0.01
+Epoch [675/1000], Loss: 125.52882385253906, Learning Rate: 0.01
+Epoch [676/1000], Loss: 125.46406555175781, Learning Rate: 0.01
+Epoch [677/1000], Loss: 125.39937591552734, Learning Rate: 0.01
+Epoch [678/1000], Loss: 125.3350830078125, Learning Rate: 0.01
+Epoch [679/1000], Loss: 125.27105712890625, Learning Rate: 0.01
+Epoch [680/1000], Loss: 125.20720672607422, Learning Rate: 0.01
+Epoch [681/1000], Loss: 125.14385986328125, Learning Rate: 0.01
+Epoch [682/1000], Loss: 125.0806655883789, Learning Rate: 0.01
+Epoch [683/1000], Loss: 125.01759338378906, Learning Rate: 0.01
+Epoch [684/1000], Loss: 124.95499420166016, Learning Rate: 0.01
+Epoch [685/1000], Loss: 124.89252471923828, Learning Rate: 0.01
+Epoch [686/1000], Loss: 124.8304672241211, Learning Rate: 0.01
+Epoch [687/1000], Loss: 124.76858520507812, Learning Rate: 0.01
+Epoch [688/1000], Loss: 124.70694732666016, Learning Rate: 0.01
+Epoch [689/1000], Loss: 124.64557647705078, Learning Rate: 0.01
+Epoch [690/1000], Loss: 124.58457946777344, Learning Rate: 0.01
+Epoch [691/1000], Loss: 124.52373504638672, Learning Rate: 0.01
+Epoch [692/1000], Loss: 124.46319580078125, Learning Rate: 0.01
+Epoch [693/1000], Loss: 124.40283203125, Learning Rate: 0.01
+Epoch [694/1000], Loss: 124.34288024902344, Learning Rate: 0.01
+Epoch [695/1000], Loss: 124.28306579589844, Learning Rate: 0.01
+Epoch [696/1000], Loss: 124.22351837158203, Learning Rate: 0.01
+Epoch [697/1000], Loss: 124.16417694091797, Learning Rate: 0.01
+Epoch [698/1000], Loss: 124.10514068603516, Learning Rate: 0.01
+Epoch [699/1000], Loss: 124.04647827148438, Learning Rate: 0.01
+Epoch [700/1000], Loss: 123.98789978027344, Learning Rate: 0.01
+Epoch [701/1000], Loss: 123.92959594726562, Learning Rate: 0.01
+Epoch [702/1000], Loss: 123.87151336669922, Learning Rate: 0.01
+Epoch [703/1000], Loss: 123.81367492675781, Learning Rate: 0.01
+Epoch [704/1000], Loss: 123.75619506835938, Learning Rate: 0.01
+Epoch [705/1000], Loss: 123.69888305664062, Learning Rate: 0.01
+Epoch [706/1000], Loss: 123.6417465209961, Learning Rate: 0.01
+Epoch [707/1000], Loss: 123.58502197265625, Learning Rate: 0.01
+Epoch [708/1000], Loss: 123.52828979492188, Learning Rate: 0.01
+Epoch [709/1000], Loss: 123.47193145751953, Learning Rate: 0.01
+Epoch [710/1000], Loss: 123.41583251953125, Learning Rate: 0.01
+Epoch [711/1000], Loss: 123.3599624633789, Learning Rate: 0.01
+Epoch [712/1000], Loss: 123.30426788330078, Learning Rate: 0.01
+Epoch [713/1000], Loss: 123.24891662597656, Learning Rate: 0.01
+Epoch [714/1000], Loss: 123.19364166259766, Learning Rate: 0.01
+Epoch [715/1000], Loss: 123.138671875, Learning Rate: 0.01
+Epoch [716/1000], Loss: 123.08385467529297, Learning Rate: 0.01
+Epoch [717/1000], Loss: 123.02940368652344, Learning Rate: 0.01
+Epoch [718/1000], Loss: 122.97493743896484, Learning Rate: 0.01
+Epoch [719/1000], Loss: 122.92086791992188, Learning Rate: 0.01
+Epoch [720/1000], Loss: 122.86708068847656, Learning Rate: 0.01
+Epoch [721/1000], Loss: 122.81332397460938, Learning Rate: 0.01
+Epoch [722/1000], Loss: 122.75992584228516, Learning Rate: 0.01
+Epoch [723/1000], Loss: 122.70673370361328, Learning Rate: 0.01
+Epoch [724/1000], Loss: 122.6536865234375, Learning Rate: 0.01
+Epoch [725/1000], Loss: 122.60079956054688, Learning Rate: 0.01
+Epoch [726/1000], Loss: 122.54830169677734, Learning Rate: 0.01
+Epoch [727/1000], Loss: 122.4958267211914, Learning Rate: 0.01
+Epoch [728/1000], Loss: 122.44367980957031, Learning Rate: 0.01
+Epoch [729/1000], Loss: 122.39171600341797, Learning Rate: 0.01
+Epoch [730/1000], Loss: 122.34002685546875, Learning Rate: 0.01
+Epoch [731/1000], Loss: 122.28840637207031, Learning Rate: 0.01
+Epoch [732/1000], Loss: 122.23700714111328, Learning Rate: 0.01
+Epoch [733/1000], Loss: 122.1858901977539, Learning Rate: 0.01
+Epoch [734/1000], Loss: 122.13491821289062, Learning Rate: 0.01
+Epoch [735/1000], Loss: 122.0841064453125, Learning Rate: 0.01
+Epoch [736/1000], Loss: 122.03355407714844, Learning Rate: 0.01
+Epoch [737/1000], Loss: 121.98312377929688, Learning Rate: 0.01
+Epoch [738/1000], Loss: 121.93296813964844, Learning Rate: 0.01
+Epoch [739/1000], Loss: 121.88301849365234, Learning Rate: 0.01
+Epoch [740/1000], Loss: 121.83316040039062, Learning Rate: 0.01
+Epoch [741/1000], Loss: 121.78357696533203, Learning Rate: 0.01
+Epoch [742/1000], Loss: 121.73411560058594, Learning Rate: 0.01
+Epoch [743/1000], Loss: 121.68490600585938, Learning Rate: 0.01
+Epoch [744/1000], Loss: 121.63582611083984, Learning Rate: 0.01
+Epoch [745/1000], Loss: 121.58687591552734, Learning Rate: 0.01
+Epoch [746/1000], Loss: 121.53820037841797, Learning Rate: 0.01
+Epoch [747/1000], Loss: 121.48970794677734, Learning Rate: 0.01
+Epoch [748/1000], Loss: 121.4413070678711, Learning Rate: 0.01
+Epoch [749/1000], Loss: 121.3931884765625, Learning Rate: 0.01
+Epoch [750/1000], Loss: 121.34524536132812, Learning Rate: 0.01
+Epoch [751/1000], Loss: 121.2973403930664, Learning Rate: 0.01
+Epoch [752/1000], Loss: 121.24978637695312, Learning Rate: 0.01
+Epoch [753/1000], Loss: 121.20233154296875, Learning Rate: 0.01
+Epoch [754/1000], Loss: 121.15497589111328, Learning Rate: 0.01
+Epoch [755/1000], Loss: 121.1078872680664, Learning Rate: 0.01
+Epoch [756/1000], Loss: 121.06089782714844, Learning Rate: 0.01
+Epoch [757/1000], Loss: 121.01424407958984, Learning Rate: 0.01
+Epoch [758/1000], Loss: 120.96755981445312, Learning Rate: 0.01
+Epoch [759/1000], Loss: 120.92105102539062, Learning Rate: 0.01
+Epoch [760/1000], Loss: 120.87480163574219, Learning Rate: 0.01
+Epoch [761/1000], Loss: 120.8286361694336, Learning Rate: 0.01
+Epoch [762/1000], Loss: 120.78270721435547, Learning Rate: 0.01
+Epoch [763/1000], Loss: 120.73693084716797, Learning Rate: 0.01
+Epoch [764/1000], Loss: 120.6912612915039, Learning Rate: 0.01
+Epoch [765/1000], Loss: 120.64580535888672, Learning Rate: 0.01
+Epoch [766/1000], Loss: 120.60037994384766, Learning Rate: 0.01
+Epoch [767/1000], Loss: 120.55529022216797, Learning Rate: 0.01
+Epoch [768/1000], Loss: 120.51026153564453, Learning Rate: 0.01
+Epoch [769/1000], Loss: 120.46546936035156, Learning Rate: 0.01
+Epoch [770/1000], Loss: 120.42071533203125, Learning Rate: 0.01
+Epoch [771/1000], Loss: 120.37616729736328, Learning Rate: 0.01
+Epoch [772/1000], Loss: 120.33177947998047, Learning Rate: 0.01
+Epoch [773/1000], Loss: 120.2874526977539, Learning Rate: 0.01
+Epoch [774/1000], Loss: 120.24345397949219, Learning Rate: 0.01
+Epoch [775/1000], Loss: 120.19940948486328, Learning Rate: 0.01
+Epoch [776/1000], Loss: 120.15562438964844, Learning Rate: 0.01
+Epoch [777/1000], Loss: 120.11190032958984, Learning Rate: 0.01
+Epoch [778/1000], Loss: 120.06837463378906, Learning Rate: 0.01
+Epoch [779/1000], Loss: 120.02510070800781, Learning Rate: 0.01
+Epoch [780/1000], Loss: 119.98189544677734, Learning Rate: 0.01
+Epoch [781/1000], Loss: 119.9388198852539, Learning Rate: 0.01
+Epoch [782/1000], Loss: 119.89578247070312, Learning Rate: 0.01
+Epoch [783/1000], Loss: 119.85294342041016, Learning Rate: 0.01
+Epoch [784/1000], Loss: 119.8103256225586, Learning Rate: 0.01
+Epoch [785/1000], Loss: 119.76776123046875, Learning Rate: 0.01
+Epoch [786/1000], Loss: 119.72540283203125, Learning Rate: 0.01
+Epoch [787/1000], Loss: 119.68312072753906, Learning Rate: 0.01
+Epoch [788/1000], Loss: 119.6409912109375, Learning Rate: 0.01
+Epoch [789/1000], Loss: 119.59903717041016, Learning Rate: 0.01
+Epoch [790/1000], Loss: 119.55708312988281, Learning Rate: 0.01
+Epoch [791/1000], Loss: 119.51536560058594, Learning Rate: 0.01
+Epoch [792/1000], Loss: 119.47384643554688, Learning Rate: 0.01
+Epoch [793/1000], Loss: 119.43234252929688, Learning Rate: 0.01
+Epoch [794/1000], Loss: 119.39102935791016, Learning Rate: 0.01
+Epoch [795/1000], Loss: 119.349853515625, Learning Rate: 0.01
+Epoch [796/1000], Loss: 119.3086166381836, Learning Rate: 0.01
+Epoch [797/1000], Loss: 119.26777648925781, Learning Rate: 0.01
+Epoch [798/1000], Loss: 119.22700500488281, Learning Rate: 0.01
+Epoch [799/1000], Loss: 119.1863021850586, Learning Rate: 0.01
+Epoch [800/1000], Loss: 119.14570617675781, Learning Rate: 0.01
+Epoch [801/1000], Loss: 119.10531616210938, Learning Rate: 0.01
+Epoch [802/1000], Loss: 119.06491088867188, Learning Rate: 0.01
+Epoch [803/1000], Loss: 119.02474212646484, Learning Rate: 0.01
+Epoch [804/1000], Loss: 118.98462677001953, Learning Rate: 0.01
+Epoch [805/1000], Loss: 118.94462585449219, Learning Rate: 0.01
+Epoch [806/1000], Loss: 118.90486907958984, Learning Rate: 0.01
+Epoch [807/1000], Loss: 118.8651123046875, Learning Rate: 0.01
+Epoch [808/1000], Loss: 118.8254623413086, Learning Rate: 0.01
+Epoch [809/1000], Loss: 118.78596496582031, Learning Rate: 0.01
+Epoch [810/1000], Loss: 118.74662780761719, Learning Rate: 0.01
+Epoch [811/1000], Loss: 118.70731353759766, Learning Rate: 0.01
+Epoch [812/1000], Loss: 118.66813659667969, Learning Rate: 0.01
+Epoch [813/1000], Loss: 118.62920379638672, Learning Rate: 0.01
+Epoch [814/1000], Loss: 118.59028625488281, Learning Rate: 0.01
+Epoch [815/1000], Loss: 118.551513671875, Learning Rate: 0.01
+Epoch [816/1000], Loss: 118.51271057128906, Learning Rate: 0.01
+Epoch [817/1000], Loss: 118.47417449951172, Learning Rate: 0.01
+Epoch [818/1000], Loss: 118.43577575683594, Learning Rate: 0.01
+Epoch [819/1000], Loss: 118.39743041992188, Learning Rate: 0.01
+Epoch [820/1000], Loss: 118.35921478271484, Learning Rate: 0.01
+Epoch [821/1000], Loss: 118.32103729248047, Learning Rate: 0.01
+Epoch [822/1000], Loss: 118.28305053710938, Learning Rate: 0.01
+Epoch [823/1000], Loss: 118.24510192871094, Learning Rate: 0.01
+Epoch [824/1000], Loss: 118.20722961425781, Learning Rate: 0.01
+Epoch [825/1000], Loss: 118.1695556640625, Learning Rate: 0.01
+Epoch [826/1000], Loss: 118.13201904296875, Learning Rate: 0.01
+Epoch [827/1000], Loss: 118.09452819824219, Learning Rate: 0.01
+Epoch [828/1000], Loss: 118.0571060180664, Learning Rate: 0.01
+Epoch [829/1000], Loss: 118.01984405517578, Learning Rate: 0.01
+Epoch [830/1000], Loss: 117.9826431274414, Learning Rate: 0.01
+Epoch [831/1000], Loss: 117.94561004638672, Learning Rate: 0.01
+Epoch [832/1000], Loss: 117.90861511230469, Learning Rate: 0.01
+Epoch [833/1000], Loss: 117.87176513671875, Learning Rate: 0.01
+Epoch [834/1000], Loss: 117.83490753173828, Learning Rate: 0.01
+Epoch [835/1000], Loss: 117.79828643798828, Learning Rate: 0.01
+Epoch [836/1000], Loss: 117.76174926757812, Learning Rate: 0.01
+Epoch [837/1000], Loss: 117.72527313232422, Learning Rate: 0.01
+Epoch [838/1000], Loss: 117.6888427734375, Learning Rate: 0.01
+Epoch [839/1000], Loss: 117.6525650024414, Learning Rate: 0.01
+Epoch [840/1000], Loss: 117.61643981933594, Learning Rate: 0.01
+Epoch [841/1000], Loss: 117.5802993774414, Learning Rate: 0.01
+Epoch [842/1000], Loss: 117.54432678222656, Learning Rate: 0.01
+Epoch [843/1000], Loss: 117.5085220336914, Learning Rate: 0.01
+Epoch [844/1000], Loss: 117.47266387939453, Learning Rate: 0.01
+Epoch [845/1000], Loss: 117.43701934814453, Learning Rate: 0.01
+Epoch [846/1000], Loss: 117.40142822265625, Learning Rate: 0.01
+Epoch [847/1000], Loss: 117.3659439086914, Learning Rate: 0.01
+Epoch [848/1000], Loss: 117.33036804199219, Learning Rate: 0.01
+Epoch [849/1000], Loss: 117.29515075683594, Learning Rate: 0.01
+Epoch [850/1000], Loss: 117.25987243652344, Learning Rate: 0.01
+Epoch [851/1000], Loss: 117.22478485107422, Learning Rate: 0.01
+Epoch [852/1000], Loss: 117.18974304199219, Learning Rate: 0.01
+Epoch [853/1000], Loss: 117.15472412109375, Learning Rate: 0.01
+Epoch [854/1000], Loss: 117.11991119384766, Learning Rate: 0.01
+Epoch [855/1000], Loss: 117.08513641357422, Learning Rate: 0.01
+Epoch [856/1000], Loss: 117.05037689208984, Learning Rate: 0.01
+Epoch [857/1000], Loss: 117.01579284667969, Learning Rate: 0.01
+Epoch [858/1000], Loss: 116.98136901855469, Learning Rate: 0.01
+Epoch [859/1000], Loss: 116.94691467285156, Learning Rate: 0.01
+Epoch [860/1000], Loss: 116.91252899169922, Learning Rate: 0.01
+Epoch [861/1000], Loss: 116.87828826904297, Learning Rate: 0.01
+Epoch [862/1000], Loss: 116.84419250488281, Learning Rate: 0.01
+Epoch [863/1000], Loss: 116.81005859375, Learning Rate: 0.01
+Epoch [864/1000], Loss: 116.77608489990234, Learning Rate: 0.01
+Epoch [865/1000], Loss: 116.74223327636719, Learning Rate: 0.01
+Epoch [866/1000], Loss: 116.70829772949219, Learning Rate: 0.01
+Epoch [867/1000], Loss: 116.67452239990234, Learning Rate: 0.01
+Epoch [868/1000], Loss: 116.64090728759766, Learning Rate: 0.01
+Epoch [869/1000], Loss: 116.60734558105469, Learning Rate: 0.01
+Epoch [870/1000], Loss: 116.57386779785156, Learning Rate: 0.01
+Epoch [871/1000], Loss: 116.5403823852539, Learning Rate: 0.01
+Epoch [872/1000], Loss: 116.5071792602539, Learning Rate: 0.01
+Epoch [873/1000], Loss: 116.47383880615234, Learning Rate: 0.01
+Epoch [874/1000], Loss: 116.44066619873047, Learning Rate: 0.01
+Epoch [875/1000], Loss: 116.40748596191406, Learning Rate: 0.01
+Epoch [876/1000], Loss: 116.37460327148438, Learning Rate: 0.01
+Epoch [877/1000], Loss: 116.34172058105469, Learning Rate: 0.01
+Epoch [878/1000], Loss: 116.308837890625, Learning Rate: 0.01
+Epoch [879/1000], Loss: 116.2760238647461, Learning Rate: 0.01
+Epoch [880/1000], Loss: 116.24325561523438, Learning Rate: 0.01
+Epoch [881/1000], Loss: 116.21077728271484, Learning Rate: 0.01
+Epoch [882/1000], Loss: 116.17823791503906, Learning Rate: 0.01
+Epoch [883/1000], Loss: 116.1456527709961, Learning Rate: 0.01
+Epoch [884/1000], Loss: 116.11333465576172, Learning Rate: 0.01
+Epoch [885/1000], Loss: 116.0810317993164, Learning Rate: 0.01
+Epoch [886/1000], Loss: 116.0488510131836, Learning Rate: 0.01
+Epoch [887/1000], Loss: 116.01667022705078, Learning Rate: 0.01
+Epoch [888/1000], Loss: 115.98454284667969, Learning Rate: 0.01
+Epoch [889/1000], Loss: 115.95260620117188, Learning Rate: 0.01
+Epoch [890/1000], Loss: 115.92058563232422, Learning Rate: 0.01
+Epoch [891/1000], Loss: 115.88872528076172, Learning Rate: 0.01
+Epoch [892/1000], Loss: 115.85702514648438, Learning Rate: 0.01
+Epoch [893/1000], Loss: 115.82528686523438, Learning Rate: 0.01
+Epoch [894/1000], Loss: 115.7935791015625, Learning Rate: 0.01
+Epoch [895/1000], Loss: 115.76213836669922, Learning Rate: 0.01
+Epoch [896/1000], Loss: 115.73057556152344, Learning Rate: 0.01
+Epoch [897/1000], Loss: 115.69918823242188, Learning Rate: 0.01
+Epoch [898/1000], Loss: 115.66783905029297, Learning Rate: 0.01
+Epoch [899/1000], Loss: 115.63653564453125, Learning Rate: 0.01
+Epoch [900/1000], Loss: 115.60536193847656, Learning Rate: 0.01
+Epoch [901/1000], Loss: 115.57413482666016, Learning Rate: 0.01
+Epoch [902/1000], Loss: 115.54303741455078, Learning Rate: 0.01
+Epoch [903/1000], Loss: 115.5120620727539, Learning Rate: 0.01
+Epoch [904/1000], Loss: 115.4811019897461, Learning Rate: 0.01
+Epoch [905/1000], Loss: 115.45033264160156, Learning Rate: 0.01
+Epoch [906/1000], Loss: 115.41948699951172, Learning Rate: 0.01
+Epoch [907/1000], Loss: 115.38882446289062, Learning Rate: 0.01  0%|          | 0/50000 [00:00<?, ?it/s]HMC:   0%|          | 0/50000 [00:05<?, ?it/s]HMC:   0%|          | 0/50000 [00:05<?, ?it/s, norm=12.8, potential=119, rate=0, step=0.002]HMC:   0%|          | 1/50000 [00:05<71:04:58,  5.12s/it, norm=12.8, potential=119, rate=0, step=0.002]HMC:   0%|          | 1/50000 [00:09<71:04:58,  5.12s/it, norm=12.8, potential=119, rate=0, step=0.002]HMC:   0%|          | 1/50000 [00:09<71:04:58,  5.12s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 2/50000 [00:09<69:57:26,  5.04s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 2/50000 [00:14<69:57:26,  5.04s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 2/50000 [00:14<69:57:26,  5.04s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 3/50000 [00:14<65:47:02,  4.74s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 3/50000 [00:14<65:47:02,  4.74s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 3/50000 [00:14<65:47:02,  4.74s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 4/50000 [00:14<49:47:02,  3.58s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 4/50000 [00:16<49:47:02,  3.58s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 4/50000 [00:16<49:47:02,  3.58s/it, norm=12.4, potential=113, rate=0, step=0.002]HMC:   0%|          | 5/50000 [00:16<43:04:23,  3.10s/it, norm=12.4, potential=113, rate=0, step=0.002]HMC:   0%|          | 5/50000 [00:19<43:04:23,  3.10s/it, norm=12.4, potential=113, rate=0, step=0.002]HMC:   0%|          | 5/50000 [00:19<43:04:23,  3.10s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 6/50000 [00:19<41:46:10,  3.01s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 6/50000 [00:20<41:46:10,  3.01s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 6/50000 [00:20<41:46:10,  3.01s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 7/50000 [00:20<30:53:12,  2.22s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 7/50000 [00:20<30:53:12,  2.22s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 7/50000 [00:20<30:53:12,  2.22s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 8/50000 [00:20<24:09:17,  1.74s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 8/50000 [00:24<24:09:17,  1.74s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 8/50000 [00:24<24:09:17,  1.74s/it, norm=12.2, potential=113, rate=0, step=0.002]HMC:   0%|          | 9/50000 [00:24<33:53:20,  2.44s/it, norm=12.2, potential=113, rate=0, step=0.002]HMC:   0%|          | 9/50000 [00:29<33:53:20,  2.44s/it, norm=12.2, potential=113, rate=0, step=0.002]HMC:   0%|          | 9/50000 [00:29<33:53:20,  2.44s/it, norm=12.6, potential=116, rate=0, step=0.002]HMC:   0%|          | 10/50000 [00:29<44:43:05,  3.22s/it, norm=12.6, potential=116, rate=0, step=0.002]HMC:   0%|          | 10/50000 [00:30<44:43:05,  3.22s/it, norm=12.6, potential=116, rate=0, step=0.002]HMC:   0%|          | 10/50000 [00:30<44:43:05,  3.22s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 11/50000 [00:30<35:07:09,  2.53s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 11/50000 [00:32<35:07:09,  2.53s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 11/50000 [00:32<35:07:09,  2.53s/it, norm=12.3, potential=114, rate=0, step=0.002]HMC:   0%|          | 12/50000 [00:32<33:42:52,  2.43s/it, norm=12.3, potential=114, rate=0, step=0.002]HMC:   0%|          | 12/50000 [00:36<33:42:52,  2.43s/it, norm=12.3, potential=114, rate=0, step=0.002]HMC:   0%|          | 12/50000 [00:36<33:42:52,  2.43s/it, norm=12.4, potential=116, rate=0, step=0.002]HMC:   0%|          | 13/50000 [00:36<40:14:43,  2.90s/it, norm=12.4, potential=116, rate=0, step=0.002]HMC:   0%|          | 13/50000 [00:37<40:14:43,  2.90s/it, norm=12.4, potential=116, rate=0, step=0.002]HMC:   0%|          | 13/50000 [00:37<40:14:43,  2.90s/it, norm=12.4, potential=114, rate=0, step=0.002]HMC:   0%|          | 14/50000 [00:37<30:21:14,  2.19s/it, norm=12.4, potential=114, rate=0, step=0.002]HMC:   0%|          | 14/50000 [00:39<30:21:14,  2.19s/it, norm=12.4, potential=114, rate=0, step=0.002]HMC:   0%|          | 14/50000 [00:39<30:21:14,  2.19s/it, norm=12.3, potential=115, rate=0, step=0.002]HMC:   0%|          | 15/50000 [00:39<28:01:25,  2.02s/it, norm=12.3, potential=115, rate=0, step=0.002]HMC:   0%|          | 15/50000 [00:39<28:01:25,  2.02s/it, norm=12.3, potential=115, rate=0, step=0.002]HMC:   0%|          | 15/50000 [00:39<28:01:25,  2.02s/it, norm=12.3, potential=114, rate=0, step=0.002]HMC:   0%|          | 15/50000 [00:40<28:01:25,  2.02s/it, norm=12.3, potential=114, rate=0, step=0.002]HMC:   0%|          | 15/50000 [00:40<28:01:25,  2.02s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 17/50000 [00:40<22:14:11,  1.60s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 17/50000 [00:40<22:14:11,  1.60s/it, norm=12.2, potential=110, rate=0, step=0.002]HMC:   0%|          | 17/50000 [00:40<22:14:11,  1.60s/it, norm=12.2, potential=111, rate=0, step=0.002]HMC:   0%|          | 18/50000 [00:40<16:07:45,  1.16s/it, norm=12.2, potential=111, rate=0, step=0.002]HMC:   0%|          | 18/50000 [00:41<16:07:45,  1.16s/it, norm=12.2, potential=111, rate=0, step=0.002]HMC:   0%|          | 18/50000 [00:41<16:07:45,  1.16s/it, norm=12.2, potential=111, rate=0, step=0.002]HMC:   0%|          | 19/50000 [00:41<17:48:23,  1.28s/it, norm=12.2, potential=111, rate=0, step=0.002]HMC:   0%|          | 19/50000 [00:45<17:48:23,  1.28s/it, norm=12.2, potential=111, rate=0, step=0.002]HMC:   0%|          | 19/50000 [00:45<17:48:23,  1.28s/it, norm=12, potential=111, rate=0, step=0.002]  HMC:   0%|          | 20/50000 [00:45<27:08:59,  1.96s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 20/50000 [00:46<27:08:59,  1.96s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 20/50000 [00:46<27:08:59,  1.96s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 21/50000 [00:46<24:08:21,  1.74s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 21/50000 [00:50<24:08:21,  1.74s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 21/50000 [00:50<24:08:21,  1.74s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 22/50000 [00:50<30:36:21,  2.20s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 22/50000 [00:51<30:36:21,  2.20s/it, norm=12, potential=111, rate=0, step=0.002]HMC:   0%|          | 22/50000 [00:51<30:36:21,  2.20s/it, norm=11.9, potential=109, rate=0, step=0.002]HMC:   0%|          | 23/50000 [00:51<28:19:18,  2.04s/it, norm=11.9, potential=109, rate=0, step=0.002]HMC:   0%|          | 23/50000 [00:55<28:19:18,  2.04s/it, norm=11.9, potential=109, rate=0, step=0.002]HMC:   0%|          | 23/50000 [00:55<28:19:18,  2.04s/it, norm=12, potential=112, rate=0, step=0.002]  HMC:   0%|          | 24/50000 [00:55<33:34:09,  2.42s/it, norm=12, potential=112, rate=0, step=0.002]HMC:   0%|          | 24/50000 [00:55<33:34:09,  2.42s/it, norm=12, potential=112, rate=0, step=0.002]HMC:   0%|          | 24/50000 [00:55<33:34:09,  2.42s/it, norm=12, potential=109, rate=0, step=0.002]HMC:   0%|          | 25/50000 [00:55<26:49:48,  1.93s/it, norm=12, potential=109, rate=0, step=0.002]HMC:   0%|          | 25/50000 [00:56<26:49:48,  1.93s/it, norm=12, potential=109, rate=0, step=0.002]HMC:   0%|          | 25/50000 [00:56<26:49:48,  1.93s/it, norm=12, potential=108, rate=0, step=0.002]HMC:   0%|          | 26/50000 [00:56<20:48:00,  1.50s/it, norm=12, potential=108, rate=0, step=0.002]HMC:   0%|          | 26/50000 [00:56<20:48:00,  1.50s/it, norm=12, potential=108, rate=0, step=0.002]HMC:   0%|          | 26/50000 [00:56<20:48:00,  1.50s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 27/50000 [00:56<15:26:09,  1.11s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 27/50000 [00:59<15:26:09,  1.11s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 27/50000 [00:59<15:26:09,  1.11s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 28/50000 [00:59<23:24:53,  1.69s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 28/50000 [01:04<23:24:53,  1.69s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 28/50000 [01:04<23:24:53,  1.69s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 29/50000 [01:04<35:33:41,  2.56s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 29/50000 [01:06<35:33:41,  2.56s/it, norm=12, potential=110, rate=0, step=0.002]HMC:   0%|          | 29/50000 [01:06<35:33:41,  2.56s/it, norm=12.1, potential=112, rate=0, step=0.002]HMC:   0%|          | 30/50000 [01:06<33:16:16,  2.40s/it, norm=12.1, potential=112, rate=0, step=0.002]HMC:   0%|          | 30/50000 [01:09<33:16:16,  2.40s/it, norm=12.1, potential=112, rate=0, step=0.002]HMC:   0%|          | 30/50000 [01:09<33:16:16,  2.40s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 31/50000 [01:09<37:45:02,  2.72s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 31/50000 [01:14<37:45:02,  2.72s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 31/50000 [01:14<37:45:02,  2.72s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 32/50000 [01:14<45:51:32,  3.30s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 32/50000 [01:15<45:51:32,  3.30s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 32/50000 [01:15<45:51:32,  3.30s/it, norm=13, potential=118, rate=0, step=0.002]  HMC:   0%|          | 33/50000 [01:15<35:48:45,  2.58s/it, norm=13, potential=118, rate=0, step=0.002]HMC:   0%|          | 33/50000 [01:16<35:48:45,  2.58s/it, norm=13, potential=118, rate=0, step=0.002]HMC:   0%|          | 33/50000 [01:16<35:48:45,  2.58s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 34/50000 [01:16<29:20:14,  2.11s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 34/50000 [01:19<29:20:14,  2.11s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 34/50000 [01:19<29:20:14,  2.11s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 35/50000 [01:19<34:02:42,  2.45s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 35/50000 [01:20<34:02:42,  2.45s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 35/50000 [01:20<34:02:42,  2.45s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 36/50000 [01:20<29:08:23,  2.10s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 36/50000 [01:22<29:08:23,  2.10s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 36/50000 [01:22<29:08:23,  2.10s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 37/50000 [01:22<28:39:32,  2.06s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 37/50000 [01:25<28:39:32,  2.06s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 37/50000 [01:25<28:39:32,  2.06s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 38/50000 [01:25<30:01:03,  2.16s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 38/50000 [01:27<30:01:03,  2.16s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 38/50000 [01:27<30:01:03,  2.16s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 39/50000 [01:27<31:12:04,  2.25s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 39/50000 [01:30<31:12:04,  2.25s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 39/50000 [01:30<31:12:04,  2.25s/it, norm=12.9, potential=122, rate=0, step=0.002]HMC:   0%|          | 40/50000 [01:30<33:38:19,  2.42s/it, norm=12.9, potential=122, rate=0, step=0.002]HMC:   0%|          | 40/50000 [01:31<33:38:19,  2.42s/it, norm=12.9, potential=122, rate=0, step=0.002]HMC:   0%|          | 40/50000 [01:31<33:38:19,  2.42s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 41/50000 [01:31<28:55:38,  2.08s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 41/50000 [01:33<28:55:38,  2.08s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 41/50000 [01:33<28:55:38,  2.08s/it, norm=12.8, potential=121, rate=0, step=0.002]HMC:   0%|          | 42/50000 [01:33<28:08:06,  2.03s/it, norm=12.8, potential=121, rate=0, step=0.002]HMC:   0%|          | 42/50000 [01:36<28:08:06,  2.03s/it, norm=12.8, potential=121, rate=0, step=0.002]HMC:   0%|          | 42/50000 [01:36<28:08:06,  2.03s/it, norm=12.8, potential=123, rate=0, step=0.002]HMC:   0%|          | 43/50000 [01:36<30:20:05,  2.19s/it, norm=12.8, potential=123, rate=0, step=0.002]HMC:   0%|          | 43/50000 [01:36<30:20:05,  2.19s/it, norm=12.8, potential=123, rate=0, step=0.002]HMC:   0%|          | 43/50000 [01:36<30:20:05,  2.19s/it, norm=12.8, potential=123, rate=0, step=0.002]HMC:   0%|          | 44/50000 [01:36<22:36:09,  1.63s/it, norm=12.8, potential=123, rate=0, step=0.002]HMC:   0%|          | 44/50000 [01:39<22:36:09,  1.63s/it, norm=12.8, potential=123, rate=0, step=0.002]HMC:   0%|          | 44/50000 [01:39<22:36:09,  1.63s/it, norm=12.5, potential=121, rate=0, step=0.002]HMC:   0%|          | 45/50000 [01:39<29:04:23,  2.10s/it, norm=12.5, potential=121, rate=0, step=0.002]HMC:   0%|          | 45/50000 [01:43<29:04:23,  2.10s/it, norm=12.5, potential=121, rate=0, step=0.002]HMC:   0%|          | 45/50000 [01:43<29:04:23,  2.10s/it, norm=12.4, potential=116, rate=0, step=0.002]HMC:   0%|          | 46/50000 [01:43<37:13:14,  2.68s/it, norm=12.4, potential=116, rate=0, step=0.002]HMC:   0%|          | 46/50000 [01:48<37:13:14,  2.68s/it, norm=12.4, potential=116, rate=0, step=0.002]HMC:   0%|          | 46/50000 [01:48<37:13:14,  2.68s/it, norm=12.6, potential=121, rate=0, step=0.002]HMC:   0%|          | 47/50000 [01:48<45:43:13,  3.29s/it, norm=12.6, potential=121, rate=0, step=0.002]HMC:   0%|          | 47/50000 [01:50<45:43:13,  3.29s/it, norm=12.6, potential=121, rate=0, step=0.002]HMC:   0%|          | 47/50000 [01:50<45:43:13,  3.29s/it, norm=12.7, potential=121, rate=0, step=0.002]HMC:   0%|          | 48/50000 [01:50<41:33:51,  3.00s/it, norm=12.7, potential=121, rate=0, step=0.002]HMC:   0%|          | 48/50000 [01:51<41:33:51,  3.00s/it, norm=12.7, potential=121, rate=0, step=0.002]HMC:   0%|          | 48/50000 [01:51<41:33:51,  3.00s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 49/50000 [01:51<32:15:08,  2.32s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 49/50000 [01:53<32:15:08,  2.32s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 49/50000 [01:53<32:15:08,  2.32s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 50/50000 [01:53<29:21:13,  2.12s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 50/50000 [01:57<29:21:13,  2.12s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 50/50000 [01:57<29:21:13,  2.12s/it, norm=13, potential=123, rate=0, step=0.002]  HMC:   0%|          | 51/50000 [01:57<39:49:06,  2.87s/it, norm=13, potential=123, rate=0, step=0.002]HMC:   0%|          | 51/50000 [02:02<39:49:06,  2.87s/it, norm=13, potential=123, rate=0, step=0.002]HMC:   0%|          | 51/50000 [02:02<39:49:06,  2.87s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 52/50000 [02:02<49:23:27,  3.56s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 52/50000 [02:05<49:23:27,  3.56s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 52/50000 [02:05<49:23:27,  3.56s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 53/50000 [02:05<46:03:45,  3.32s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 53/50000 [02:09<46:03:45,  3.32s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 53/50000 [02:09<46:03:45,  3.32s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 54/50000 [02:09<49:14:41,  3.55s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 54/50000 [02:11<49:14:41,  3.55s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 54/50000 [02:11<49:14:41,  3.55s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 55/50000 [02:11<40:42:27,  2.93s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 55/50000 [02:12<40:42:27,  2.93s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 55/50000 [02:12<40:42:27,  2.93s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 56/50000 [02:12<35:37:16,  2.57s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 56/50000 [02:17<35:37:16,  2.57s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 56/50000 [02:17<35:37:16,  2.57s/it, norm=12.9, potential=123, rate=0, step=0.002]HMC:   0%|          | 57/50000 [02:17<42:22:48,  3.05s/it, norm=12.9, potential=123, rate=0, step=0.002]HMC:   0%|          | 57/50000 [02:20<42:22:48,  3.05s/it, norm=12.9, potential=123, rate=0, step=0.002]HMC:   0%|          | 57/50000 [02:20<42:22:48,  3.05s/it, norm=12.9, potential=123, rate=0, step=0.002]HMC:   0%|          | 58/50000 [02:20<45:27:38,  3.28s/it, norm=12.9, potential=123, rate=0, step=0.002]HMC:   0%|          | 58/50000 [02:22<45:27:38,  3.28s/it, norm=12.9, potential=123, rate=0, step=0.002]HMC:   0%|          | 58/50000 [02:22<45:27:38,  3.28s/it, norm=13, potential=126, rate=0, step=0.002]  HMC:   0%|          | 59/50000 [02:22<37:16:02,  2.69s/it, norm=13, potential=126, rate=0, step=0.002]HMC:   0%|          | 59/50000 [02:25<37:16:02,  2.69s/it, norm=13, potential=126, rate=0, step=0.002]HMC:   0%|          | 59/50000 [02:25<37:16:02,  2.69s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 60/50000 [02:25<39:58:27,  2.88s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 60/50000 [02:26<39:58:27,  2.88s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 60/50000 [02:26<39:58:27,  2.88s/it, norm=12.9, potential=116, rate=0, step=0.002]HMC:   0%|          | 61/50000 [02:26<32:19:20,  2.33s/it, norm=12.9, potential=116, rate=0, step=0.002]HMC:   0%|          | 61/50000 [02:28<32:19:20,  2.33s/it, norm=12.9, potential=116, rate=0, step=0.002]HMC:   0%|          | 61/50000 [02:28<32:19:20,  2.33s/it, norm=12.9, potential=116, rate=0, step=0.002]HMC:   0%|          | 62/50000 [02:28<30:12:13,  2.18s/it, norm=12.9, potential=116, rate=0, step=0.002]HMC:   0%|          | 62/50000 [02:30<30:12:13,  2.18s/it, norm=12.9, potential=116, rate=0, step=0.002]HMC:   0%|          | 62/50000 [02:30<30:12:13,  2.18s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 63/50000 [02:30<30:14:34,  2.18s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 63/50000 [02:34<30:14:34,  2.18s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 63/50000 [02:34<30:14:34,  2.18s/it, norm=12.9, potential=121, rate=0, step=0.002]HMC:   0%|          | 64/50000 [02:34<36:10:03,  2.61s/it, norm=12.9, potential=121, rate=0, step=0.002]HMC:   0%|          | 64/50000 [02:35<36:10:03,  2.61s/it, norm=12.9, potential=121, rate=0, step=0.002]HMC:   0%|          | 64/50000 [02:35<36:10:03,  2.61s/it, norm=13, potential=119, rate=0, step=0.002]  HMC:   0%|          | 65/50000 [02:35<30:02:41,  2.17s/it, norm=13, potential=119, rate=0, step=0.002]HMC:   0%|          | 65/50000 [02:38<30:02:41,  2.17s/it, norm=13, potential=119, rate=0, step=0.002]HMC:   0%|          | 65/50000 [02:38<30:02:41,  2.17s/it, norm=13, potential=118, rate=0, step=0.002]HMC:   0%|          | 66/50000 [02:38<32:33:24,  2.35s/it, norm=13, potential=118, rate=0, step=0.002]HMC:   0%|          | 66/50000 [02:40<32:33:24,  2.35s/it, norm=13, potential=118, rate=0, step=0.002]HMC:   0%|          | 66/50000 [02:40<32:33:24,  2.35s/it, norm=12.8, potential=116, rate=0, step=0.002]HMC:   0%|          | 67/50000 [02:40<34:34:21,  2.49s/it, norm=12.8, potential=116, rate=0, step=0.002]HMC:   0%|          | 67/50000 [02:46<34:34:21,  2.49s/it, norm=12.8, potential=116, rate=0, step=0.002]HMC:   0%|          | 67/50000 [02:46<34:34:21,  2.49s/it, norm=12.7, potential=118, rate=0, step=0.002]HMC:   0%|          | 68/50000 [02:46<45:10:49,  3.26s/it, norm=12.7, potential=118, rate=0, step=0.002]HMC:   0%|          | 68/50000 [02:49<45:10:49,  3.26s/it, norm=12.7, potential=118, rate=0, step=0.002]HMC:   0%|          | 68/50000 [02:49<45:10:49,  3.26s/it, norm=12.9, potential=120, rate=0, step=0.002]HMC:   0%|          | 69/50000 [02:49<46:39:54,  3.36s/it, norm=12.9, potential=120, rate=0, step=0.002]HMC:   0%|          | 69/50000 [02:54<46:39:54,  3.36s/it, norm=12.9, potential=120, rate=0, step=0.002]HMC:   0%|          | 69/50000 [02:54<46:39:54,  3.36s/it, norm=13.5, potential=125, rate=0, step=0.002]HMC:   0%|          | 70/50000 [02:54<52:44:36,  3.80s/it, norm=13.5, potential=125, rate=0, step=0.002]HMC:   0%|          | 70/50000 [02:54<52:44:36,  3.80s/it, norm=13.5, potential=125, rate=0, step=0.002]HMC:   0%|          | 70/50000 [02:54<52:44:36,  3.80s/it, norm=13.5, potential=124, rate=0, step=0.002]HMC:   0%|          | 71/50000 [02:54<38:34:02,  2.78s/it, norm=13.5, potential=124, rate=0, step=0.002]HMC:   0%|          | 71/50000 [02:58<38:34:02,  2.78s/it, norm=13.5, potential=124, rate=0, step=0.002]HMC:   0%|          | 71/50000 [02:58<38:34:02,  2.78s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 72/50000 [02:58<42:36:32,  3.07s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 72/50000 [03:01<42:36:32,  3.07s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 72/50000 [03:01<42:36:32,  3.07s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 73/50000 [03:01<42:52:25,  3.09s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 73/50000 [03:01<42:52:25,  3.09s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 73/50000 [03:01<42:52:25,  3.09s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 74/50000 [03:01<30:40:23,  2.21s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 74/50000 [03:08<30:40:23,  2.21s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 74/50000 [03:08<30:40:23,  2.21s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 75/50000 [03:08<47:56:57,  3.46s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 75/50000 [03:09<47:56:57,  3.46s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 75/50000 [03:09<47:56:57,  3.46s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 76/50000 [03:09<37:57:21,  2.74s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 76/50000 [03:10<37:57:21,  2.74s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 76/50000 [03:10<37:57:21,  2.74s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 77/50000 [03:10<32:27:35,  2.34s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 77/50000 [03:11<32:27:35,  2.34s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 77/50000 [03:11<32:27:35,  2.34s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 78/50000 [03:11<27:36:07,  1.99s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 78/50000 [03:11<27:36:07,  1.99s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 78/50000 [03:11<27:36:07,  1.99s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 78/50000 [03:13<27:36:07,  1.99s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 78/50000 [03:13<27:36:07,  1.99s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 80/50000 [03:13<22:23:46,  1.62s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 80/50000 [03:15<22:23:46,  1.62s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 80/50000 [03:15<22:23:46,  1.62s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 81/50000 [03:15<23:32:59,  1.70s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 81/50000 [03:17<23:32:59,  1.70s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 81/50000 [03:17<23:32:59,  1.70s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 82/50000 [03:17<26:54:10,  1.94s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 82/50000 [03:22<26:54:10,  1.94s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 82/50000 [03:22<26:54:10,  1.94s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 83/50000 [03:22<37:55:59,  2.74s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 83/50000 [03:22<37:55:59,  2.74s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 83/50000 [03:22<37:55:59,  2.74s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 84/50000 [03:22<28:45:17,  2.07s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 84/50000 [03:25<28:45:17,  2.07s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 84/50000 [03:25<28:45:17,  2.07s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 85/50000 [03:25<30:19:03,  2.19s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 85/50000 [03:28<30:19:03,  2.19s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 85/50000 [03:28<30:19:03,  2.19s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 86/50000 [03:28<33:30:59,  2.42s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 86/50000 [03:32<33:30:59,  2.42s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 86/50000 [03:32<33:30:59,  2.42s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 87/50000 [03:32<39:40:13,  2.86s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 87/50000 [03:36<39:40:13,  2.86s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 87/50000 [03:36<39:40:13,  2.86s/it, norm=13, potential=121, rate=0, step=0.002]  HMC:   0%|          | 88/50000 [03:36<44:43:14,  3.23s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 88/50000 [03:37<44:43:14,  3.23s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 88/50000 [03:37<44:43:14,  3.23s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 89/50000 [03:37<34:32:58,  2.49s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 89/50000 [03:37<34:32:58,  2.49s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 89/50000 [03:37<34:32:58,  2.49s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 90/50000 [03:37<26:41:42,  1.93s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 90/50000 [03:41<26:41:42,  1.93s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 90/50000 [03:41<26:41:42,  1.93s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 91/50000 [03:41<35:56:33,  2.59s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 91/50000 [03:42<35:56:33,  2.59s/it, norm=12.9, potential=119, rate=0, step=0.002]HMC:   0%|          | 91/50000 [03:42<35:56:33,  2.59s/it, norm=12.9, potential=121, rate=0, step=0.002]HMC:   0%|          | 92/50000 [03:42<28:14:04,  2.04s/it, norm=12.9, potential=121, rate=0, step=0.002]HMC:   0%|          | 92/50000 [03:45<28:14:04,  2.04s/it, norm=12.9, potential=121, rate=0, step=0.002]HMC:   0%|          | 92/50000 [03:45<28:14:04,  2.04s/it, norm=12.9, potential=120, rate=0, step=0.002]HMC:   0%|          | 93/50000 [03:45<30:35:32,  2.21s/it, norm=12.9, potential=120, rate=0, step=0.002]HMC:   0%|          | 93/50000 [03:49<30:35:32,  2.21s/it, norm=12.9, potential=120, rate=0, step=0.002]HMC:   0%|          | 93/50000 [03:49<30:35:32,  2.21s/it, norm=13, potential=122, rate=0, step=0.002]  HMC:   0%|          | 94/50000 [03:49<39:49:47,  2.87s/it, norm=13, potential=122, rate=0, step=0.002]HMC:   0%|          | 94/50000 [03:50<39:49:47,  2.87s/it, norm=13, potential=122, rate=0, step=0.002]HMC:   0%|          | 94/50000 [03:50<39:49:47,  2.87s/it, norm=13, potential=122, rate=0, step=0.002]HMC:   0%|          | 95/50000 [03:50<31:18:03,  2.26s/it, norm=13, potential=122, rate=0, step=0.002]HMC:   0%|          | 95/50000 [03:54<31:18:03,  2.26s/it, norm=13, potential=122, rate=0, step=0.002]HMC:   0%|          | 95/50000 [03:54<31:18:03,  2.26s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 96/50000 [03:54<37:34:06,  2.71s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 96/50000 [03:59<37:34:06,  2.71s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 96/50000 [03:59<37:34:06,  2.71s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 97/50000 [03:59<47:17:24,  3.41s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 97/50000 [04:00<47:17:24,  3.41s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 97/50000 [04:00<47:17:24,  3.41s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 98/50000 [04:00<36:30:45,  2.63s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 98/50000 [04:01<36:30:45,  2.63s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 98/50000 [04:01<36:30:45,  2.63s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 99/50000 [04:01<31:16:44,  2.26s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 99/50000 [04:05<31:16:44,  2.26s/it, norm=13.3, potential=125, rate=0, step=0.002]HMC:   0%|          | 99/50000 [04:05<31:16:44,  2.26s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 100/50000 [04:05<40:00:36,  2.89s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 100/50000 [04:10<40:00:36,  2.89s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 100/50000 [04:10<40:00:36,  2.89s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 101/50000 [04:10<45:43:18,  3.30s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 101/50000 [04:15<45:43:18,  3.30s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 101/50000 [04:15<45:43:18,  3.30s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 102/50000 [04:15<53:20:29,  3.85s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 102/50000 [04:15<53:20:29,  3.85s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 102/50000 [04:15<53:20:29,  3.85s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 103/50000 [04:15<39:08:05,  2.82s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 103/50000 [04:15<39:08:05,  2.82s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 103/50000 [04:15<39:08:05,  2.82s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 104/50000 [04:15<27:52:45,  2.01s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 104/50000 [04:16<27:52:45,  2.01s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 104/50000 [04:16<27:52:45,  2.01s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 105/50000 [04:16<21:25:11,  1.55s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 105/50000 [04:19<21:25:11,  1.55s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 105/50000 [04:19<21:25:11,  1.55s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 106/50000 [04:19<27:52:04,  2.01s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 106/50000 [04:26<27:52:04,  2.01s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 106/50000 [04:26<27:52:04,  2.01s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 107/50000 [04:26<48:16:55,  3.48s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 107/50000 [04:26<48:16:55,  3.48s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 107/50000 [04:26<48:16:55,  3.48s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 108/50000 [04:26<35:40:43,  2.57s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 108/50000 [04:28<35:40:43,  2.57s/it, norm=13.3, potential=123, rate=0, step=0.002]HMC:   0%|          | 108/50000 [04:28<35:40:43,  2.57s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 109/50000 [04:28<33:47:11,  2.44s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 109/50000 [04:30<33:47:11,  2.44s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 109/50000 [04:30<33:47:11,  2.44s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 110/50000 [04:30<31:01:56,  2.24s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 110/50000 [04:32<31:01:56,  2.24s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 110/50000 [04:32<31:01:56,  2.24s/it, norm=13.5, potential=125, rate=0, step=0.002]HMC:   0%|          | 111/50000 [04:32<28:30:24,  2.06s/it, norm=13.5, potential=125, rate=0, step=0.002]HMC:   0%|          | 111/50000 [04:34<28:30:24,  2.06s/it, norm=13.5, potential=125, rate=0, step=0.002]HMC:   0%|          | 111/50000 [04:34<28:30:24,  2.06s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 112/50000 [04:34<28:06:50,  2.03s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 112/50000 [04:34<28:06:50,  2.03s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 112/50000 [04:34<28:06:50,  2.03s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 113/50000 [04:34<20:33:04,  1.48s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 113/50000 [04:39<20:33:04,  1.48s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 113/50000 [04:39<20:33:04,  1.48s/it, norm=13.3, potential=121, rate=0, step=0.002]HMC:   0%|          | 114/50000 [04:39<35:42:26,  2.58s/it, norm=13.3, potential=121, rate=0, step=0.002]HMC:   0%|          | 114/50000 [04:41<35:42:26,  2.58s/it, norm=13.3, potential=121, rate=0, step=0.002]HMC:   0%|          | 114/50000 [04:41<35:42:26,  2.58s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 115/50000 [04:41<33:24:02,  2.41s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 115/50000 [04:43<33:24:02,  2.41s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 115/50000 [04:43<33:24:02,  2.41s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 116/50000 [04:43<33:29:16,  2.42s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 116/50000 [04:48<33:29:16,  2.42s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 116/50000 [04:48<33:29:16,  2.42s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 117/50000 [04:48<43:04:01,  3.11s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 117/50000 [04:49<43:04:01,  3.11s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 117/50000 [04:49<43:04:01,  3.11s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 118/50000 [04:49<34:43:15,  2.51s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 118/50000 [04:52<34:43:15,  2.51s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 118/50000 [04:52<34:43:15,  2.51s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 119/50000 [04:52<35:52:36,  2.59s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 119/50000 [04:52<35:52:36,  2.59s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 119/50000 [04:52<35:52:36,  2.59s/it, norm=13.6, potential=129, rate=0, step=0.002]HMC:   0%|          | 120/50000 [04:52<26:36:33,  1.92s/it, norm=13.6, potential=129, rate=0, step=0.002]HMC:   0%|          | 120/50000 [04:59<26:36:33,  1.92s/it, norm=13.6, potential=129, rate=0, step=0.002]HMC:   0%|          | 120/50000 [04:59<26:36:33,  1.92s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 121/50000 [04:59<44:35:28,  3.22s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 121/50000 [05:04<44:35:28,  3.22s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 121/50000 [05:04<44:35:28,  3.22s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 122/50000 [05:04<52:26:13,  3.78s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 122/50000 [05:09<52:26:13,  3.78s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 122/50000 [05:09<52:26:13,  3.78s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 123/50000 [05:09<59:07:12,  4.27s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 123/50000 [05:11<59:07:12,  4.27s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 123/50000 [05:11<59:07:12,  4.27s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 124/50000 [05:11<47:07:24,  3.40s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 124/50000 [05:11<47:07:24,  3.40s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 124/50000 [05:11<47:07:24,  3.40s/it, norm=12.7, potential=117, rate=0, step=0.002]HMC:   0%|          | 125/50000 [05:11<33:41:22,  2.43s/it, norm=12.7, potential=117, rate=0, step=0.002]HMC:   0%|          | 125/50000 [05:12<33:41:22,  2.43s/it, norm=12.7, potential=117, rate=0, step=0.002]HMC:   0%|          | 125/50000 [05:12<33:41:22,  2.43s/it, norm=12.6, potential=117, rate=0, step=0.002]HMC:   0%|          | 126/50000 [05:12<28:42:05,  2.07s/it, norm=12.6, potential=117, rate=0, step=0.002]HMC:   0%|          | 126/50000 [05:18<28:42:05,  2.07s/it, norm=12.6, potential=117, rate=0, step=0.002]HMC:   0%|          | 126/50000 [05:18<28:42:05,  2.07s/it, norm=12.8, potential=119, rate=0, step=0.002]HMC:   0%|          | 127/50000 [05:18<45:20:04,  3.27s/it, norm=12.8, potential=119, rate=0, step=0.002]HMC:   0%|          | 127/50000 [05:19<45:20:04,  3.27s/it, norm=12.8, potential=119, rate=0, step=0.002]HMC:   0%|          | 127/50000 [05:19<45:20:04,  3.27s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 128/50000 [05:19<34:48:59,  2.51s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 128/50000 [05:22<34:48:59,  2.51s/it, norm=12.8, potential=120, rate=0, step=0.002]HMC:   0%|          | 128/50000 [05:22<34:48:59,  2.51s/it, norm=12.9, potential=118, rate=0, step=0.002]HMC:   0%|          | 129/50000 [05:22<39:56:23,  2.88s/it, norm=12.9, potential=118, rate=0, step=0.002]HMC:   0%|          | 129/50000 [05:28<39:56:23,  2.88s/it, norm=12.9, potential=118, rate=0, step=0.002]HMC:   0%|          | 129/50000 [05:28<39:56:23,  2.88s/it, norm=12.6, potential=116, rate=0, step=0.002]HMC:   0%|          | 130/50000 [05:28<52:40:43,  3.80s/it, norm=12.6, potential=116, rate=0, step=0.002]HMC:   0%|          | 130/50000 [05:30<52:40:43,  3.80s/it, norm=12.6, potential=116, rate=0, step=0.002]HMC:   0%|          | 130/50000 [05:30<52:40:43,  3.80s/it, norm=12.6, potential=119, rate=0, step=0.002]HMC:   0%|          | 131/50000 [05:30<43:43:48,  3.16s/it, norm=12.6, potential=119, rate=0, step=0.002]HMC:   0%|          | 131/50000 [05:34<43:43:48,  3.16s/it, norm=12.6, potential=119, rate=0, step=0.002]HMC:   0%|          | 131/50000 [05:34<43:43:48,  3.16s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 132/50000 [05:34<48:19:05,  3.49s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 132/50000 [05:35<48:19:05,  3.49s/it, norm=12.6, potential=115, rate=0, step=0.002]HMC:   0%|          | 132/50000 [05:35<48:19:05,  3.49s/it, norm=12.6, potential=114, rate=0, step=0.002]HMC:   0%|          | 133/50000 [05:35<38:34:00,  2.78s/it, norm=12.6, potential=114, rate=0, step=0.002]HMC:   0%|          | 133/50000 [05:41<38:34:00,  2.78s/it, norm=12.6, potential=114, rate=0, step=0.002]HMC:   0%|          | 133/50000 [05:41<38:34:00,  2.78s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 134/50000 [05:41<48:40:50,  3.51s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 134/50000 [05:41<48:40:50,  3.51s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 134/50000 [05:41<48:40:50,  3.51s/it, norm=12.7, potential=115, rate=0, step=0.002]HMC:   0%|          | 135/50000 [05:41<37:00:32,  2.67s/it, norm=12.7, potential=115, rate=0, step=0.002]HMC:   0%|          | 135/50000 [05:42<37:00:32,  2.67s/it, norm=12.7, potential=115, rate=0, step=0.002]HMC:   0%|          | 135/50000 [05:42<37:00:32,  2.67s/it, norm=12.8, potential=115, rate=0, step=0.002]HMC:   0%|          | 136/50000 [05:42<28:23:49,  2.05s/it, norm=12.8, potential=115, rate=0, step=0.002]HMC:   0%|          | 136/50000 [05:42<28:23:49,  2.05s/it, norm=12.8, potential=115, rate=0, step=0.002]HMC:   0%|          | 136/50000 [05:42<28:23:49,  2.05s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 137/50000 [05:42<20:42:59,  1.50s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 137/50000 [05:45<20:42:59,  1.50s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 137/50000 [05:45<20:42:59,  1.50s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 138/50000 [05:45<27:11:42,  1.96s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 138/50000 [05:51<27:11:42,  1.96s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 138/50000 [05:51<27:11:42,  1.96s/it, norm=12.8, potential=118, rate=0, step=0.002]HMC:   0%|          | 139/50000 [05:51<43:24:58,  3.13s/it, norm=12.8, potential=118, rate=0, step=0.002]HMC:   0%|          | 139/50000 [05:51<43:24:58,  3.13s/it, norm=12.8, potential=118, rate=0, step=0.002]HMC:   0%|          | 139/50000 [05:51<43:24:58,  3.13s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 140/50000 [05:51<30:50:46,  2.23s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 140/50000 [05:51<30:50:46,  2.23s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 140/50000 [05:51<30:50:46,  2.23s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 140/50000 [05:55<30:50:46,  2.23s/it, norm=12.8, potential=117, rate=0, step=0.002]HMC:   0%|          | 140/50000 [05:55<30:50:46,  2.23s/it, norm=12.8, potential=118, rate=0, step=0.002]HMC:   0%|          | 142/50000 [05:55<29:08:07,  2.10s/it, norm=12.8, potential=118, rate=0, step=0.002]HMC:   0%|          | 142/50000 [05:58<29:08:07,  2.10s/it, norm=12.8, potential=118, rate=0, step=0.002]HMC:   0%|          | 142/50000 [05:58<29:08:07,  2.10s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 143/50000 [05:58<31:49:56,  2.30s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 143/50000 [06:00<31:49:56,  2.30s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 143/50000 [06:00<31:49:56,  2.30s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 144/50000 [06:00<32:21:19,  2.34s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 144/50000 [06:05<32:21:19,  2.34s/it, norm=12.7, potential=119, rate=0, step=0.002]HMC:   0%|          | 144/50000 [06:05<32:21:19,  2.34s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 145/50000 [06:05<43:31:01,  3.14s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 145/50000 [06:08<43:31:01,  3.14s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 145/50000 [06:08<43:31:01,  3.14s/it, norm=13.4, potential=131, rate=0, step=0.002]HMC:   0%|          | 146/50000 [06:08<44:26:57,  3.21s/it, norm=13.4, potential=131, rate=0, step=0.002]HMC:   0%|          | 146/50000 [06:13<44:26:57,  3.21s/it, norm=13.4, potential=131, rate=0, step=0.002]HMC:   0%|          | 146/50000 [06:13<44:26:57,  3.21s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 147/50000 [06:13<51:07:31,  3.69s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 147/50000 [06:17<51:07:31,  3.69s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 147/50000 [06:17<51:07:31,  3.69s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 148/50000 [06:17<51:51:03,  3.74s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 148/50000 [06:21<51:51:03,  3.74s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 148/50000 [06:21<51:51:03,  3.74s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 149/50000 [06:21<52:06:41,  3.76s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 149/50000 [06:24<52:06:41,  3.76s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 149/50000 [06:24<52:06:41,  3.76s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 150/50000 [06:24<49:57:26,  3.61s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 150/50000 [06:26<49:57:26,  3.61s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 150/50000 [06:26<49:57:26,  3.61s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 151/50000 [06:26<42:40:04,  3.08s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 151/50000 [06:31<42:40:04,  3.08s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 151/50000 [06:31<42:40:04,  3.08s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 152/50000 [06:31<51:03:34,  3.69s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 152/50000 [06:36<51:03:34,  3.69s/it, norm=13.7, potential=130, rate=0, step=0.002]HMC:   0%|          | 152/50000 [06:36<51:03:34,  3.69s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 153/50000 [06:36<55:57:42,  4.04s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 153/50000 [06:37<55:57:42,  4.04s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 153/50000 [06:37<55:57:42,  4.04s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 154/50000 [06:37<44:35:35,  3.22s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 154/50000 [06:39<44:35:35,  3.22s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 154/50000 [06:39<44:35:35,  3.22s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 155/50000 [06:39<38:13:45,  2.76s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 155/50000 [06:40<38:13:45,  2.76s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 155/50000 [06:40<38:13:45,  2.76s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 156/50000 [06:40<32:18:20,  2.33s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 156/50000 [06:44<32:18:20,  2.33s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 156/50000 [06:44<32:18:20,  2.33s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 157/50000 [06:44<38:33:11,  2.78s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 157/50000 [06:49<38:33:11,  2.78s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 157/50000 [06:49<38:33:11,  2.78s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 158/50000 [06:49<48:46:56,  3.52s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 158/50000 [06:55<48:46:56,  3.52s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 158/50000 [06:55<48:46:56,  3.52s/it, norm=12.8, potential=121, rate=0, step=0.002]HMC:   0%|          | 159/50000 [06:55<59:10:02,  4.27s/it, norm=12.8, potential=121, rate=0, step=0.002]HMC:   0%|          | 159/50000 [07:00<59:10:02,  4.27s/it, norm=12.8, potential=121, rate=0, step=0.002]HMC:   0%|          | 159/50000 [07:00<59:10:02,  4.27s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 160/50000 [07:00<60:18:57,  4.36s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 160/50000 [07:03<60:18:57,  4.36s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 160/50000 [07:03<60:18:57,  4.36s/it, norm=12.4, potential=117, rate=0, step=0.002]HMC:   0%|          | 161/50000 [07:03<55:37:57,  4.02s/it, norm=12.4, potential=117, rate=0, step=0.002]HMC:   0%|          | 161/50000 [07:07<55:37:57,  4.02s/it, norm=12.4, potential=117, rate=0, step=0.002]HMC:   0%|          | 161/50000 [07:07<55:37:57,  4.02s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 162/50000 [07:07<56:11:54,  4.06s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 162/50000 [07:13<56:11:54,  4.06s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 162/50000 [07:13<56:11:54,  4.06s/it, norm=12.4, potential=117, rate=0, step=0.002]HMC:   0%|          | 163/50000 [07:13<62:02:15,  4.48s/it, norm=12.4, potential=117, rate=0, step=0.002]HMC:   0%|          | 163/50000 [07:17<62:02:15,  4.48s/it, norm=12.4, potential=117, rate=0, step=0.002]HMC:   0%|          | 163/50000 [07:17<62:02:15,  4.48s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 164/50000 [07:17<59:25:49,  4.29s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 164/50000 [07:20<59:25:49,  4.29s/it, norm=12.5, potential=115, rate=0, step=0.002]HMC:   0%|          | 164/50000 [07:20<59:25:49,  4.29s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 165/50000 [07:20<57:14:01,  4.13s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 165/50000 [07:25<57:14:01,  4.13s/it, norm=12.5, potential=114, rate=0, step=0.002]HMC:   0%|          | 165/50000 [07:25<57:14:01,  4.13s/it, norm=12.4, potential=112, rate=0, step=0.002]HMC:   0%|          | 166/50000 [07:25<59:50:44,  4.32s/it, norm=12.4, potential=112, rate=0, step=0.002]HMC:   0%|          | 166/50000 [07:28<59:50:44,  4.32s/it, norm=12.4, potential=112, rate=0, step=0.002]HMC:   0%|          | 166/50000 [07:28<59:50:44,  4.32s/it, norm=12.4, potential=113, rate=0, step=0.002]HMC:   0%|          | 167/50000 [07:28<53:31:26,  3.87s/it, norm=12.4, potential=113, rate=0, step=0.002]HMC:   0%|          | 167/50000 [07:29<53:31:26,  3.87s/it, norm=12.4, potential=113, rate=0, step=0.002]HMC:   0%|          | 167/50000 [07:29<53:31:26,  3.87s/it, norm=12.5, potential=113, rate=0, step=0.002]HMC:   0%|          | 168/50000 [07:29<43:32:46,  3.15s/it, norm=12.5, potential=113, rate=0, step=0.002]HMC:   0%|          | 168/50000 [07:33<43:32:46,  3.15s/it, norm=12.5, potential=113, rate=0, step=0.002]HMC:   0%|          | 168/50000 [07:33<43:32:46,  3.15s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 169/50000 [07:33<43:09:05,  3.12s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 169/50000 [07:39<43:09:05,  3.12s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 169/50000 [07:39<43:09:05,  3.12s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 170/50000 [07:39<56:03:11,  4.05s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 170/50000 [07:46<56:03:11,  4.05s/it, norm=12.7, potential=116, rate=0, step=0.002]HMC:   0%|          | 170/50000 [07:46<56:03:11,  4.05s/it, norm=13, potential=121, rate=0, step=0.002]  HMC:   0%|          | 171/50000 [07:46<68:12:12,  4.93s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 171/50000 [07:46<68:12:12,  4.93s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 171/50000 [07:46<68:12:12,  4.93s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 172/50000 [07:46<50:15:08,  3.63s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 172/50000 [07:47<50:15:08,  3.63s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 172/50000 [07:47<50:15:08,  3.63s/it, norm=13, potential=120, rate=0, step=0.002]HMC:   0%|          | 173/50000 [07:47<38:14:49,  2.76s/it, norm=13, potential=120, rate=0, step=0.002]HMC:   0%|          | 173/50000 [07:49<38:14:49,  2.76s/it, norm=13, potential=120, rate=0, step=0.002]HMC:   0%|          | 173/50000 [07:49<38:14:49,  2.76s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 174/50000 [07:49<36:00:06,  2.60s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 174/50000 [07:53<36:00:06,  2.60s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 174/50000 [07:53<36:00:06,  2.60s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 175/50000 [07:53<40:12:50,  2.91s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 175/50000 [07:57<40:12:50,  2.91s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 175/50000 [07:57<40:12:50,  2.91s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 176/50000 [07:57<46:00:21,  3.32s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 176/50000 [07:59<46:00:21,  3.32s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 176/50000 [07:59<46:00:21,  3.32s/it, norm=13.2, potential=124, rate=0, step=0.002]HMC:   0%|          | 177/50000 [07:59<37:58:28,  2.74s/it, norm=13.2, potential=124, rate=0, step=0.002]HMC:   0%|          | 177/50000 [08:02<37:58:28,  2.74s/it, norm=13.2, potential=124, rate=0, step=0.002]HMC:   0%|          | 177/50000 [08:02<37:58:28,  2.74s/it, norm=13, potential=121, rate=0, step=0.002]  HMC:   0%|          | 178/50000 [08:02<38:55:46,  2.81s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 178/50000 [08:05<38:55:46,  2.81s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 178/50000 [08:05<38:55:46,  2.81s/it, norm=13.3, potential=126, rate=0, step=0.002]HMC:   0%|          | 179/50000 [08:05<40:08:33,  2.90s/it, norm=13.3, potential=126, rate=0, step=0.002]HMC:   0%|          | 179/50000 [08:07<40:08:33,  2.90s/it, norm=13.3, potential=126, rate=0, step=0.002]HMC:   0%|          | 179/50000 [08:07<40:08:33,  2.90s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 180/50000 [08:07<39:22:09,  2.84s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 180/50000 [08:09<39:22:09,  2.84s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 180/50000 [08:09<39:22:09,  2.84s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 181/50000 [08:09<32:16:39,  2.33s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 181/50000 [08:09<32:16:39,  2.33s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 181/50000 [08:09<32:16:39,  2.33s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 182/50000 [08:09<24:32:04,  1.77s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 182/50000 [08:09<24:32:04,  1.77s/it, norm=13.2, potential=127, rate=0, step=0.002]HMC:   0%|          | 182/50000 [08:09<24:32:04,  1.77s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 183/50000 [08:09<18:04:49,  1.31s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 183/50000 [08:13<18:04:49,  1.31s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 183/50000 [08:13<18:04:49,  1.31s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 184/50000 [08:13<27:40:23,  2.00s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 184/50000 [08:14<27:40:23,  2.00s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   0%|          | 184/50000 [08:14<27:40:23,  2.00s/it, norm=13.2, potential=128, rate=0, step=0.002]HMC:   0%|          | 185/50000 [08:14<23:51:28,  1.72s/it, norm=13.2, potential=128, rate=0, step=0.002]HMC:   0%|          | 185/50000 [08:18<23:51:28,  1.72s/it, norm=13.2, potential=128, rate=0, step=0.002]HMC:   0%|          | 185/50000 [08:18<23:51:28,  1.72s/it, norm=13, potential=123, rate=0, step=0.002]  HMC:   0%|          | 186/50000 [08:18<32:07:38,  2.32s/it, norm=13, potential=123, rate=0, step=0.002]HMC:   0%|          | 186/50000 [08:21<32:07:38,  2.32s/it, norm=13, potential=123, rate=0, step=0.002]HMC:   0%|          | 186/50000 [08:21<32:07:38,  2.32s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 187/50000 [08:21<36:04:30,  2.61s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 187/50000 [08:22<36:04:30,  2.61s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 187/50000 [08:22<36:04:30,  2.61s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 188/50000 [08:22<28:39:58,  2.07s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 188/50000 [08:23<28:39:58,  2.07s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 188/50000 [08:23<28:39:58,  2.07s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 189/50000 [08:23<24:35:57,  1.78s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 189/50000 [08:27<24:35:57,  1.78s/it, norm=13.1, potential=123, rate=0, step=0.002]HMC:   0%|          | 189/50000 [08:27<24:35:57,  1.78s/it, norm=13, potential=120, rate=0, step=0.002]  HMC:   0%|          | 190/50000 [08:27<34:06:56,  2.47s/it, norm=13, potential=120, rate=0, step=0.002]HMC:   0%|          | 190/50000 [08:30<34:06:56,  2.47s/it, norm=13, potential=120, rate=0, step=0.002]HMC:   0%|          | 190/50000 [08:30<34:06:56,  2.47s/it, norm=13.3, potential=127, rate=0, step=0.002]HMC:   0%|          | 191/50000 [08:30<36:20:35,  2.63s/it, norm=13.3, potential=127, rate=0, step=0.002]HMC:   0%|          | 191/50000 [08:32<36:20:35,  2.63s/it, norm=13.3, potential=127, rate=0, step=0.002]HMC:   0%|          | 191/50000 [08:32<36:20:35,  2.63s/it, norm=13.5, potential=129, rate=0, step=0.002]HMC:   0%|          | 192/50000 [08:32<33:57:55,  2.45s/it, norm=13.5, potential=129, rate=0, step=0.002]HMC:   0%|          | 192/50000 [08:35<33:57:55,  2.45s/it, norm=13.5, potential=129, rate=0, step=0.002]HMC:   0%|          | 192/50000 [08:35<33:57:55,  2.45s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 193/50000 [08:35<35:11:19,  2.54s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 193/50000 [08:37<35:11:19,  2.54s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 193/50000 [08:37<35:11:19,  2.54s/it, norm=13.6, potential=129, rate=0, step=0.002]HMC:   0%|          | 194/50000 [08:37<32:21:36,  2.34s/it, norm=13.6, potential=129, rate=0, step=0.002]HMC:   0%|          | 194/50000 [08:38<32:21:36,  2.34s/it, norm=13.6, potential=129, rate=0, step=0.002]HMC:   0%|          | 194/50000 [08:38<32:21:36,  2.34s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 195/50000 [08:38<28:12:51,  2.04s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 195/50000 [08:41<28:12:51,  2.04s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 195/50000 [08:41<28:12:51,  2.04s/it, norm=13.4, potential=131, rate=0, step=0.002]HMC:   0%|          | 196/50000 [08:41<31:54:54,  2.31s/it, norm=13.4, potential=131, rate=0, step=0.002]HMC:   0%|          | 196/50000 [08:43<31:54:54,  2.31s/it, norm=13.4, potential=131, rate=0, step=0.002]HMC:   0%|          | 196/50000 [08:43<31:54:54,  2.31s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 197/50000 [08:43<30:00:14,  2.17s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 197/50000 [08:44<30:00:14,  2.17s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 197/50000 [08:44<30:00:14,  2.17s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 198/50000 [08:44<26:55:08,  1.95s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 198/50000 [08:46<26:55:08,  1.95s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 198/50000 [08:46<26:55:08,  1.95s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 199/50000 [08:46<28:00:18,  2.02s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 199/50000 [08:51<28:00:18,  2.02s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 199/50000 [08:51<28:00:18,  2.02s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 200/50000 [08:51<37:06:22,  2.68s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 200/50000 [08:55<37:06:22,  2.68s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 200/50000 [08:55<37:06:22,  2.68s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 201/50000 [08:55<45:52:47,  3.32s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 201/50000 [08:58<45:52:47,  3.32s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 201/50000 [08:58<45:52:47,  3.32s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 202/50000 [08:58<42:56:38,  3.10s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 202/50000 [09:00<42:56:38,  3.10s/it, norm=13.1, potential=119, rate=0, step=0.002]HMC:   0%|          | 202/50000 [09:00<42:56:38,  3.10s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 203/50000 [09:00<36:37:03,  2.65s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 203/50000 [09:01<36:37:03,  2.65s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 203/50000 [09:01<36:37:03,  2.65s/it, norm=12.9, potential=118, rate=0, step=0.002]HMC:   0%|          | 204/50000 [09:01<33:03:13,  2.39s/it, norm=12.9, potential=118, rate=0, step=0.002]HMC:   0%|          | 204/50000 [09:05<33:03:13,  2.39s/it, norm=12.9, potential=118, rate=0, step=0.002]HMC:   0%|          | 204/50000 [09:05<33:03:13,  2.39s/it, norm=13, potential=118, rate=0, step=0.002]  HMC:   0%|          | 205/50000 [09:05<36:53:54,  2.67s/it, norm=13, potential=118, rate=0, step=0.002]HMC:   0%|          | 205/50000 [09:10<36:53:54,  2.67s/it, norm=13, potential=118, rate=0, step=0.002]HMC:   0%|          | 205/50000 [09:10<36:53:54,  2.67s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 206/50000 [09:10<46:52:39,  3.39s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 206/50000 [09:13<46:52:39,  3.39s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 206/50000 [09:13<46:52:39,  3.39s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 207/50000 [09:13<46:46:14,  3.38s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 207/50000 [09:15<46:46:14,  3.38s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 207/50000 [09:15<46:46:14,  3.38s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 208/50000 [09:15<41:43:06,  3.02s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 208/50000 [09:21<41:43:06,  3.02s/it, norm=13.4, potential=124, rate=0, step=0.002]HMC:   0%|          | 208/50000 [09:21<41:43:06,  3.02s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   0%|          | 209/50000 [09:21<53:23:01,  3.86s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   0%|          | 209/50000 [09:22<53:23:01,  3.86s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   0%|          | 209/50000 [09:22<53:23:01,  3.86s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 210/50000 [09:22<43:15:55,  3.13s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 210/50000 [09:24<43:15:55,  3.13s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 210/50000 [09:24<43:15:55,  3.13s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   0%|          | 211/50000 [09:24<36:14:55,  2.62s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   0%|          | 211/50000 [09:27<36:14:55,  2.62s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   0%|          | 211/50000 [09:27<36:14:55,  2.62s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 212/50000 [09:27<37:37:22,  2.72s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 212/50000 [09:29<37:37:22,  2.72s/it, norm=13.6, potential=128, rate=0, step=0.002]HMC:   0%|          | 212/50000 [09:29<37:37:22,  2.72s/it, norm=14.1, potential=136, rate=0, step=0.002]HMC:   0%|          | 213/50000 [09:29<36:11:51,  2.62s/it, norm=14.1, potential=136, rate=0, step=0.002]HMC:   0%|          | 213/50000 [09:32<36:11:51,  2.62s/it, norm=14.1, potential=136, rate=0, step=0.002]HMC:   0%|          | 213/50000 [09:32<36:11:51,  2.62s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 214/50000 [09:32<36:00:45,  2.60s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 214/50000 [09:33<36:00:45,  2.60s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 214/50000 [09:33<36:00:45,  2.60s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 215/50000 [09:33<31:04:59,  2.25s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 215/50000 [09:38<31:04:59,  2.25s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 215/50000 [09:38<31:04:59,  2.25s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 216/50000 [09:38<39:35:33,  2.86s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 216/50000 [09:38<39:35:33,  2.86s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 216/50000 [09:38<39:35:33,  2.86s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 217/50000 [09:38<28:15:26,  2.04s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 217/50000 [09:42<28:15:26,  2.04s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   0%|          | 217/50000 [09:42<28:15:26,  2.04s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 218/50000 [09:42<36:52:14,  2.67s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 218/50000 [09:44<36:52:14,  2.67s/it, norm=13.4, potential=125, rate=0, step=0.002]HMC:   0%|          | 218/50000 [09:44<36:52:14,  2.67s/it, norm=13.5, potential=128, rate=0, step=0.002]HMC:   0%|          | 219/50000 [09:44<33:16:01,  2.41s/it, norm=13.5, potential=128, rate=0, step=0.002]HMC:   0%|          | 219/50000 [09:46<33:16:01,  2.41s/it, norm=13.5, potential=128, rate=0, step=0.002]HMC:   0%|          | 219/50000 [09:46<33:16:01,  2.41s/it, norm=13.5, potential=128, rate=0, step=0.002]HMC:   0%|          | 220/50000 [09:46<33:01:32,  2.39s/it, norm=13.5, potential=128, rate=0, step=0.002]HMC:   0%|          | 220/50000 [09:46<33:01:32,  2.39s/it, norm=13.5, potential=128, rate=0, step=0.002]HMC:   0%|          | 220/50000 [09:46<33:01:32,  2.39s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 221/50000 [09:46<24:02:20,  1.74s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 221/50000 [09:49<24:02:20,  1.74s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 221/50000 [09:49<24:02:20,  1.74s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 222/50000 [09:49<28:55:35,  2.09s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 222/50000 [09:51<28:55:35,  2.09s/it, norm=13.4, potential=129, rate=0, step=0.002]HMC:   0%|          | 222/50000 [09:51<28:55:35,  2.09s/it, norm=13.3, potential=131, rate=0, step=0.002]HMC:   0%|          | 223/50000 [09:51<27:50:13,  2.01s/it, norm=13.3, potential=131, rate=0, step=0.002]HMC:   0%|          | 223/50000 [09:51<27:50:13,  2.01s/it, norm=13.3, potential=131, rate=0, step=0.002]HMC:   0%|          | 223/50000 [09:51<27:50:13,  2.01s/it, norm=13.3, potential=129, rate=0, step=0.002]HMC:   0%|          | 224/50000 [09:51<21:42:12,  1.57s/it, norm=13.3, potential=129, rate=0, step=0.002]HMC:   0%|          | 224/50000 [09:55<21:42:12,  1.57s/it, norm=13.3, potential=129, rate=0, step=0.002]HMC:   0%|          | 224/50000 [09:55<21:42:12,  1.57s/it, norm=13.4, potential=128, rate=0, step=0.002]HMC:   0%|          | 225/50000 [09:55<29:38:53,  2.14s/it, norm=13.4, potential=128, rate=0, step=0.002]HMC:   0%|          | 225/50000 [09:56<29:38:53,  2.14s/it, norm=13.4, potential=128, rate=0, step=0.002]HMC:   0%|          | 225/50000 [09:56<29:38:53,  2.14s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 226/50000 [09:56<25:13:12,  1.82s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 226/50000 [10:00<25:13:12,  1.82s/it, norm=13.2, potential=126, rate=0, step=0.002]HMC:   0%|          | 226/50000 [10:00<25:13:12,  1.82s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 227/50000 [10:00<34:31:03,  2.50s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 227/50000 [10:02<34:31:03,  2.50s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   0%|          | 227/50000 [10:02<34:31:03,  2.50s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 228/50000 [10:02<30:54:42,  2.24s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 228/50000 [10:05<30:54:42,  2.24s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 228/50000 [10:05<30:54:42,  2.24s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 229/50000 [10:05<34:06:02,  2.47s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 229/50000 [10:07<34:06:02,  2.47s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   0%|          | 229/50000 [10:07<34:06:02,  2.47s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 230/50000 [10:07<31:33:47,  2.28s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 230/50000 [10:12<31:33:47,  2.28s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 230/50000 [10:12<31:33:47,  2.28s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 231/50000 [10:12<46:03:05,  3.33s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 231/50000 [10:15<46:03:05,  3.33s/it, norm=13.2, potential=121, rate=0, step=0.002]HMC:   0%|          | 231/50000 [10:15<46:03:05,  3.33s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 232/50000 [10:15<43:53:44,  3.18s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 232/50000 [10:16<43:53:44,  3.18s/it, norm=13.1, potential=121, rate=0, step=0.002]HMC:   0%|          | 232/50000 [10:16<43:53:44,  3.18s/it, norm=13.2, potential=120, rate=0, step=0.002]HMC:   0%|          | 233/50000 [10:16<33:46:56,  2.44s/it, norm=13.2, potential=120, rate=0, step=0.002]HMC:   0%|          | 233/50000 [10:18<33:46:56,  2.44s/it, norm=13.2, potential=120, rate=0, step=0.002]HMC:   0%|          | 233/50000 [10:18<33:46:56,  2.44s/it, norm=13, potential=119, rate=0, step=0.002]  HMC:   0%|          | 234/50000 [10:18<32:28:16,  2.35s/it, norm=13, potential=119, rate=0, step=0.002]HMC:   0%|          | 234/50000 [10:23<32:28:16,  2.35s/it, norm=13, potential=119, rate=0, step=0.002]HMC:   0%|          | 234/50000 [10:23<32:28:16,  2.35s/it, norm=13, potential=119, rate=0, step=0.002]HMC:   0%|          | 235/50000 [10:23<42:47:37,  3.10s/it, norm=13, potential=119, rate=0, step=0.002]HMC:   0%|          | 235/50000 [10:28<42:47:37,  3.10s/it, norm=13, potential=119, rate=0, step=0.002]HMC:   0%|          | 235/50000 [10:28<42:47:37,  3.10s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 236/50000 [10:28<50:12:56,  3.63s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 236/50000 [10:30<50:12:56,  3.63s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 236/50000 [10:30<50:12:56,  3.63s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 237/50000 [10:30<43:36:36,  3.15s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 237/50000 [10:31<43:36:36,  3.15s/it, norm=13.2, potential=122, rate=0, step=0.002]HMC:   0%|          | 237/50000 [10:31<43:36:36,  3.15s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 238/50000 [10:31<36:54:52,  2.67s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 238/50000 [10:33<36:54:52,  2.67s/it, norm=13.1, potential=120, rate=0, step=0.002]HMC:   0%|          | 238/50000 [10:33<36:54:52,  2.67s/it, norm=13, potential=121, rate=0, step=0.002]  HMC:   0%|          | 239/50000 [10:33<31:10:53,  2.26s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 239/50000 [10:37<31:10:53,  2.26s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 239/50000 [10:37<31:10:53,  2.26s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 240/50000 [10:37<40:47:53,  2.95s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 240/50000 [10:40<40:47:53,  2.95s/it, norm=13, potential=121, rate=0, step=0.002]HMC:   0%|          | 240/50000 [10:40<40:47:53,  2.95s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 241/50000 [10:40<41:42:02,  3.02s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 241/50000 [10:41<41:42:02,  3.02s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 241/50000 [10:41<41:42:02,  3.02s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 242/50000 [10:41<30:11:29,  2.18s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 242/50000 [10:43<30:11:29,  2.18s/it, norm=13.3, potential=122, rate=0, step=0.002]HMC:   0%|          | 242/50000 [10:43<30:11:29,  2.18s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 243/50000 [10:43<32:15:38,  2.33s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 243/50000 [10:43<32:15:38,  2.33s/it, norm=13.5, potential=127, rate=0, step=0.002]HMC:   0%|          | 243/50000 [10:43<32:15:38,  2.33s/it, norm=13.5, potential=130, rate=0, step=0.002]HMC:   0%|          | 243/50000 [10:47<32:15:38,  2.33s/it, norm=13.5, potential=130, rate=0, step=0.002]HMC:   0%|          | 243/50000 [10:47<32:15:38,  2.33s/it, norm=13.5, potential=129, rate=0, step=0.002]HMC:   0%|          | 245/50000 [10:47<30:48:37,  2.23s/it, norm=13.5, potential=129, rate=0, step=0.002]HMC:   0%|          | 245/50000 [10:49<30:48:37,  2.23s/it, norm=13.5, potential=129, rate=0, step=0.002]HMC:   0%|          | 245/50000 [10:49<30:48:37,  2.23s/it, norm=13.5, potential=131, rate=0, step=0.002]HMC:   0%|          | 246/50000 [10:49<29:19:22,  2.12s/it, norm=13.5, potential=131, rate=0, step=0.002]HMC:   0%|          | 246/50000 [10:51<29:19:22,  2.12s/it, norm=13.5, potential=131, rate=0, step=0.002]HMC:   0%|          | 246/50000 [10:51<29:19:22,  2.12s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 247/50000 [10:51<27:29:19,  1.99s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 247/50000 [10:51<27:29:19,  1.99s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 247/50000 [10:51<27:29:19,  1.99s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 248/50000 [10:51<20:22:55,  1.47s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 248/50000 [10:53<20:22:55,  1.47s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 248/50000 [10:53<20:22:55,  1.47s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 249/50000 [10:53<21:48:09,  1.58s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 249/50000 [10:55<21:48:09,  1.58s/it, norm=13.3, potential=124, rate=0, step=0.002]HMC:   0%|          | 249/50000 [10:55<21:48:09,  1.58s/it, norm=13, potential=120, rate=0, step=0.002]  HMC:   0%|          | 250/50000 [10:55<25:19:45,  1.83s/it, norm=13, potential=120, rate=0, step=0.002]HMC:   0%|          | 250/50000 [10:59<25:19:45,  1.83s/it, norm=13, potential=120, rate=0, step=0.002]HMC:   0%|          | 250/50000 [10:59<25:19:45,  1.83s/it, norm=13.6, potential=127, rate=0, step=0.002]HMC:   1%|          | 251/50000 [10:59<31:04:05,  2.25s/it, norm=13.6, potential=127, rate=0, step=0.002]HMC:   1%|          | 251/50000 [11:01<31:04:05,  2.25s/it, norm=13.6, potential=127, rate=0, step=0.002]HMC:   1%|          | 251/50000 [11:01<31:04:05,  2.25s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   1%|          | 252/50000 [11:01<33:05:22,  2.39s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   1%|          | 252/50000 [11:03<33:05:22,  2.39s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   1%|          | 252/50000 [11:03<33:05:22,  2.39s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   1%|          | 253/50000 [11:03<29:37:50,  2.14s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   1%|          | 253/50000 [11:04<29:37:50,  2.14s/it, norm=13.4, potential=126, rate=0, step=0.002]HMC:   1%|          | 253/50000 [11:04<29:37:50,  2.14s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   1%|          | 254/50000 [11:04<26:18:41,  1.90s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   1%|          | 254/50000 [11:07<26:18:41,  1.90s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   1%|          | 254/50000 [11:07<26:18:41,  1.90s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   1%|          | 255/50000 [11:07<31:02:25,  2.25s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   1%|          | 255/50000 [11:10<31:02:25,  2.25s/it, norm=13.7, potential=129, rate=0, step=0.002]HMC:   1%|          | 255/50000 [11:10<31:02:25,  2.25s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   1%|          | 256/50000 [11:10<34:29:17,  2.50s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   1%|          | 256/50000 [11:11<34:29:17,  2.50s/it, norm=13.1, potential=122, rate=0, step=0.002]HMC:   1%|          | 256/50000 [11:11<34:29:17,  2.50s/it, norm=13, potential=123, rate=0, step=0.002]  HMC:   1%|          | 257/50000 [11:11<26:57:02,  1.95s/it, norm=13, potential=123, rate=0, step=0.002]HMC:   1%|          | 257/50000 [11:13<26:57:02,  1.95s/it, norm=13, potential=123, rate=0, step=0.002]HMC:   1%|          | 257/50000 [11:13<26:57:02,  1.95s/it, norm=13, potential=125, rate=0, step=0.002]HMC:   1%|          | 258/50000 [11:13<26:16:54,  1.90s/it, norm=13, potential=125, rate=0, step=0.002]HMC:   1%|          | 258/50000 [11:14<26:16:54,  1.90s/it, norm=13, potential=125, rate=0, step=0.002]HMC:   1%|          | 258/50000 [11:14<26:16:54,  1.90s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   1%|          | 259/50000 [11:14<22:47:20,  1.65s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   1%|          | 259/50000 [11:14<22:47:20,  1.65s/it, norm=13.2, potential=123, rate=0, step=0.002]HMC:   1%|          | 259/50000 [11:14<22:47:20,  1.65s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   1%|          | 260/50000 [11:14<17:20:31,  1.26s/it, norm=13.2, potential=125, rate=0, step=0.002]HMC:   1%|          | 260/50000 [11:15<35:54:39,  2.60s/it, norm=13.2, potential=125, rate=0, step=0.002]
+Traceback (most recent call last):
+  File "/home/yann/anaconda3/envs/myenv/lib/python3.8/runpy.py", line 193, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/yann/anaconda3/envs/myenv/lib/python3.8/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/yann/BayesianNN/Experiments/HMC.py", line 90, in <module>
+    samples, rates, step_sizes, log_prob = hamiltonian_monte_carlo(numiter, burning,thinning, potential, #
+  File "/home/yann/BayesianNN/Inference/HMC.py", line 165, in hamiltonian_monte_carlo
+    q_new, p_new, final_V, final_dVdq = integrator(
+  File "/home/yann/BayesianNN/Inference/HMC.py", line 41, in leapfrog
+    V, dVdq = potential(q)
+  File "/home/yann/BayesianNN/Experiments/HMC.py", line 80, in potential
+    lp=logposterior(theta.unsqueeze(0))
+  File "/home/yann/BayesianNN/Experiments/__init__.py", line 138, in logposterior
+    return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
+  File "/home/yann/BayesianNN/Experiments/__init__.py", line 134, in _loglikelihood
+    y_pred = self._normalized_prediction(X, theta, device)  # MxNx1 tensor
+  File "/home/yann/BayesianNN/Experiments/__init__.py", line 120, in _normalized_prediction
+    y_pred = self._model(X.to(device), theta)
+  File "/home/yann/BayesianNN/Models/__init__.py", line 46, in mlp
+    m = activation(m)
+  File "/home/yann/anaconda3/envs/myenv/lib/python3.8/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/yann/anaconda3/envs/myenv/lib/python3.8/site-packages/torch/nn/modules/activation.py", line 295, in forward
+    return torch.tanh(input)
+KeyboardInterrupt
+
+Epoch [908/1000], Loss: 115.35822296142578, Learning Rate: 0.01
+Epoch [909/1000], Loss: 115.32743835449219, Learning Rate: 0.01
+Epoch [910/1000], Loss: 115.29698181152344, Learning Rate: 0.01
+Epoch [911/1000], Loss: 115.26654052734375, Learning Rate: 0.01
+Epoch [912/1000], Loss: 115.2362289428711, Learning Rate: 0.01
+Epoch [913/1000], Loss: 115.20586395263672, Learning Rate: 0.01
+Epoch [914/1000], Loss: 115.1756591796875, Learning Rate: 0.01
+Epoch [915/1000], Loss: 115.14543914794922, Learning Rate: 0.01
+Epoch [916/1000], Loss: 115.11527252197266, Learning Rate: 0.01
+Epoch [917/1000], Loss: 115.08528137207031, Learning Rate: 0.01
+Epoch [918/1000], Loss: 115.0551528930664, Learning Rate: 0.01
+Epoch [919/1000], Loss: 115.02532958984375, Learning Rate: 0.01
+Epoch [920/1000], Loss: 114.9954605102539, Learning Rate: 0.01
+Epoch [921/1000], Loss: 114.96562957763672, Learning Rate: 0.01
+Epoch [922/1000], Loss: 114.93580627441406, Learning Rate: 0.01
+Epoch [923/1000], Loss: 114.90614318847656, Learning Rate: 0.01
+Epoch [924/1000], Loss: 114.87663269042969, Learning Rate: 0.01
+Epoch [925/1000], Loss: 114.84708404541016, Learning Rate: 0.01
+Epoch [926/1000], Loss: 114.81749725341797, Learning Rate: 0.01
+Epoch [927/1000], Loss: 114.78807830810547, Learning Rate: 0.01
+Epoch [928/1000], Loss: 114.75872802734375, Learning Rate: 0.01
+Epoch [929/1000], Loss: 114.7294692993164, Learning Rate: 0.01
+Epoch [930/1000], Loss: 114.70015716552734, Learning Rate: 0.01
+Epoch [931/1000], Loss: 114.67103576660156, Learning Rate: 0.01
+Epoch [932/1000], Loss: 114.64196014404297, Learning Rate: 0.01
+Epoch [933/1000], Loss: 114.61290740966797, Learning Rate: 0.01
+Epoch [934/1000], Loss: 114.58375549316406, Learning Rate: 0.01
+Epoch [935/1000], Loss: 114.55500030517578, Learning Rate: 0.01
+Epoch [936/1000], Loss: 114.52600860595703, Learning Rate: 0.01
+Epoch [937/1000], Loss: 114.49720764160156, Learning Rate: 0.01
+Epoch [938/1000], Loss: 114.46842956542969, Learning Rate: 0.01
+Epoch [939/1000], Loss: 114.43962860107422, Learning Rate: 0.01
+Epoch [940/1000], Loss: 114.41107940673828, Learning Rate: 0.01
+Epoch [941/1000], Loss: 114.38239288330078, Learning Rate: 0.01
+Epoch [942/1000], Loss: 114.3538589477539, Learning Rate: 0.01
+Epoch [943/1000], Loss: 114.32538604736328, Learning Rate: 0.01
+Epoch [944/1000], Loss: 114.29695892333984, Learning Rate: 0.01
+Epoch [945/1000], Loss: 114.26870727539062, Learning Rate: 0.01
+Epoch [946/1000], Loss: 114.24029541015625, Learning Rate: 0.01
+Epoch [947/1000], Loss: 114.21205139160156, Learning Rate: 0.01
+Epoch [948/1000], Loss: 114.1838607788086, Learning Rate: 0.01
+Epoch [949/1000], Loss: 114.15581512451172, Learning Rate: 0.01
+Epoch [950/1000], Loss: 114.12757110595703, Learning Rate: 0.01
+Epoch [951/1000], Loss: 114.09967041015625, Learning Rate: 0.01
+Epoch [952/1000], Loss: 114.07160949707031, Learning Rate: 0.01
+Epoch [953/1000], Loss: 114.04364776611328, Learning Rate: 0.01
+Epoch [954/1000], Loss: 114.01585388183594, Learning Rate: 0.01
+Epoch [955/1000], Loss: 113.98802947998047, Learning Rate: 0.01
+Epoch [956/1000], Loss: 113.96025085449219, Learning Rate: 0.01
+Epoch [957/1000], Loss: 113.9326400756836, Learning Rate: 0.01
+Epoch [958/1000], Loss: 113.90495300292969, Learning Rate: 0.01
+Epoch [959/1000], Loss: 113.87736511230469, Learning Rate: 0.01
+Epoch [960/1000], Loss: 113.84980773925781, Learning Rate: 0.01
+Epoch [961/1000], Loss: 113.82229614257812, Learning Rate: 0.01
+Epoch [962/1000], Loss: 113.79489135742188, Learning Rate: 0.01
+Epoch [963/1000], Loss: 113.76737213134766, Learning Rate: 0.01
+Epoch [964/1000], Loss: 113.74020385742188, Learning Rate: 0.01
+Epoch [965/1000], Loss: 113.71277618408203, Learning Rate: 0.01
+Epoch [966/1000], Loss: 113.6855239868164, Learning Rate: 0.01
+Epoch [967/1000], Loss: 113.65838623046875, Learning Rate: 0.01
+Epoch [968/1000], Loss: 113.6312484741211, Learning Rate: 0.01
+Epoch [969/1000], Loss: 113.60417938232422, Learning Rate: 0.01
+Epoch [970/1000], Loss: 113.57718658447266, Learning Rate: 0.01
+Epoch [971/1000], Loss: 113.55025482177734, Learning Rate: 0.01
+Epoch [972/1000], Loss: 113.52320861816406, Learning Rate: 0.01
+Epoch [973/1000], Loss: 113.49647521972656, Learning Rate: 0.01
+Epoch [974/1000], Loss: 113.46967315673828, Learning Rate: 0.01
+Epoch [975/1000], Loss: 113.4427490234375, Learning Rate: 0.01
+Epoch [976/1000], Loss: 113.41615295410156, Learning Rate: 0.01
+Epoch [977/1000], Loss: 113.38935852050781, Learning Rate: 0.01
+Epoch [978/1000], Loss: 113.36275482177734, Learning Rate: 0.01
+Epoch [979/1000], Loss: 113.33612823486328, Learning Rate: 0.01
+Epoch [980/1000], Loss: 113.30965423583984, Learning Rate: 0.01
+Epoch [981/1000], Loss: 113.28314971923828, Learning Rate: 0.01
+Epoch [982/1000], Loss: 113.25677490234375, Learning Rate: 0.01
+Epoch [983/1000], Loss: 113.23030853271484, Learning Rate: 0.01
+Epoch [984/1000], Loss: 113.20390319824219, Learning Rate: 0.01
+Epoch [985/1000], Loss: 113.17757415771484, Learning Rate: 0.01
+Epoch [986/1000], Loss: 113.15141296386719, Learning Rate: 0.01
+Epoch [987/1000], Loss: 113.12525177001953, Learning Rate: 0.01
+Epoch [988/1000], Loss: 113.09899139404297, Learning Rate: 0.01
+Epoch [989/1000], Loss: 113.07295989990234, Learning Rate: 0.01
+Epoch [990/1000], Loss: 113.04695129394531, Learning Rate: 0.01
+Epoch [991/1000], Loss: 113.02093505859375, Learning Rate: 0.01
+Epoch [992/1000], Loss: 112.99498748779297, Learning Rate: 0.01
+Epoch [993/1000], Loss: 112.96900177001953, Learning Rate: 0.01
+Epoch [994/1000], Loss: 112.94309997558594, Learning Rate: 0.01
+Epoch [995/1000], Loss: 112.91729736328125, Learning Rate: 0.01
+Epoch [996/1000], Loss: 112.8914794921875, Learning Rate: 0.01
+Epoch [997/1000], Loss: 112.86579132080078, Learning Rate: 0.01
+Epoch [998/1000], Loss: 112.84001922607422, Learning Rate: 0.01
+Epoch [999/1000], Loss: 112.81433868408203, Learning Rate: 0.01
+Epoch [1000/1000], Loss: 112.78881072998047, Learning Rate: 0.01
