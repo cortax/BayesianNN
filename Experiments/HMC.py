@@ -97,7 +97,7 @@ if __name__ == "__main__":
     stop = timeit.default_timer()
     execution_time = stop - start
     
-    results=[samples, rates, step_sizes]
+    results=[samples, rates, step_sizes,log_prob]
     theta=torch.as_tensor(samples)
     
     xpname = setup.experiment_name + '/HMC'
@@ -109,6 +109,12 @@ if __name__ == "__main__":
         
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
     
+        for t in range(len(rates)):
+            mlflow.log_metric("acceptance", float(rates[t]), step=check_rate*(t+1))
+            mlflow.log_metric("step_sizes", float(step_sizes[t]), step=check_rate*(t+1))
+            mlflow.log_metric("log_prob", float(log_prob[t]), step=check_rate*(t+1))
+
+          
         if setup.plot:
             draw_experiment(setup.makePlot, theta, 'cpu')
         #
