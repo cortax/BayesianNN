@@ -204,8 +204,8 @@ def hamiltonian_monte_carlo(
 
             
             
-            tr.set_description('HMC')        
-            tr.set_postfix(potential=initial_potential, rate=current_acceptance_rate, step=step_size, norm=norm(q_new))
+        
+            tr.set_postfix(pot=initial_potential, rate=current_acceptance_rate, step=step_size, norm=norm(q_new))
             
             
             
