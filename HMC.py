@@ -16,9 +16,9 @@ layerwidth=50
 nblayers=1
 
 numiter_init=20000
-numiter=100000
+numiter=50000
 burning=40000
-thinning=120
+thinning=20
 
 device ='cpu'
 setup=Setup(device,layerwidth=layerwidth,nblayers=nblayers)
@@ -144,6 +144,7 @@ def hamiltonian_monte_carlo(
     thinning,
     potential,
     initial_position,
+    check_rate=500,
     initial_potential=None,
     initial_potential_grad=None,
     path_len=1,
@@ -174,7 +175,8 @@ def hamiltonian_monte_carlo(
     np.array
         Array of length `n_samples`.
     """
-    acceptance_count=0
+    acceptance_count=[] # record number of accept for the last check_rate iterations
+    current_acceptance_rate=0.
     initial_position = np.array(initial_position)
     if initial_potential is None or initial_potential_grad is None:
         initial_potential, initial_potential_grad = potential(initial_position)
@@ -210,26 +212,35 @@ def hamiltonian_monte_carlo(
             # Check Metropolis acceptance criterion
             p_accept = min(1, np.exp(energy_change))
             if np.random.rand() < p_accept:
-                acceptance_count+=1
+                acceptance_count.append(1.)
                 initial_potential = final_V
                 initial_potential_grad = final_dVdq
             else:
                 q_new=q_last
+                acceptance_count.append(0.)
 
             if (t - burnin) % thinning == 0:
                         samples.append(q_new)
 
-            acceptance_rate=acceptance_count/(t+1)
-            if t % 1000 ==0 and t>0 :
-                accept_rates.append(acceptance_rate)
+            
+            
+            if t % check_rate ==0 and t>0 :
+                current_acceptance_rate=sum(acceptance_count)/(t+1)
+                accept_rates.append(current_acceptance_rate)
                 step_sizes.append(step_size)
-                if acceptance_rate < 0.2:
+                if current_acceptance_rate < 0.2:
                     step_size*=0.9
-                if acceptance_rate > 0.8:
+                    acceptance_count=[]
+                if current_acceptance_rate > 0.8:
                     step_size*=1.1
+                    acceptance_count=[]
 
+            
+            
             tr.set_description('HMC')        
-            tr.set_postfix(accept_rate=acceptance_rate, step=step_size, norm=norm(q_new))
+            tr.set_postfix(accept_rate=current_acceptance_rate, step=step_size, norm=norm(q_new))
+            
+            
             
             if np.isnan(q_new).sum():
                 print('Current state contains nan')
@@ -245,7 +256,7 @@ samples, rates, step_sizes = hamiltonian_monte_carlo(numiter, burning,thinning, 
                                   initial_position=theta.squeeze().numpy(), 
                                   initial_step_size=0.002,
                                   path_len=100,
-                                  integrator=leapfrog_twostage
+                                  integrator=leapfrog#_twostage
                                  )
 
 results=[samples, rates, step_sizes]
