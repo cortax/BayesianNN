@@ -5,7 +5,7 @@ import scipy.stats as st
 from tqdm import tqdm, trange
 
 from Inference.PointEstimate import AdamGradientDescent
-from Inference.HMC import hamiltonian_monte_carlo
+from Inference.HMC import hamiltonian_monte_carlo_da
 
 from Experiments.foong import Setup
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
                         help="number of initial samples to skip in the Markov chain")
     parser.add_argument("--thinning", type=int, default=20,
                         help="subsampling factor of the Markov chain")
-    parser.add_argument("--check_rate", type=int, default=500,
+    parser.add_argument("--check_rate", type=int, default=500, 
                         help="check acceptance rate every check_rate steps for monitoring step_size")
     parser.add_argument("--step_size", type=float, default=0.002,
                         help="initial step_size for integrator")
@@ -87,9 +87,9 @@ if __name__ == "__main__":
     theta=_MAP(numiter_init,1., logposterior, param_count)
 
     
-    samples, rates, step_sizes, log_prob = hamiltonian_monte_carlo(numiter, burning,thinning, potential, #
+    samples, rates, step_sizes, log_prob = hamiltonian_monte_carlo_da(numiter, burning,thinning, potential, #
                                   initial_position=theta.squeeze().numpy(), 
-                                  check_rate=check_rate,
+                                  #check_rate=check_rate,
                                   initial_step_size=initial_step_size,
                                   path_len=path_len
                                     )
