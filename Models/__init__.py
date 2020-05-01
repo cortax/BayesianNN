@@ -1,4 +1,7 @@
 import torch
+from torch import nn
+
+
 
 
 def get_mlp(input_dim, layerwidth, nblayers, activation):
@@ -54,3 +57,72 @@ def get_mlp(input_dim, layerwidth, nblayers, activation):
         m = m.add(theta[2*(nb_layers-1)+3].reshape(nb_theta, 1, 1, 1))
         return m.squeeze(-1)
     return param_count, mlp
+
+
+class GeNet(nn.Module):
+            def __init__(self, lat_dim, nb_neur, output_dim,  activation, init_w, init_b, device):
+                super(GeNet, self).__init__()
+                self.lat_dim = lat_dim
+                self.device=device
+                self.output_dim=output_dim
+                self.hnet=nn.Sequential(
+                        nn.Linear(lat_dim,nb_neur),
+                        activation,
+                        #nn.Linear(nb_neur,nb_neur),
+                        #activation,
+                        nn.Linear(nb_neur,output_dim)
+                        ).to(device)
+                
+                torch.nn.init.normal_(self.hnet[2].weight,mean=0., std=init_w)
+                torch.nn.init.normal_(self.hnet[2].bias,mean=0., std=init_b)
+    
+            def forward(self, n=1):
+                epsilon = torch.randn(size=(n,self.lat_dim), device=self.device)
+                return self.hnet(epsilon)           
+
+class GeNetEns(nn.Module):
+    def __init__(self, nb_comp, lat_dim, layer_width, output_dim, activation, init_w, init_b, device):
+        super(GeNetEns, self).__init__()
+        self.device = device
+        self.nb_comp=nb_comp
+        self.output_dim=output_dim
+        self.components= nn.ModuleList([GeNet(lat_dim,layer_width,output_dim,activation,init_w,init_b,device) for i in range(nb_comp)]).to(device)
+
+        self._best_compnents = None
+        self._best_score = float('inf')
+
+    def sample(self, n=1):
+        return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
+
+    def _save_best_model(self, score,epoch,ED,LP):
+        if score < self._best_score:
+            torch.save({
+                'epoch': epoch,
+                'state_dict': self.state_dict(),
+                'ELBO': score,
+                'ED':ED,
+                'LP':LP
+            }, 'best.pt')
+            self._best_score=score
+
+    def _get_best_model(self):
+        best= torch.load('best.pt')
+        self.load_state_dict(best['state_dict'])
+        return best['epoch'], best['ELBO'], best['ED'], best['LP']
+    
+    def forward(self, n=1):
+        d = torch.distributions.multinomial.Multinomial(n, torch.ones(self.nb_comp))
+        m = d.sample()
+        return torch.cat([self.components[c](int(m[c])) for c in range(len(self.components))])
+    
+    
+"""
+use:
+
+Hyper_Nets=HyNetEns(ensemble_size,lat_dim,HN_layerwidth, output_dim,activation,init_w,init_b).to(device)
+
+Hyper_Nets(100)
+
+Hyper_Nets.sample(100)
+
+"""

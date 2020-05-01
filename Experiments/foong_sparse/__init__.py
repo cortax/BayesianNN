@@ -10,7 +10,7 @@ import numpy as np
 
 from Tools import logmvn01pdf, NormalLogLikelihood
 
-experiment_name = 'Foong'
+experiment_name = 'Foong_sparse'
 data_path='Experiments/foong/data/'
 
 input_dim = 1

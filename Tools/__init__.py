@@ -66,7 +66,7 @@ def logmvn01pdf(theta, device,v=1.):
     const = 0.5*S.log().sum()+0.5*dim*torch.tensor(2*math.pi).log()
     return -0.5*(H*d).sum(2).squeeze()-const
 
-def NNE(theta,k=1):
+def NNE(theta,k=1,device='cpu'):
         """
         Parameters:
             theta (Tensor): Samples, NbExemples X NbDimensions   
@@ -124,4 +124,43 @@ def KL(theta0,theta1,k=1,device='cpu'):
         Mnn=(torch.log(a1)-torch.log(a0)).mean()
         return dim0*Mnn + N1.log()-(N0-1).log()
 
-        
+def KDE(x, x_kde,device):
+    """
+    KDE
+
+    Parameters:
+        x (Tensor): Inputs, NbSamples X NbDimensions
+        x_kde (Tensor): Batched samples, NbBatch x NbSamples X NbDimensions
+
+
+    Returns:
+        (Tensor) KDE log estimate for x based on batched diagonal "Silverman's rule of thumb", NbExemples
+        See Wand and Jones p.111 "Kernel Smoothing" 1995.
+
+    """
+
+    dim=x.shape[-1]
+    n_ed=x.shape[0]
+    n_comp=x_kde.shape[0]
+    n_kde=x_kde.shape[1]
+    c_=(n_kde*(dim+2))/4
+    c=torch.as_tensor(c_).pow(2/(dim+4)).to(device)
+    H=(x_kde.var(1) / c).clamp(torch.finfo().eps, float('inf'))
+
+    d=((x_kde.view(n_comp, n_kde, 1, dim) - x.view(1, 1, n_ed, dim)) ** 2)
+    H_=H.view(n_comp,dim,1,1).inverse().view(n_comp,1,1,dim)
+    const=0.5*H.log().sum(1)+0.5*dim*torch.tensor(2*math.pi).log()
+    const=const.view(n_comp,1,1)
+    ln=-0.5*(H_*d).sum(3)-const
+    N=torch.as_tensor(float(n_comp*n_kde), device=device)
+    return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
+
+def EntropyKDE(x,device):
+    """
+    x (Tensor): Inputs, NbSamples X NbDimensions
+    Returns:
+     float: Entropy estimate based on KDE density estimation.
+    """
+    K=KDE(x,x.unsqueeze(0),device)
+    return -K.mean()
+     
