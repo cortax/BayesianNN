@@ -34,8 +34,8 @@ class Setup(AbstractRegressionSetup):
         
 
     def _preparare_data(self):
-        train = torch.load(data_path + 'foong_train_sparse.pt')
-        valid = torch.load(data_path + 'foong_validation_sparse.pt')
+        train = torch.load(data_path + 'foong_train_mixed.pt')
+        valid = torch.load(data_path + 'foong_validation_mixed.pt')
         test = torch.load(data_path + 'foong_test.pt')
         
         self._X_train, self._y_train = train[0].to(self.device), train[1].unsqueeze(-1).to(self.device)
@@ -72,7 +72,7 @@ class Setup(AbstractRegressionSetup):
          #   plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
-
+    
     def makePlotCI(self, theta, device):
         N=theta.shape[0]
         N_low=int(0.025*N)
@@ -91,7 +91,7 @@ class Setup(AbstractRegressionSetup):
         plt.ylim(-4, 4)
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
-    
+
     def loglikelihood(self, theta):
         ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
         return ll
