@@ -73,6 +73,25 @@ class Setup(AbstractRegressionSetup):
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
 
+    def makePlotCI(self, theta, device):
+        N=theta.shape[0]
+        N_low=int(0.025*N)
+        N_high=N-N_low
+        X=torch.arange(-2,2,0.02).to(device)
+
+        pred, _=self._normalized_prediction(X,theta).sort(dim=0)
+        y_mean=pred.mean(dim=0).cpu()
+        y_low=pred[N_low,:].cpu()
+        y_high=pred[N_high,:].cpu()
+
+        fig, ax=plt.subplots()
+        ax.fill_between(X.cpu(), y_low, y_high, facecolor='springgreen', alpha=0.1)
+        plt.plot(X.cpu(),y_mean, color='springgreen')
+        plt.xlim(-2,2)
+        plt.ylim(-4, 4)
+        plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
+        return fig
+
     def loglikelihood(self, theta):
         ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
         return ll
