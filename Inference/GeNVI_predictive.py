@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import math
 
-from Tools import KDE
+from Tools import KDE, NNE
 
 from Models import GeNet, GeNetEns
 
@@ -69,7 +69,7 @@ class GeNPredVI():
                 theta_proj2=self.projection(GeN(self.n_samples_KDE),self.k_MC)
                 ED=-KDE(theta_proj2,theta_proj.unsqueeze(0),self.device).mean()
             else:
-                ED=NNE(theta_proj,self.device,self.k_MC,k=self.kNNE)
+                ED=NNE(theta_proj, k=self.kNNE, k_MC=self.k_MC, device=self.device)
             
             LP= self.logprior(theta_proj).mean()
             
