@@ -125,6 +125,12 @@ def KL(theta0,theta1,k=1,device='cpu'):
         Mnn=(torch.log(a1)-torch.log(a0)).mean()
         return dim0*Mnn + N1.log()-(N0-1).log()
 
+def JSD(x0,x1, k=1,device='cpu'):
+    D0=KL(x0,x1,k,device)
+    D1=KL(x1,x1,k,device)
+    return .5*D0+.5*D1
+
+    
 def KDE(x, x_kde,device):
     """
     KDE
