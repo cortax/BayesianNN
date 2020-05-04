@@ -45,6 +45,12 @@ def log_GeNVI_experiment(setup, sigma_prior,n_samples_MC, the_epoch, the_scores,
                          device, save_best):
 
 
+
+
+	entropy_mthd = str(kNNE) + 'NNE'
+	mlflow.set_tag('entropy', entropy_mthd)
+
+    
 	mlflow.set_tag('device', device)
 	mlflow.set_tag('save_best', save_best)
 	mlflow.set_tag('sigma noise', setup.sigma_noise)

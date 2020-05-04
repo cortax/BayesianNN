@@ -133,9 +133,9 @@ class Generator(nn.Module):
             return layers
 
         self.model = nn.Sequential(
-            *block(lat_dim, 50, normalize=False),
-            *block(50, 50, normalize=True),
-            nn.Linear(50, output_dim)
+            *block(lat_dim, 20, normalize=False),
+            *block(20, 20, normalize=True),
+            nn.Linear(20, output_dim)
         )
         
     def _save_best_model(self, score,epoch,ED,LP):

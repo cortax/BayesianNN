@@ -88,7 +88,7 @@ def NNE(theta,k=1,k_MC=1,device='cpu'):
     lcd = d/2.*pi.log() - torch.lgamma(1. + d/2.0)-d/2*K_MC.log()
     return torch.log(N) - torch.digamma(K) + lcd + d/nb_samples*torch.sum(torch.log(a))
 
-def KL(theta0,theta1,k=1,device='cpu'):
+def KL(theta0,theta1,k=1,device='cpu', p=2):
         """
         Parameters:
             theta0 (Tensor): Samples, P X NbDimensions   
@@ -109,8 +109,8 @@ def KL(theta0,theta1,k=1,device='cpu'):
         
    
         
-        D0=torch.cdist(theta0,theta0)
-        D1=torch.cdist(theta0,theta1)
+        D0=torch.cdist(theta0,theta0, p=p)
+        D1=torch.cdist(theta0,theta1,p=p)
         
 
         a0 = torch.topk(D0, k=k+1, dim=1, largest=False, sorted=True)[0][:,k]#.clamp(torch.finfo().eps,float('inf')).to(device)
@@ -125,9 +125,9 @@ def KL(theta0,theta1,k=1,device='cpu'):
         Mnn=(torch.log(a1)-torch.log(a0)).mean()
         return dim0*Mnn + N1.log()-(N0-1).log()
 
-def JSD(x0,x1, k=1,device='cpu'):
-    D0=KL(x0,x1,k,device)
-    D1=KL(x1,x1,k,device)
+def JSD(x0,x1, k=1,device='cpu',p=2):
+    D0=KL(x0,x1,k,device,p)
+    D1=KL(x1,x1,k,device,p)
     return .5*D0+.5*D1
 
     

@@ -5,7 +5,7 @@ import math
 from tqdm import trange
 
 
-from Tools import KL
+from Tools import KL, JSD
 
 
 
@@ -71,6 +71,7 @@ class GeNPredVI():
                 theta_prior_proj=self.projection(self.prior(self.n_samples_KL),self.k_MC)
 
                 K=KL(theta_proj, theta_prior_proj,k=self.kNNE,device=self.device)
+                #JSD(theta_proj, theta_prior_proj,k=self.kNNE,device=self.device,p=1)
 
                 LL = self.loglikelihood(GeN(self.n_samples_LL)).mean()
                 L = K - LL
