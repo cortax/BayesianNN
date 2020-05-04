@@ -4,7 +4,6 @@ import math
 
 from Tools import KDE, NNE
 
-from Models import GeNet, GeNetEns
 
 
 

@@ -88,8 +88,8 @@ class GeNetEns(nn.Module):
         self.output_dim=output_dim
         self.components= nn.ModuleList([GeNet(lat_dim,layer_width,output_dim,activation,init_w,init_b,device) for i in range(nb_comp)]).to(device)
 
-        self._best_compnents = None
         self._best_score = float('inf')
+        self.d = torch.distributions.multinomial.Multinomial(probs=torch.ones(nb_comp))
 
     def sample(self, n=1):
         return torch.stack([self.components[c](n) for c in range(self.nb_comp)])
@@ -111,11 +111,53 @@ class GeNetEns(nn.Module):
         return best['epoch'], best['ELBO'], best['ED'], best['LP']
     
     def forward(self, n=1):
-        d = torch.distributions.multinomial.Multinomial(n, torch.ones(self.nb_comp))
-        m = d.sample()
+        m = self.d.sample((n,))
         return torch.cat([self.components[c](int(m[c])) for c in range(len(self.components))])
     
-    
+
+class Generator(nn.Module):
+    def __init__(self, lat_dim, output_dim, device):
+        super(Generator, self).__init__()
+        
+        self.lat_dim = lat_dim
+        self.device=device
+        self.output_dim=output_dim
+        
+        self._best_score = float('inf')
+        
+        def block(in_feat, out_feat, normalize=True):
+            layers = [nn.Linear(in_feat, out_feat)]
+            if normalize:
+                layers.append(nn.BatchNorm1d(out_feat, 0.8))
+            layers.append(nn.LeakyReLU(0.2, inplace=True))
+            return layers
+
+        self.model = nn.Sequential(
+            *block(lat_dim, 50, normalize=False),
+            *block(50, 50, normalize=True),
+            nn.Linear(50, output_dim)
+        )
+        
+    def _save_best_model(self, score,epoch,ED,LP):
+        if score < self._best_score:
+            torch.save({
+                'epoch': epoch,
+                'state_dict': self.state_dict(),
+                'ELBO': score,
+                'ED':ED,
+                'LP':LP
+            }, 'best.pt')
+            self._best_score=score
+
+    def _get_best_model(self):
+        best= torch.load('best.pt')
+        self.load_state_dict(best['state_dict'])
+        return best['epoch'], best['ELBO'], best['ED'], best['LP']
+
+    def forward(self, n=1):
+        epsilon = torch.randn(size=(n,self.lat_dim), device=self.device)
+        return self.model(epsilon)           
+
 """
 use:
 

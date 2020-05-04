@@ -31,6 +31,8 @@ class Setup(AbstractRegressionSetup):
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
         self._preparare_data()
+        #self._normalize_data()
+        self._flip_data_to_torch()
         
 
     def _preparare_data(self):
@@ -38,9 +40,9 @@ class Setup(AbstractRegressionSetup):
         valid = torch.load(data_path + 'foong_validation_out.pt')
         test = torch.load(data_path + 'foong_test.pt')
         
-        self._X_train, self._y_train = train[0].to(self.device), train[1].unsqueeze(-1).to(self.device)
-        self._X_validation, self._y_validation = valid[0].to(self.device), valid[1].unsqueeze(-1).to(self.device)
-        self._X_test, self._y_test = test[0].to(self.device), test[1].unsqueeze(-1).to(self.device)
+        self._X_train, self._y_train = train[0].cpu(), train[1].unsqueeze(-1).cpu()
+        self._X_validation, self._y_validation = valid[0].cpu(), valid[1].unsqueeze(-1).cpu()
+        self._X_test, self._y_test = test[0].cpu(), test[1].unsqueeze(-1).cpu()
         self.n_train_samples=self._X_train.shape[0]
 
 
@@ -79,10 +81,10 @@ class Setup(AbstractRegressionSetup):
         N_high=N-N_low
         X=torch.arange(-2,2,0.02).to(device)
 
-        pred, _=self._normalized_prediction(X,theta).sort(dim=0)
-        y_mean=pred.mean(dim=0).cpu()
-        y_low=pred[N_low,:].cpu()
-        y_high=pred[N_high,:].cpu()
+        pred, _=self._normalized_prediction(X,theta,device).sort(dim=0)
+        y_mean=pred.mean(dim=0).squeeze().cpu()
+        y_low=pred[N_low,:].squeeze().cpu()
+        y_high=pred[N_high,:].squeeze().cpu()
 
         fig, ax=plt.subplots()
         ax.fill_between(X.cpu(), y_low, y_high, facecolor='springgreen', alpha=0.1)
@@ -110,7 +112,7 @@ class Setup(AbstractRegressionSetup):
         return  self._logprior(theta)
     
     def projection(self,theta,k):
-        X=torch.Tensor(k,input_dim).uniform_(-2.,2.).to(self.device)
+        X=torch.cat([torch.Tensor(k,input_dim).uniform_(-2.,2.).to(self.device),self._X_train])
         theta_proj=self._normalized_prediction(X, theta, self.device).squeeze(2)
         #theta_proj=self._normalized_prediction(self._X_train, theta, self.device).squeeze(2)
         return theta_proj
@@ -124,6 +126,15 @@ class Setup(AbstractRegressionSetup):
     def train_data(self):
         return self._X_train, self._y_train
         
+    def _flip_data_to_torch(self): 
+        self._X_train = self._X_train.to(self.device).float()
+        self._y_train = self._y_train.to(self.device).float()
+        self._X_validation = self._X_validation.to(self.device).float()
+        self._y_validation = self._y_validation.to(self.device).float()
+        self._X_test = self._X_test.to(self.device).float()
+        self._y_test = self._y_test.to(self.device).float()
+        self.n_train_samples=self._X_train.shape[0]
+
 
 
         

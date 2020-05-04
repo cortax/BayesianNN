@@ -1,12 +1,14 @@
+import torch
 from torch import nn
 import argparse
 import mlflow
 import timeit
 
+
 from tempfile import TemporaryDirectory
 
-from Inference.GeNVI_predictive import GeNPredVI
-from Models import GeNetEns
+from Inference.GeNVI_predictive_implicit import GeNPredVI
+from Models import GeNetEns, Generator
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 
 import tempfile
@@ -15,54 +17,51 @@ import tempfile
 ## command line example
 # python -m Experiments.GeNVI-pred --setup=boston --verbose=True --max_iter=10000 --learning_rate=0.05
 
-def GeNVI_learning(loglikelihood, logprior, projection, k_MC,
-                   ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, kNNE, n_samples_KDE, n_samples_ED, n_samples_LP, max_iter, learning_rate, min_lr, patience, lr_decay,device=None, verbose=False, save_best=True):
-	GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count,
-	               activation, init_w, init_b, device)
+def GeNVI_learning(loglikelihood, prior, projection, k_MC,
+                   ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, 
+                   kNNE, n_samples_KL, n_samples_LL,  
+                   max_iter, learning_rate, min_lr, patience, lr_decay, 
+                   device=None, verbose=False, save_best=True):
+    
+	GeN = Generator(lat_dim, param_count,device).to(device)
+	#GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, device)
 
 	with TemporaryDirectory() as temp_dir:
-		optimizer = GeNPredVI(loglikelihood, logprior, projection, k_MC,
-                                                kNNE, n_samples_KDE, n_samples_ED, n_samples_LP,
-                                                max_iter, learning_rate, min_lr, patience, lr_decay,
-                                                device, verbose, temp_dir, save_best=save_best)
+		optimizer = GeNPredVI(loglikelihood, prior, projection, k_MC,
+                              kNNE, n_samples_KL, n_samples_LL, 
+                              max_iter, learning_rate, min_lr, patience, lr_decay,
+                              device, verbose, temp_dir, save_best=save_best)
+
 		the_epoch, the_scores = optimizer.run(GeN)
 
-	log_scores = [optimizer.score_elbo, optimizer.score_entropy, optimizer.score_logposterior, optimizer.score_lr]
+	log_scores = [optimizer.score_elbo, optimizer.score_KL, optimizer.score_LL, optimizer.score_lr]
 	return GeN, the_epoch, the_scores, log_scores
 
 
-def log_GeNVI_experiment(setup, n_samples_MC, the_epoch, the_scores, log_scores,
+def log_GeNVI_experiment(setup, sigma_prior,n_samples_MC, the_epoch, the_scores, log_scores,
                          ensemble_size, lat_dim, layerwidth, param_count, init_w,
-                         kNNE, n_samples_KDE, n_samples_ED, n_samples_LP,
+                         kNNE, n_samples_KL, n_samples_LL, 
                          max_iter, learning_rate, min_lr, patience, lr_decay,
-                         device,save_best):
+                         device, save_best):
 
 
 	mlflow.set_tag('device', device)
 	mlflow.set_tag('save_best', save_best)
-
 	mlflow.set_tag('sigma noise', setup.sigma_noise)
 	mlflow.set_tag('dimensions', setup.param_count)
-    
-    
-	if kNNE == 0:
-		entropy_mthd = 'KDE'
-	else:
-		entropy_mthd = str(kNNE) + 'NNE'
-
-	mlflow.set_tag('entropy', entropy_mthd)
 
 	mlflow.log_param('ensemble_size', ensemble_size)
 	mlflow.log_param('lat_dim', lat_dim)
 	mlflow.log_param('layerwidth', layerwidth)
 	mlflow.log_param('init_w', init_w)
+	mlflow.log_param('scale prior', sigma_prior)
 
+ 
 	mlflow.log_param('n_samples_MC', n_samples_MC)
 
 
-	mlflow.log_param('n_samples_KDE', n_samples_KDE)
-	mlflow.log_param('n_samples_ED', n_samples_ED)
-	mlflow.log_param('n_samples_LP', n_samples_LP)
+	mlflow.log_param('n_samples_KL', n_samples_KL)
+	mlflow.log_param('n_samples_LL', n_samples_LL)
 
 	mlflow.log_param('learning_rate', learning_rate)
 	mlflow.log_param('patience', patience)
@@ -73,13 +72,13 @@ def log_GeNVI_experiment(setup, n_samples_MC, the_epoch, the_scores, log_scores,
 	mlflow.log_metric('The epoch', the_epoch)
 
 	mlflow.log_metric("The elbo", float(the_scores[0]))
-	mlflow.log_metric("The entropy", float(the_scores[1]))
-	mlflow.log_metric("The logposterior", float(the_scores[2]))
+	mlflow.log_metric("The KL", float(the_scores[1]))
+	mlflow.log_metric("The LL", float(the_scores[2]))
 
 	for t in range(len(log_scores[0])):
 		mlflow.log_metric("elbo", float(log_scores[0][t]), step=100*t)
-		mlflow.log_metric("entropy", float(log_scores[1][t]), step=100*t)
-		mlflow.log_metric("logposterior", float(log_scores[2][t]), step=100*t)
+		mlflow.log_metric("KL", float(log_scores[1][t]), step=100*t)
+		mlflow.log_metric("Exp. loglikelihood", float(log_scores[2][t]), step=100*t)
 		mlflow.log_metric("learning_rate", float(log_scores[3][t]), step=100*t)
 
 
@@ -98,14 +97,12 @@ parser.add_argument("--init_w", type=float, default=0.2,
 #                        help="std for bias initialization of output layers")
 parser.add_argument("--EntropyE", type=int, default=1,
                     help="k≥1 Nearest Neighbor Estimate, 0 is for KDE")
-parser.add_argument("--n_samples_MC", type=int, default=500,
+parser.add_argument("--n_samples_MC", type=int, default=200,
                     help="number of samples for Monte-Carlo sampling of predictive distance")
-parser.add_argument("--n_samples_KDE", type=int, default=1000,
-                    help="number of samples for KDE")
-parser.add_argument("--n_samples_ED", type=int, default=100,
-                    help="number of samples for estimation of differential entropy")
-parser.add_argument("--n_samples_LP", type=int, default=100,
-                    help="number of samples for MC estimation of expected logposterior")
+parser.add_argument("--n_samples_KL", type=int, default=1000,
+                    help="number of samples for NNE estimation of the KL")
+parser.add_argument("--n_samples_LL", type=int, default=100,
+                    help="number of samples for estimation of expected loglikelihood")
 parser.add_argument("--max_iter", type=int, default=10000,
                     help="maximum number of learning iterations")
 parser.add_argument("--learning_rate", type=float, default=0.08,
@@ -122,6 +119,8 @@ parser.add_argument("--verbose", type=bool, default=True,
                     help="force device to be used")
 parser.add_argument("--save_best", type=bool, default=False,
                     help="if True return best model during training, else return last model")
+parser.add_argument("--prior", type=float, default=1.0,
+                    help="scale for the mutlivariate Gaussian (implicit) prior on weights")
 
 if __name__ == "__main__":
 	# python -m Experiments.boston.GeNVI --max_iter=10 --verbose=True --device='cpu'
@@ -140,23 +139,28 @@ if __name__ == "__main__":
 	init_b = .001
 
 	start = timeit.default_timer()
-	GeN, the_epoch, the_scores, log_scores = GeNVI_learning(loglikelihood, logprior, projection, args.n_samples_MC,
+    
+	def prior(n):
+		return args.prior*torch.randn(size=(n,param_count), device=args.device)
+
+    
+	GeN, the_epoch, the_scores, log_scores = GeNVI_learning(loglikelihood, prior, projection, args.n_samples_MC,
                                                             args.ensemble_size, args.lat_dim, args.layerwidth, setup.param_count, 
                                                             activation, args.init_w, init_b, 
                                                             args.EntropyE,  
-                                                            args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP,
+                                                            args.n_samples_KL, args.n_samples_LL,
                                                             args.max_iter, args.learning_rate, args.min_lr, args.patience, 
                                                             args.lr_decay, args.device, args.verbose, args.save_best)
 	stop = timeit.default_timer()
 	execution_time = stop - start
 
-	xpname = setup.experiment_name + '/GeNVI-Pred'
+	xpname = setup.experiment_name + '/GeNVI-Pred-IP'
 	mlflow.set_experiment(xpname)
 
 	with mlflow.start_run():
-		log_GeNVI_experiment(setup, args.n_samples_MC, the_epoch, the_scores, log_scores,
+		log_GeNVI_experiment(setup, args.prior, args.n_samples_MC, the_epoch, the_scores, log_scores,
 		                     args.ensemble_size, args.lat_dim, args.layerwidth, setup.param_count, args.init_w,
-		                     args.EntropyE, args.n_samples_KDE, args.n_samples_ED, args.n_samples_LP,
+		                     args.EntropyE, args.n_samples_KL, args.n_samples_LL,
 		                     args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
 		                     args.device, args.save_best)
 

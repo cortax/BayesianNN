@@ -142,7 +142,7 @@ class AbstractRegressionSetup():
         self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
         
 
-    def _normalize_data(self):
+    def _normalize_data(self):        
         self._scaler_X, self._scaler_y = fitStandardScalerNormalization(self._X_train, self._y_train)
         self._X_train, self._y_train = normalize(self._X_train, self._y_train, self._scaler_X, self._scaler_y)
         self._X_validation, self._y_validation = normalize(self._X_validation, self._y_validation, self._scaler_X, self._scaler_y)
