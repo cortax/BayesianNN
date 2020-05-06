@@ -17,12 +17,12 @@ input_dim = 1
 nblayers = 1
 activation = nn.Tanh()
 layerwidth = 50
-sigma_noise = 0.1
+sigma_noise=0.1
 seed = 42
 
 class Setup(AbstractRegressionSetup):  
-    def __init__(self, device, layerwidth=layerwidth, nblayers=nblayers):
-        super(Setup).__init__()
+    def __init__(self, device, layerwidth=layerwidth, nblayers=nblayers, sigma_prior=1.0):
+        super(Setup, self).__init__()
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
         
@@ -106,6 +106,16 @@ class Setup(AbstractRegressionSetup):
         B = y_pred.shape[0]
         S = y_pred.shape[1]
         d = torch.tanh(R*(y_pred.view(B, S, 1) - self._y_train.view(1, S, 1)) ** 2)
+        return d.mean(1)
+    
+    def sqloss(self,theta):
+        y_pred = self._normalized_prediction(self._X_train, theta, self.device)  # MxNx1 tensor
+        assert y_pred.shape[1] == self._y_train.shape[0]
+        assert y_pred.shape[2] == self._y_train.shape[1]
+        assert self._y_train.shape[1] == 1
+        B = y_pred.shape[0]
+        S = y_pred.shape[1]
+        d = (y_pred.view(B, S, 1) - self._y_train.view(1, S, 1)) ** 2
         return d.mean(1)
 
     def logprior(self, theta):

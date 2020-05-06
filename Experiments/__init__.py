@@ -32,6 +32,11 @@ def get_setup(setup,device):
     spec.loader.exec_module(setup)
     return setup.Setup(device)
 
+def get_Setup(setup):
+    spec=switch_setup(setup)
+    setup = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(setup)
+    return setup
 
 def log_exp_metrics(evaluate_metrics, theta_ens, execution_time, device):
     mlflow.set_tag('execution_time ', '{0:.2f}'.format(execution_time)+'s')
@@ -75,14 +80,14 @@ def save_params_ens(theta):
 seed=37
 
 class AbstractRegressionSetup():
-    def __init__(self):
+    def __init__(self, sigma_prior=1.):
         self.experiment_name=''
         self.plot = False
         self.param_count=None
         self.device=None
         self.sigma_noise=None
         self.n_train_samples=None
-
+        self.sigma_prior=sigma_prior
 
     #@abstractmethod
 
@@ -105,7 +110,7 @@ class AbstractRegressionSetup():
         return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
 
     def _logprior(self, theta):
-        return logmvn01pdf(theta, self.device)
+        return logmvn01pdf(theta, self.device, v=self.sigma_prior)
 
     def _normalized_prediction(self, X, theta, device):
         """Predict raw inverse normalized values for M models on N data points of D-dimensions

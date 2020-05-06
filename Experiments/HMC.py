@@ -7,15 +7,13 @@ from tqdm import tqdm, trange
 from Inference.PointEstimate import AdamGradientDescent
 from Inference.HMC import hamiltonian_monte_carlo_da
 
-from Experiments.foong import Setup
-
 from numpy.linalg import norm
 
 import argparse
 import mlflow
 import timeit
 
-from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params_ens
+from Experiments import log_exp_metrics, draw_experiment, get_Setup, save_params_ens
 
 
 
@@ -59,6 +57,8 @@ if __name__ == "__main__":
                         help="number of optimization iterations to initialize the state")
     parser.add_argument("--device", type=str, default='cpu',
                         help="force device to be used")
+    parser.add_argument("--sigma_prior", type=float, default=1.00,
+                        help="std for mutlivariate Gaussian prior")
     args = parser.parse_args()
 
     numiter_init=args.optimize
@@ -69,8 +69,9 @@ if __name__ == "__main__":
     path_len=args.path_len
     initial_step_size=args.step_size
     
-    setup =get_setup(args.setup,args.device)
-
+    mysetup=get_Setup(args.setup)
+    
+    setup=mysetup.Setup(sigma_prior=args.sigma_prior,device=args.device)
     
     param_count=setup.param_count
     logposterior=setup.logposterior
