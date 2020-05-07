@@ -129,14 +129,23 @@ class Generator(nn.Module):
             layers = [nn.Linear(in_feat, out_feat)]
             if normalize:
                 layers.append(nn.BatchNorm1d(out_feat, 0.8))
-            layers.append(nn.LeakyReLU(0.2, inplace=True))
+            layers.append(nn.LeakyReLU(inplace=True))
             return layers
-
+        
         self.model = nn.Sequential(
             *block(lat_dim, 20, normalize=False),
-            *block(20, 20, normalize=True),
-            nn.Linear(20, output_dim)
+            *block(20, 80, normalize=False),
+            nn.Linear(80, output_dim)
         )
+        """
+        self.model = nn.Sequential(
+            *block(lat_dim, 128, normalize=False),
+            *block(128, 256),
+            *block(256, 512),
+            *block(512, 1024),
+            nn.Linear(1024, output_dim)
+        )
+        """
         
     def _save_best_model(self, score,epoch,ED,LP):
         if score < self._best_score:
@@ -158,6 +167,8 @@ class Generator(nn.Module):
         epsilon = torch.randn(size=(n,self.lat_dim), device=self.device)
         return self.model(epsilon)           
 
+    
+    
 """
 use:
 
