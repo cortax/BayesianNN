@@ -126,8 +126,9 @@ def KL(theta0,theta1,k=1,device='cpu', p=2):
         return dim0*Mnn + N1.log()-(N0-1).log()
 
 def JSD(x0,x1, k=1,device='cpu',p=2):
-    D0=KL(x0,x1,k,device,p)
-    D1=KL(x1,x1,k,device,p)
+    x=torch.cat([x0,x1],dim=0)
+    D0=KL(x0,x,k,device,p)
+    D1=KL(x1,x,k,device,p)
     return .5*D0+.5*D1
 
     

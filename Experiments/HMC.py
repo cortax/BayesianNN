@@ -26,7 +26,9 @@ def _MAP(nbiter, std_init,logposterior, dim, device='cpu'):
         return best_theta.detach().clone()
 
 
-def log_exp_params(numiter, burning, thinning, check_rate,initial_step_size):
+def log_exp_params(numiter, burning, thinning, check_rate,initial_step_size,sigma_prior):
+
+    mlflow.log_param('sigma_prior', sigma_prior)
 
     mlflow.log_param('numiter', numiter)
     mlflow.log_param('burning', burning)
@@ -106,7 +108,7 @@ if __name__ == "__main__":
 
     with mlflow.start_run():
 
-        log_exp_params(numiter, burning, thinning, check_rate,initial_step_size)
+        log_exp_params(numiter, burning, thinning, check_rate,initial_step_size,args.sigma_prior)
         
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
     
