@@ -325,7 +325,7 @@ def hamiltonian_monte_carlo_da(
                 step_sizes.append(step_size)
                 log_prob.append(initial_potential)
     
-            tr.set_postfix(pot=initial_potential, rate=current_acceptance_rate, step=step_size, norm=norm(q_new))
+            tr.set_postfix(pot=initial_potential, delta_acc=current_acceptance_rate, step=step_size, norm=norm(q_new))
             
             
             

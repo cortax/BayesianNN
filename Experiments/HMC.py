@@ -15,7 +15,13 @@ import timeit
 
 from Experiments import log_exp_metrics, draw_experiment, get_Setup, save_params_ens
 
+"""
+example command:
 
+python -m Experiments.HMC --setup=foong --numiter=2000 --burning=1000 --thinning=2 
+python -m Experiments.HMC --setup=boston --numiter=2000 --burning=1000 --thinning=2 
+
+"""
 
 def _MAP(nbiter, std_init,logposterior, dim, device='cpu'):
         optimizer = AdamGradientDescent(logposterior, nbiter, .01, .00000001, 50, .5, device, True)
@@ -55,7 +61,7 @@ if __name__ == "__main__":
                         help="initial step_size for integrator")
     parser.add_argument("--path_len", type=int, default=100,
                         help="number of leapfrog integration steps")
-    parser.add_argument("--optimize", type=int, default=1000,
+    parser.add_argument("--optimize", type=int, default=5000,
                         help="number of optimization iterations to initialize the state")
     parser.add_argument("--device", type=str, default='cpu',
                         help="force device to be used")
@@ -73,7 +79,8 @@ if __name__ == "__main__":
     
     mysetup=get_Setup(args.setup)
     
-    setup=mysetup.Setup(sigma_prior=args.sigma_prior,device=args.device)
+#    setup=mysetup.Setup(sigma_prior=args.sigma_prior,device=args.device)
+    setup=mysetup.Setup(device=args.device)
     
     param_count=setup.param_count
     logposterior=setup.logposterior

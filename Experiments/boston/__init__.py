@@ -20,6 +20,8 @@ seed = 42
 
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device):
+        super(Setup, self).__init__()
+
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
         

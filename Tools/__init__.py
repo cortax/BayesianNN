@@ -1,9 +1,6 @@
 import torch
 import math
 
-#TODO vérifier si ces fonctions ne doivent pas prendre device en argument
-# device ajouter pour logmvn01pdf
-
 
 def log_norm(x, mu, std):
     """

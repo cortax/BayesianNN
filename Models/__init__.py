@@ -131,19 +131,88 @@ class Generator(nn.Module):
             return layers
         
         self.model = nn.Sequential(
-            *block(lat_dim, 20),
-            *block(20, 80),
-            nn.Linear(80, output_dim)
+            *block(lat_dim, 2*lat_dim),
+            *block(2*lat_dim, 4*lat_dim),
+            nn.Linear(4*lat_dim, output_dim)
         )
-        """
+      
+        
+    def _save_best_model(self, score,epoch,ED,LP):
+        if score < self._best_score:
+            torch.save({
+                'epoch': epoch,
+                'state_dict': self.state_dict(),
+            }, 'best.pt')
+            self._best_score=score
+
+    def _get_best_model(self):
+        best= torch.load('best.pt')
+        self.load_state_dict(best['state_dict'])
+        return best['epoch'], best['ELBO']
+
+    def forward(self, n=1):
+        epsilon = torch.randn(size=(n,self.lat_dim), device=self.device)
+        return self.model(epsilon) 
+    
+class BigGenerator(nn.Module):
+    def __init__(self, lat_dim, output_dim, device):
+        super(BigGenerator, self).__init__()
+        
+        self.lat_dim = lat_dim
+        self.device=device
+        self.output_dim=output_dim
+        
+        self._best_score = float('inf')
+        
+        def block(in_feat, out_feat):
+            layers = [nn.Linear(in_feat, out_feat)]
+            layers.append(nn.ReLU(inplace=True))#nn.LeakyReLU(inplace=True))
+            return layers
+        
         self.model = nn.Sequential(
-            *block(lat_dim, 128, normalize=False),
-            *block(128, 256),
-            *block(256, 512),
-            *block(512, 1024),
-            nn.Linear(1024, output_dim)
+            *block(lat_dim, 4*lat_dim),
+            *block(4*lat_dim, 8*lat_dim),
+            nn.Linear(8*lat_dim, output_dim)
         )
-        """
+      
+        
+    def _save_best_model(self, score,epoch,ED,LP):
+        if score < self._best_score:
+            torch.save({
+                'epoch': epoch,
+                'state_dict': self.state_dict(),
+            }, 'best.pt')
+            self._best_score=score
+
+    def _get_best_model(self):
+        best= torch.load('best.pt')
+        self.load_state_dict(best['state_dict'])
+        return best['epoch'], best['ELBO']
+
+    def forward(self, n=1):
+        epsilon = torch.randn(size=(n,self.lat_dim), device=self.device)
+        return self.model(epsilon) 
+    
+class SLPGenerator(nn.Module):
+    def __init__(self, lat_dim, output_dim, device):
+        super(SLPGenerator, self).__init__()
+        
+        self.lat_dim = lat_dim
+        self.device=device
+        self.output_dim=output_dim
+        
+        self._best_score = float('inf')
+        
+        def block(in_feat, out_feat):
+            layers = [nn.Linear(in_feat, out_feat)]
+            layers.append(nn.ReLU(inplace=True))#nn.LeakyReLU(inplace=True))
+            return layers
+        
+        self.model = nn.Sequential(
+            *block(lat_dim, 50),
+            nn.Linear(50, output_dim)
+        )
+
         
     def _save_best_model(self, score,epoch,ED,LP):
         if score < self._best_score:
@@ -151,29 +220,17 @@ class Generator(nn.Module):
                 'epoch': epoch,
                 'state_dict': self.state_dict(),
                 'ELBO': score,
-                'ED':ED,
-                'LP':LP
             }, 'best.pt')
             self._best_score=score
 
     def _get_best_model(self):
         best= torch.load('best.pt')
         self.load_state_dict(best['state_dict'])
-        return best['epoch'], best['ELBO'], best['ED'], best['LP']
+        return best['epoch'], best['ELBO']
 
     def forward(self, n=1):
         epsilon = torch.randn(size=(n,self.lat_dim), device=self.device)
-        return self.model(epsilon)           
+        return self.model(epsilon)  
 
     
-    
-"""
-use:
 
-Hyper_Nets=HyNetEns(ensemble_size,lat_dim,HN_layerwidth, output_dim,activation,init_w,init_b).to(device)
-
-Hyper_Nets(100)
-
-Hyper_Nets.sample(100)
-
-"""
