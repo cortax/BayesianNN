@@ -85,7 +85,7 @@ parser.add_argument("--max_iter", type=int, default=10000,
                     help="maximum number of learning iterations")
 parser.add_argument("--learning_rate", type=float, default=0.01,
                     help="initial learning rate of the optimizer")
-parser.add_argument("--min_lr", type=float, default=0.00000001,
+parser.add_argument("--min_lr", type=float, default=1e-6,
                     help="minimum learning rate triggering the end of the optimization")
 parser.add_argument("--patience", type=int, default=300,
                     help="scheduler patience")

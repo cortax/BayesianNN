@@ -111,6 +111,7 @@ if __name__ == "__main__":
                                   path_len=path_len
                                     )
 
+    
     stop = timeit.default_timer()
     execution_time = stop - start
     

@@ -41,30 +41,30 @@ def get_Setup(setup):
 def log_exp_metrics(evaluate_metrics, theta_ens, execution_time, device):
     mlflow.set_tag('execution_time ', '{0:.2f}'.format(execution_time)+'s')
 
-    nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test = evaluate_metrics(theta_ens, device)
-    mlflow.log_metric("MnLPP_train", float(nLPP_train[0].cpu().numpy()))
-    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
-    mlflow.log_metric("MnLPP_test", float(nLPP_test[0].cpu().numpy()))
+    nLPP_test, RSE_test = evaluate_metrics(theta_ens, device)
+ #   mlflow.log_metric("MnLPP_train", float(nLPP_train[0].item()))
+#    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
+    mlflow.log_metric("LPP_test", float(nLPP_test[0].cpu().numpy()))
 
-    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
-    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
-    mlflow.log_metric("SnLPP_test", float(nLPP_test[1].cpu().numpy()))
+#    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
+#    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
+    mlflow.log_metric("LPP_test_std", float(nLPP_test[1].cpu().numpy()))
 
-    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
-    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
-    mlflow.log_metric("MSE_test", float(RSE_test[0].cpu().numpy()))
+#    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
+#    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
+    mlflow.log_metric("RMSE_test", float(RSE_test[0].cpu().numpy()))
 
-    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
-    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
-    mlflow.log_metric("SSE_test", float(RSE_test[1].cpu().numpy()))
+#    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
+#    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
+    mlflow.log_metric("RSSE_test_std", float(RSE_test[1].cpu().numpy()))
 
 def draw_experiment(makePlot, theta,device):
     fig = makePlot(theta,device)
     tempdir = tempfile.TemporaryDirectory()
-#    fig.savefig(tempdir.name + '/plot_train.png', dpi=3 * fig.dpi)
-    fig.savefig(tempdir.name + '/plot_train.svg', dpi=5 * fig.dpi)
-#    mlflow.log_artifact(tempdir.name + '/plot_train.png')
-    mlflow.log_artifact(tempdir.name + '/plot_train.svg')
+    fig.savefig(tempdir.name + '/plot_train.png', dpi=2*fig.dpi)
+#    fig.savefig(tempdir.name + '/plot_train.svg', dpi=5 * fig.dpi)
+    mlflow.log_artifact(tempdir.name + '/plot_train.png')
+#    mlflow.log_artifact(tempdir.name + '/plot_train.svg')
     plt.close(fig)
 
 def save_model(model):
@@ -100,14 +100,15 @@ class AbstractRegressionSetup():
 
     def evaluate_metrics(self, theta,device):
         theta = theta.to(device)
-        nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train.to(device),device)
-        nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation.to(device),device)
+     #   nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train.to(device),device)
+     #   nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation.to(device),device)
         nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test.to(device),device)
 
-        RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train.to(device),device)
-        RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation.to(device),device)
+     #   RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train.to(device),device)
+     #   RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation.to(device),device)
         RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test.to(device),device)
-        return nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
+        #nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
+        return nLPP_test, RSE_test
 
     def _logprior(self, theta):
         return logmvn01pdf(theta, self.device, v=self.sigma_prior)
