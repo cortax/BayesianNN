@@ -17,7 +17,7 @@ input_dim = 1
 nblayers = 1
 activation = nn.Tanh()
 layerwidth = 50
-sigma_noise=1.#0.1
+sigma_noise=0.1
 seed = 42
 
 class Setup(AbstractRegressionSetup):  

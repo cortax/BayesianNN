@@ -18,6 +18,13 @@ from Experiments import log_exp_metrics, draw_experiment, get_Setup, save_params
 """
 example command:
 
+python -m Experiments.HMC --setup=foong
+
+python -m Experiments.HMC --setup=foong_mixed
+
+python -m Experiments.HMC --setup=foong_sparse
+
+
 python -m Experiments.HMC --setup=foong --numiter=2000 --burning=1000 --thinning=2 
 python -m Experiments.HMC --setup=boston --numiter=2000 --burning=1000 --thinning=2 
 
@@ -94,9 +101,9 @@ if __name__ == "__main__":
     
     start = timeit.default_timer()
 
-    theta=_MAP(numiter_init,1., logposterior, param_count)
-
+    theta=_MAP(numiter_init, 1., logposterior, param_count)
     
+        
     samples, rates, step_sizes, log_prob = hamiltonian_monte_carlo_da(numiter, burning,thinning, potential, #
                                   initial_position=theta.squeeze().numpy(), 
                                   #check_rate=check_rate,
