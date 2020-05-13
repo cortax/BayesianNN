@@ -62,7 +62,7 @@ if __name__ == "__main__":
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burning", type=int, default=40000,
                         help="number of initial samples to skip in the Markov chain")
-    parser.add_argument("--thinning", type=int, default=20,
+    parser.add_argument("--thinning", type=int, default=5,
                         help="subsampling factor of the Markov chain")
     parser.add_argument("--step_size", type=float, default=0.002,
                         help="initial step_size for integrator")
@@ -76,6 +76,8 @@ if __name__ == "__main__":
                         help="std for mutlivariate Gaussian prior")
     args = parser.parse_args()
 
+    print(args)
+    
     numiter_init=args.optimize
     numiter=args.numiter
     burning=args.burning
