@@ -13,6 +13,9 @@ import argparse
 import mlflow
 import timeit
 
+import arviz as az
+
+
 from Experiments import log_exp_metrics, draw_experiment, get_Setup, save_params_ens
 
 """
@@ -39,7 +42,7 @@ def _MAP(nbiter, std_init,logposterior, dim, device='cpu'):
         return best_theta.detach().clone()
 
 
-def log_exp_params(numiter, burning, thinning, check_rate,initial_step_size,sigma_prior):
+def log_exp_params(numiter, burning, thinning, initial_step_size, sigma_prior):
 
     mlflow.log_param('sigma_prior', sigma_prior)
 
@@ -48,7 +51,6 @@ def log_exp_params(numiter, burning, thinning, check_rate,initial_step_size,sigm
     mlflow.log_param('thinning', thinning)
     mlflow.log_param('initial_step_size',initial_step_size)
     mlflow.log_param('path_len', path_len)
-    mlflow.log_param('check_rate', check_rate)
     
 
 if __name__ == "__main__":
@@ -62,8 +64,6 @@ if __name__ == "__main__":
                         help="number of initial samples to skip in the Markov chain")
     parser.add_argument("--thinning", type=int, default=20,
                         help="subsampling factor of the Markov chain")
-    parser.add_argument("--check_rate", type=int, default=500, 
-                        help="check acceptance rate every check_rate steps for monitoring step_size")
     parser.add_argument("--step_size", type=float, default=0.002,
                         help="initial step_size for integrator")
     parser.add_argument("--path_len", type=int, default=100,
@@ -80,7 +80,6 @@ if __name__ == "__main__":
     numiter=args.numiter
     burning=args.burning
     thinning=args.thinning
-    check_rate=args.check_rate
     path_len=args.path_len
     initial_step_size=args.step_size
     
@@ -104,9 +103,8 @@ if __name__ == "__main__":
     theta=_MAP(numiter_init, 1., logposterior, param_count)
     
         
-    samples, rates, step_sizes, log_prob = hamiltonian_monte_carlo_da(numiter, burning,thinning, potential, #
+    samples, scores = hamiltonian_monte_carlo_da(numiter, burning,thinning, potential, #
                                   initial_position=theta.squeeze().numpy(), 
-                                  #check_rate=check_rate,
                                   initial_step_size=initial_step_size,
                                   path_len=path_len
                                     )
@@ -115,24 +113,39 @@ if __name__ == "__main__":
     stop = timeit.default_timer()
     execution_time = stop - start
     
-    results=[samples, rates, step_sizes,log_prob]
     theta=torch.as_tensor(samples)
     
+    
+    ##diagnostic with arviz
+    
+    data=az.convert_to_inference_data(theta.unsqueeze(0).numpy())
+    
+    ess_b=az.ess(data, method='bulk')
+    ess_bulk=ess_b.to_dict()['data_vars']['x']['data']
+
+    ess_t=az.ess(data, method='tail')
+    ess_tail=ess_t.to_dict()['data_vars']['x']['data']
+    
+                                      
     xpname = setup.experiment_name + '/HMC'
     mlflow.set_experiment(xpname)
 
+    
     with mlflow.start_run():
 
-        log_exp_params(numiter, burning, thinning, check_rate,initial_step_size,args.sigma_prior)
+        log_exp_params(numiter, burning, thinning, initial_step_size,args.sigma_prior)
         
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
     
-        for t in range(len(rates)):
-            mlflow.log_metric("acceptance", float(rates[t]), step=check_rate*(t+1))
-            mlflow.log_metric("step_sizes", float(step_sizes[t]), step=check_rate*(t+1))
-            mlflow.log_metric("log_prob", float(log_prob[t]), step=check_rate*(t+1))
-
-          
+        for score in scores:
+            for t in range(len(scores[score])):
+                mlflow.log_metric(score, float(scores[score][t]), step=100*(t+1))
+        
+        for t in range(param_count):
+            mlflow.log_metric('ess_bulk', float(ess_bulk[t]), step=t)
+            mlflow.log_metric('ess_tail', float(ess_tail[t]), step=t)
+                                      
+            
         if setup.plot:
             draw_experiment(setup.makePlot, theta, 'cpu')
         #

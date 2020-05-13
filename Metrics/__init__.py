@@ -18,9 +18,9 @@ def RSE(prediction_fn,theta,X,y,device):
 
     y_pred =prediction_fn(X, theta,device).mean(0)
     SE=(y_pred-y)**2
-    MSE=torch.mean(SE)
-    StdSE=torch.std(SE)
-    return (MSE,StdSE)
+    RMSE=torch.mean(SE).sqrt()
+    RStdSE=torch.std(SE).sqrt()
+    return (RMSE,RStdSE)
 
 def nLPP(loglikelihood_fn, theta, X, y, device):
     """
@@ -40,6 +40,6 @@ def nLPP(loglikelihood_fn, theta, X, y, device):
     L = loglikelihood_fn(theta, X, y,device)
     M = torch.tensor(theta.shape[0]).type_as(theta)
     LPP = torch.logsumexp(L, 0) - torch.log(M)
-    MnLPP=torch.mean(-LPP)
-    SnLPP=torch.std(-LPP)
-    return (MnLPP, SnLPP)
+    MLPP=torch.mean(LPP)
+    SLPP=torch.std(LPP)
+    return (MLPP, SLPP)

@@ -141,7 +141,6 @@ def hamiltonian_monte_carlo(
         Array of length `n_samples`.
     """
     acceptance_count=0. # record number of accept for the last check_rate iterations
-    current_acceptance_rate=0.
     initial_position = np.array(initial_position)
     if initial_potential is None or initial_potential_grad is None:
         initial_potential, initial_potential_grad = potential(initial_position)
@@ -256,50 +255,57 @@ def hamiltonian_monte_carlo_da(
         Array of length `n_samples`.
     """
     initial_position = np.array(initial_position)
+    
+
     if initial_potential is None or initial_potential_grad is None:
         initial_potential, initial_potential_grad = potential(initial_position)
 
     q_last=initial_position
     # collect all our samples in a list
     samples = []
-    accept_rates= []
-    step_sizes=[]
-    log_prob=[]
+    
+    scores={'averaged_steps': [] ,
+                 'p_accept':[],
+                 'step_size':[],
+                 'log_prob':[]
+                }
     
     # Keep a single object for momentum resampling
     momentum = st.norm(0, 1)
 
     step_size = initial_step_size
     step_size_tuning = DualAveragingStepSize(step_size)
-    
+
     with trange(numiter) as tr:
         for t in tr:
             p0=momentum.rvs(size=initial_position.shape[:1])
+            
+
             # Integrate over our path to get a new position and momentum
             q_new, p_new, final_V, final_dVdq = integrator(
                 q_last,
                 p0,
                 initial_potential_grad,
                 potential,
-                path_len=2* np.random.rand()* path_len,  # We jitter the path length a bit
+                path_len= path_len,  #2* np.random.rand()* We jitter the path length a bit
                 step_size=step_size,
             )
-            #if np.isnan(q_new).sum():
-            #    print('q_new is NaN with step_size:'+str(step_size))
-           
-
-            start_log_p = np.sum(momentum.logpdf(p0)) - initial_potential
-            new_log_p = np.sum(momentum.logpdf(p_new)) - final_V
-            energy_change = new_log_p - start_log_p
-
+            
+            
             # Set accept prob to 0.0 if energy_change is `NaN` which may be
             # the case for a diverging trajectory when using a large step size.
-            if np.isnan(np.exp(energy_change)) or np.isnan(q_new).sum():
-                p_accept = 0.
-                
+            if np.isnan(q_new).sum():
+                p_accept = 0.           
             else:
-                p_accept = min(1, np.exp(energy_change))
-            
+                start_log_p = np.sum(momentum.logpdf(p0)) - initial_potential
+                new_log_p = np.sum(momentum.logpdf(p_new)) - final_V
+                energy_change = new_log_p - start_log_p
+                
+                if np.isnan(np.exp(energy_change)):  
+                    p_accept = 0.  
+                else:
+                    p_accept = min(1, np.exp(energy_change))
+                
             # Check Metropolis acceptance criterion
             if np.random.rand() < p_accept:
                 initial_potential = final_V
@@ -319,13 +325,14 @@ def hamiltonian_monte_carlo_da(
                 _, step_size = step_size_tuning.update(p_accept)     
                 
 
-            current_acceptance_rate=step_size_tuning.error_sum/(t+1)
+            averaged_step=np.exp(step_size_tuning.log_averaged_step)
             if t % 100 ==0:
-                accept_rates.append(current_acceptance_rate)
-                step_sizes.append(step_size)
-                log_prob.append(initial_potential)
+                scores['averaged_steps'].append(averaged_step)
+                scores['p_accept'].append(p_accept)
+                scores['step_size'].append(step_size)
+                scores['log_prob'].append(initial_potential)
     
-            tr.set_postfix(pot=initial_potential, delta_acc=current_acceptance_rate, step=step_size, norm=norm(q_new))
+            tr.set_postfix(pot=initial_potential, step_av=averaged_step, step=step_size, norm=norm(q_new))
             
             
             
@@ -333,7 +340,7 @@ def hamiltonian_monte_carlo_da(
                 print('Current state contains nan')
                 break
             q_last=q_new
-    return samples, accept_rates, step_sizes, log_prob
+    return samples, scores
 
 
 
