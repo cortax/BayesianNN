@@ -42,9 +42,8 @@ def _MAP(nbiter, std_init,logposterior, dim, device='cpu'):
         return best_theta.detach().clone()
 
 
-def log_exp_params(numiter, burning, thinning, initial_step_size, sigma_prior):
+def log_exp_params(numiter, burning, thinning, initial_step_size):
 
-    mlflow.log_param('sigma_prior', sigma_prior)
 
     mlflow.log_param('numiter', numiter)
     mlflow.log_param('burning', burning)
@@ -58,11 +57,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--setup", type=str, default=None,
                         help="data setup on which run the method")
-    parser.add_argument("--numiter", type=int, default=50000,
+    parser.add_argument("--numiter", type=int, default=100000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burning", type=int, default=40000,
                         help="number of initial samples to skip in the Markov chain")
-    parser.add_argument("--thinning", type=int, default=5,
+    parser.add_argument("--thinning", type=int, default=30,
                         help="subsampling factor of the Markov chain")
     parser.add_argument("--step_size", type=float, default=0.002,
                         help="initial step_size for integrator")
@@ -72,8 +71,7 @@ if __name__ == "__main__":
                         help="number of optimization iterations to initialize the state")
     parser.add_argument("--device", type=str, default='cpu',
                         help="force device to be used")
-    parser.add_argument("--sigma_prior", type=float, default=1.00,
-                        help="std for mutlivariate Gaussian prior")
+
     args = parser.parse_args()
 
     print(args)
@@ -128,6 +126,21 @@ if __name__ == "__main__":
     ess_t=az.ess(data, method='tail')
     ess_tail=ess_t.to_dict()['data_vars']['x']['data']
     
+    
+    trace=theta
+    draws=trace.shape[0]    
+    if draws % 2 ==1:
+        trace=trace[0:-1]
+
+    half_draws=int(trace.shape[0]/2)
+
+    trace_0=trace[0:half_draws]
+    trace_1=trace[half_draws:]
+    folded_trace=np.stack([trace_0,trace_1])
+    folded_data=az.convert_to_inference_data(folded_trace)
+    
+    folded_rhat_=az.rhat(folded_data)
+    folded_rhat=folded_rhat_.to_dict()['data_vars']['x']['data']
                                       
     xpname = setup.experiment_name + '/HMC'
     mlflow.set_experiment(xpname)
@@ -135,7 +148,7 @@ if __name__ == "__main__":
     
     with mlflow.start_run():
 
-        log_exp_params(numiter, burning, thinning, initial_step_size,args.sigma_prior)
+        log_exp_params(numiter, burning, thinning, initial_step_size)
         
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
     
@@ -146,6 +159,8 @@ if __name__ == "__main__":
         for t in range(param_count):
             mlflow.log_metric('ess_bulk', float(ess_bulk[t]), step=t)
             mlflow.log_metric('ess_tail', float(ess_tail[t]), step=t)
+            mlflow.log_metric('rhat 2-folded', float(folded_rhat[t]), step=t)
+
                                       
             
         if setup.plot:
