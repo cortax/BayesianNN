@@ -18,6 +18,7 @@ layerwidth = 50
 sigma_noise = 1.0
 seed = 42
 
+
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device):
         super(Setup, self).__init__()
@@ -39,7 +40,8 @@ class Setup(AbstractRegressionSetup):
     def _preparare_data(self):
         self._X, _y = load_boston(return_X_y=True)
         self._y = np.expand_dims(_y, axis=1)
-        
+    
+    
     def loglikelihood(self, theta):
         ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
         return ll
@@ -48,9 +50,8 @@ class Setup(AbstractRegressionSetup):
         return  self._logprior(theta)
     
     def projection(self,theta,k):
-        X=torch.Tensor(k,input_dim).normal_(0.,1.).to(self.device)
+        X=torch.cat([torch.Tensor(k,input_dim).normal_(0.,1.).to(self.device),self._X_train])
         theta_proj=self._normalized_prediction(X, theta, self.device).squeeze(2)
         return theta_proj
-
 
         

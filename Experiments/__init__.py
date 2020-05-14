@@ -80,7 +80,7 @@ def save_params_ens(theta):
 seed=37
 
 class AbstractRegressionSetup():
-    def __init__(self, sigma_prior=1.):
+    def __init__(self, sigma_prior=.5):
         self.experiment_name=''
         self.plot = False
         self.param_count=None
@@ -102,7 +102,11 @@ class AbstractRegressionSetup():
         theta = theta.to(device)
      #   nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train.to(device),device)
      #   nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation.to(device),device)
-        nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test.to(device),device)
+        std=torch.tensor(1.)
+        if hasattr(self, '_scaler_y'):
+            torch.tensor(self._scaler_y.scale_, device=device).float()
+        #TODO decide about normalization of LPP    
+        nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test.to(device), std, device)
 
      #   RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train.to(device),device)
      #   RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation.to(device),device)

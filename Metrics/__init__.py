@@ -22,7 +22,7 @@ def RSE(prediction_fn,theta,X,y,device):
     RStdSE=torch.std(SE).sqrt()
     return (RMSE,RStdSE)
 
-def nLPP(loglikelihood_fn, theta, X, y, device):
+def nLPP(loglikelihood_fn, theta, X, y, std_y_train, device):
     """
     NLPD from Quinonero-Candela and al.
     NLL from others
@@ -40,6 +40,6 @@ def nLPP(loglikelihood_fn, theta, X, y, device):
     L = loglikelihood_fn(theta, X, y,device)
     M = torch.tensor(theta.shape[0]).type_as(theta)
     LPP = torch.logsumexp(L, 0) - torch.log(M)
-    MLPP=torch.mean(LPP)
+    MLPP=torch.mean(LPP)-std_y_train.log()
     SLPP=torch.std(LPP)
     return (MLPP, SLPP)

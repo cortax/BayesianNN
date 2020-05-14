@@ -19,13 +19,14 @@ activation = nn.Tanh()
 layerwidth = 50
 sigma_noise=0.1
 seed = 42
+sigma_prior=.4
 
 class Setup(AbstractRegressionSetup):  
-    def __init__(self, device, layerwidth=layerwidth, nblayers=nblayers, sigma_prior=1.0):
+    def __init__(self, device, layerwidth=layerwidth, nblayers=nblayers):
         super(Setup, self).__init__()
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
-        
+        self.sigma_prior=sigma_prior
         self.plot = True
 
         self.device = device
@@ -77,7 +78,7 @@ class Setup(AbstractRegressionSetup):
 
     def makePlotCI(self, theta, device):
         N=theta.shape[0]
-        N_low=int(0.025*N)
+        N_low=int(0.022*N)
         N_high=N-N_low
         X=torch.arange(-2,2,0.02).to(device)
 
@@ -89,6 +90,8 @@ class Setup(AbstractRegressionSetup):
         fig, ax=plt.subplots()
         ax.fill_between(X.cpu(), y_low, y_high, facecolor='springgreen', alpha=0.1)
         plt.plot(X.cpu(),y_mean, color='springgreen')
+        plt.grid(True, which='major', linewidth=0.5)
+
         plt.xlim(-2,2)
         plt.ylim(-4, 4)
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
