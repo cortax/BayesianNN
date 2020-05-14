@@ -36,7 +36,7 @@ def leapfrog(q, p, dVdq, potential, path_len, step_size):
     q, p = np.copy(q), np.copy(p)
 
     p -= step_size * dVdq / 2  # half step
-    for _ in np.arange(path_len): #np.arange(np.round(path_len / step_size) - 1):
+    for _ in np.arange(np.round(path_len)): #np.arange(np.round(path_len / step_size) - 1):
         q += step_size * p  # whole step
         V, dVdq = potential(q)
         p -= step_size * dVdq  # whole step
@@ -287,7 +287,7 @@ def hamiltonian_monte_carlo_da(
                 p0,
                 initial_potential_grad,
                 potential,
-                path_len= path_len,  #2* np.random.rand()* We jitter the path length a bit
+                path_len= 2* np.random.rand()*path_len,  #2* np.random.rand()* We jitter the path length a bit
                 step_size=step_size,
             )
             

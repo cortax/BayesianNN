@@ -57,11 +57,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--setup", type=str, default=None,
                         help="data setup on which run the method")
-    parser.add_argument("--numiter", type=int, default=100000,
+    parser.add_argument("--numiter", type=int, default=60000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burning", type=int, default=40000,
                         help="number of initial samples to skip in the Markov chain")
-    parser.add_argument("--thinning", type=int, default=30,
+    parser.add_argument("--thinning", type=int, default=10,
                         help="subsampling factor of the Markov chain")
     parser.add_argument("--step_size", type=float, default=0.002,
                         help="initial step_size for integrator")
@@ -147,7 +147,9 @@ if __name__ == "__main__":
 
     
     with mlflow.start_run():
-
+        
+        mlflow.set_tag('sigma_prior', setup.sigma_prior) 
+        
         log_exp_params(numiter, burning, thinning, initial_step_size)
         
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')

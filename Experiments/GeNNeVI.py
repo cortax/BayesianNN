@@ -30,7 +30,7 @@ def GeNVI_run(objective_fn, lat_dim, param_count,
     with TemporaryDirectory() as temp_dir:
         model=GeNNeVI(objective_fn=logposterior,
                      kNNE=kNNE, n_samples_NNE=n_samples_NNE, n_samples_LP=n_samples_LP,
-                     max_iter=max_iter, learning_rate=0.01, min_lr=0.000001, patience=300, lr_decay=0.5,
+                     max_iter=max_iter, learning_rate=learning_rate, min_lr=min_lr, patience=patience, lr_decay=lr_decay,
                      device=device, temp_dir=temp_dir, save_best=True)
         the_epoch, the_elbo=model.run(GeN)
     
@@ -45,6 +45,7 @@ def log_GeNVI_experiment(setup, the_epoch, the_elbo, scores, time,
                          kNNE, n_samples_NNE, n_samples_LP,
                          max_iter, learning_rate, min_lr, patience, lr_decay, device):
 
+    mlflow.set_tag('sigma_prior', setup.sigma_prior)
     mlflow.set_tag('device', device)
     mlflow.set_tag('param_dim', setup.param_count)
     mlflow.set_tag('NNE', kNNE)
@@ -85,7 +86,7 @@ parser.add_argument("--max_iter", type=int, default=10000,
                     help="maximum number of learning iterations")
 parser.add_argument("--learning_rate", type=float, default=0.01,
                     help="initial learning rate of the optimizer")
-parser.add_argument("--min_lr", type=float, default=1e-6,
+parser.add_argument("--min_lr", type=float, default=1e-7,
                     help="minimum learning rate triggering the end of the optimization")
 parser.add_argument("--patience", type=int, default=300,
                     help="scheduler patience")
