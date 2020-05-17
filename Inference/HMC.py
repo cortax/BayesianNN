@@ -294,7 +294,7 @@ def hamiltonian_monte_carlo_da(
             
             # Set accept prob to 0.0 if energy_change is `NaN` which may be
             # the case for a diverging trajectory when using a large step size.
-            if np.isnan(q_new).sum():
+            if np.isnan(q_new).sum() or np.isnan(p_new).sum():
                 p_accept = 0.           
             else:
                 start_log_p = np.sum(momentum.logpdf(p0)) - initial_potential

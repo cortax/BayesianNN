@@ -12,7 +12,7 @@ input_dim = 11
 nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
-sigma_noise = 1.0
+sigma_noise = 1.0 #yarin gal 0.5
 seed = 37
 
 class Setup(AbstractRegressionSetup): 

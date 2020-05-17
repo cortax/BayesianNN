@@ -1,4 +1,4 @@
-from Metrics import RSE, nLPP
+from Metrics import RMSE, LPP
 
 import tempfile
 import mlflow
@@ -26,47 +26,47 @@ def switch_setup(setup):
         'yacht': importlib.util.spec_from_file_location("yacht", "Experiments/yacht/__init__.py")
     }[setup]
 
-def get_setup(setup,device):
-    spec=switch_setup(setup)
-    setup = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(setup)
-    return setup.Setup(device)
-
-def get_Setup(setup):
+def get_setup(setup):
     spec=switch_setup(setup)
     setup = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(setup)
     return setup
 
+
 def log_exp_metrics(evaluate_metrics, theta_ens, execution_time, device):
     mlflow.set_tag('execution_time ', '{0:.2f}'.format(execution_time)+'s')
 
-    nLPP_test, RSE_test = evaluate_metrics(theta_ens, device)
- #   mlflow.log_metric("MnLPP_train", float(nLPP_train[0].item()))
+    LPP_test, RMSE_test, RMSE_train = evaluate_metrics(theta_ens, device)
+#   mlflow.log_metric("MnLPP_train", float(nLPP_train[0].item()))
 #    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
-    mlflow.log_metric("LPP_test", float(nLPP_test[0].cpu().numpy()))
+    mlflow.log_metric("LPP_test", float(LPP_test[0].cpu().numpy()))
 
 #    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
 #    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
-    mlflow.log_metric("LPP_test_std", float(nLPP_test[1].cpu().numpy()))
+    mlflow.log_metric("LPP_test_std", float(LPP_test[1].cpu().numpy()))
 
 #    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
 #    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
-    mlflow.log_metric("RMSE_test", float(RSE_test[0].cpu().numpy()))
+    mlflow.log_metric("RMSE_test", float(RMSE_test[0].cpu().numpy()))
+    mlflow.log_metric("RMSE_train", float(RMSE_train[0].cpu().numpy()))
 
 #    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
 #    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
-    mlflow.log_metric("RSSE_test_std", float(RSE_test[1].cpu().numpy()))
+    mlflow.log_metric("RSSE_test_std", float(RMSE_test[1].cpu().numpy()))
+    return LPP_test, RMSE_test, RMSE_train
 
-def draw_experiment(makePlot, theta,device):
-    fig = makePlot(theta,device)
+def draw_experiment(setup, theta,device):
+    fig = setup.makePlot(theta,device)
     tempdir = tempfile.TemporaryDirectory()
     fig.savefig(tempdir.name + '/plot_train.png', dpi=2*fig.dpi)
-#    fig.savefig(tempdir.name + '/plot_train.svg', dpi=5 * fig.dpi)
     mlflow.log_artifact(tempdir.name + '/plot_train.png')
-#    mlflow.log_artifact(tempdir.name + '/plot_train.svg')
     plt.close(fig)
-
+    fig = setup.makePlotCI(theta,device)
+    fig.savefig(tempdir.name + '/plot_train_CI.png', dpi=2*fig.dpi)
+    mlflow.log_artifact(tempdir.name + '/plot_train_CI.png')
+    plt.close(fig)
+    
+    
 def save_model(model):
     tempdir = tempfile.TemporaryDirectory()
     torch.save({'state_dict': model.state_dict()}, tempdir.name + '/model.pt')
@@ -77,10 +77,10 @@ def save_params_ens(theta):
     torch.save(theta, tempdir.name + '/theta.pt')
     mlflow.log_artifact(tempdir.name + '/theta.pt')
 
-seed=37
+seed=1
 
 class AbstractRegressionSetup():
-    def __init__(self, sigma_prior=.5):
+    def __init__(self, seed=seed, sigma_prior=.5):
         self.experiment_name=''
         self.plot = False
         self.param_count=None
@@ -98,27 +98,32 @@ class AbstractRegressionSetup():
         if self.plot:
             raise NotImplementedError('subclasses with plot=True must override makePlot()')
 
-    def evaluate_metrics(self, theta,device):
+    def evaluate_metrics(self, theta, device):
         theta = theta.to(device)
      #   nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train.to(device),device)
      #   nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation.to(device),device)
-        std=torch.tensor(1.)
-        if hasattr(self, '_scaler_y'):
-            torch.tensor(self._scaler_y.scale_, device=device).float()
-        #TODO decide about normalization of LPP    
-        nLPP_test = nLPP(self._loglikelihood, theta, self._X_test, self._y_test.to(device), std, device)
+
+        y_pred=self._model(self._X_test.to(device), theta)
+        LPP_test = LPP(y_pred, self._y_test.to(device), self.sigma_noise, device)
 
      #   RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train.to(device),device)
      #   RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation.to(device),device)
-        RSE_test = RSE(self._normalized_prediction, theta, self._X_test, self._y_test.to(device),device)
-        #nLPP_train, nLPP_validation, nLPP_test, RSE_train, RSE_validation, RSE_test
-        return nLPP_test, RSE_test
+        std_y_train = torch.tensor(1.)
+        if hasattr(self, '_scaler_y'):
+            std_y_train=torch.tensor(self._scaler_y.scale_, device=device).float()
+        
+        y_pred_mean = y_pred.mean(dim=0)
+        RMSE_test = RMSE(self._X_test, self._y_test.to(device), y_pred_mean, std_y_train, device)
+        
+        y_pred_train_mean=self._model(self._X_train.to(device), theta).mean(dim=0)
+        RMSE_train = RMSE(self._X_train, self._y_train.to(device), y_pred_train_mean, std_y_train, device)
+        return LPP_test, RMSE_test, RMSE_train
 
     def _logprior(self, theta):
         return logmvn01pdf(theta, self.device, v=self.sigma_prior)
 
     def _normalized_prediction(self, X, theta, device):
-        """Predict raw inverse normalized values for M models on N data points of D-dimensions
+        """Predict raw INVERSE normalized values for M models on N data points of D-dimensions
 		Arguments:
 			X {[tensor]} -- Tensor of size NxD
 			theta {[type]} -- Tensor[M,:] of models
@@ -141,21 +146,23 @@ class AbstractRegressionSetup():
 		output:
 			LL (Tensor): M x N (models x data)
 		"""
-        y_pred = self._normalized_prediction(X, theta, device)  # MxNx1 tensor
+        y_pred = self._model(X.to(device), theta) # MxNx1 tensor
+        #y_pred = self._normalized_prediction(X, theta, device)  # MxNx1 tensor
         return NormalLogLikelihood(y_pred, y.to(device), self.sigma_noise)
 
     def logposterior(self, theta):
         return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
     
     def _split_holdout_data(self):
-        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.20, random_state=seed)
-        self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
+        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.10, random_state=seed) #.20
+        self._X_train, self._y_train = X_tv, y_tv
+        #self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
         
 
     def _normalize_data(self):        
         self._scaler_X, self._scaler_y = fitStandardScalerNormalization(self._X_train, self._y_train)
         self._X_train, self._y_train = normalize(self._X_train, self._y_train, self._scaler_X, self._scaler_y)
-        self._X_validation, self._y_validation = normalize(self._X_validation, self._y_validation, self._scaler_X, self._scaler_y)
+        #self._X_validation, self._y_validation = normalize(self._X_validation, self._y_validation, self._scaler_X, self._scaler_y)
         self._X_test, self._y_test = normalize(self._X_test, self._y_test, self._scaler_X, self._scaler_y)
 
     def _flip_data_to_torch(self):
@@ -163,17 +170,13 @@ class AbstractRegressionSetup():
         self._y = torch.tensor(self._y, device=self.device).float()
         self._X_train = torch.tensor(self._X_train, device=self.device).float()
         self._y_train = torch.tensor(self._y_train, device=self.device).float()
-        self._X_validation = torch.tensor(self._X_validation, device=self.device).float()
-        self._y_validation = torch.tensor(self._y_validation, device=self.device).float()
+        #self._X_validation = torch.tensor(self._X_validation, device=self.device).float()
+        #self._y_validation = torch.tensor(self._y_validation, device=self.device).float()
         self._X_test = torch.tensor(self._X_test, device=self.device).float()
         self._y_test = torch.tensor(self._y_test, device=self.device).float()
         self.n_train_samples=self._X_train.shape[0]
 
-    def logPredPrior(self, theta_pred):
-        v=torch.tensor(1., device=self.device)
-        if hasattr(self, '_scaler_y'):
-            v=torch.as_tensor(self._scaler_y.scale_).float().to(self.device)
-        return logmvn01pdf(theta_pred, self.device, v=v)
+
         
     
     # @abstractmethod

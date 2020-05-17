@@ -5,21 +5,19 @@ import math
 from tqdm import trange
 
 
-from Tools import KL, JSD
-
-
-
+from Tools import KL
 
 
 class FuNNeVI():
-    def __init__(self, loglikelihood, prior, projection, k_MC,
+    def __init__(self, loglikelihood, prior, projection, n_samples_FU, ratio_ood,
                  kNNE, n_samples_KL, n_samples_LL,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
-                 device, verbose, temp_dir, save_best=True):
+                 device,  temp_dir, save_best=True):
         self.loglikelihood=loglikelihood
         self.prior=prior
         self.projection=projection
-        self.k_MC=k_MC
+        self.n_samples_FU=n_samples_FU
+        self.ratio_ood=ratio_ood
         self.kNNE=kNNE
         self.n_samples_KL=n_samples_KL
         self.n_samples_LL=n_samples_LL
@@ -29,7 +27,6 @@ class FuNNeVI():
         self.patience = patience
         self.lr_decay = lr_decay
         self.device = device
-        self.verbose = verbose
 
         self.save_best=save_best
         self._best_score=float('inf')
@@ -66,14 +63,11 @@ class FuNNeVI():
             for t in tr:
                 optimizer.zero_grad()
 
-                theta_proj=self.projection(GeN(self.n_samples_KL),self.k_MC)
+                theta_proj=self.projection(GeN(self.n_samples_KL), self.n_samples_FU, self.ratio_ood)
 
-                theta_prior_proj=self.projection(self.prior(self.n_samples_KL),self.k_MC)
+                theta_prior_proj=self.projection(self.prior(self.n_samples_KL), self.n_samples_FU, self.ratio_ood)
 
                 K=KL(theta_proj, theta_prior_proj,k=self.kNNE,device=self.device)
-                #K1=KL( theta_prior_proj,theta_proj,k=self.kNNE,device=self.device)
-                #K=.5*(K0+K1)
-                
 
                 LL = self.loglikelihood(GeN(self.n_samples_LL)).mean()
                 L = K - LL

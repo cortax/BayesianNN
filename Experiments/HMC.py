@@ -16,7 +16,7 @@ import timeit
 import arviz as az
 
 
-from Experiments import log_exp_metrics, draw_experiment, get_Setup, save_params_ens
+from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params_ens
 
 """
 example command:
@@ -57,11 +57,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--setup", type=str, default=None,
                         help="data setup on which run the method")
-    parser.add_argument("--numiter", type=int, default=60000,
+    parser.add_argument("--numiter", type=int, default=80000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burning", type=int, default=40000,
                         help="number of initial samples to skip in the Markov chain")
-    parser.add_argument("--thinning", type=int, default=10,
+    parser.add_argument("--thinning", type=int, default=20,
                         help="subsampling factor of the Markov chain")
     parser.add_argument("--step_size", type=float, default=0.002,
                         help="initial step_size for integrator")
@@ -83,10 +83,9 @@ if __name__ == "__main__":
     path_len=args.path_len
     initial_step_size=args.step_size
     
-    mysetup=get_Setup(args.setup)
+    setup_ = get_setup(args.setup)
+    setup=setup_.Setup(args.device) 
     
-#    setup=mysetup.Setup(sigma_prior=args.sigma_prior,device=args.device)
-    setup=mysetup.Setup(device=args.device)
     
     param_count=setup.param_count
     logposterior=setup.logposterior
@@ -145,14 +144,15 @@ if __name__ == "__main__":
     xpname = setup.experiment_name + '/HMC'
     mlflow.set_experiment(xpname)
 
-    
+    #mlflow logging
     with mlflow.start_run():
         
         mlflow.set_tag('sigma_prior', setup.sigma_prior) 
+        mlflow.set_tag('sigma_noise', setup.sigma_noise) 
         
         log_exp_params(numiter, burning, thinning, initial_step_size)
         
-        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')
+        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')        
     
         for score in scores:
             for t in range(len(scores[score])):
@@ -166,7 +166,7 @@ if __name__ == "__main__":
                                       
             
         if setup.plot:
-            draw_experiment(setup.makePlot, theta, 'cpu')
+            draw_experiment(setup, theta, 'cpu')
         #
         save_params_ens(theta)
     

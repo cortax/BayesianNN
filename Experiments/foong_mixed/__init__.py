@@ -18,6 +18,7 @@ nblayers = 1
 activation = nn.Tanh()
 layerwidth = 50
 sigma_noise = 0.1
+sigma_prior=0.5
 seed = 42
 
 class Setup(AbstractRegressionSetup):  
@@ -25,6 +26,7 @@ class Setup(AbstractRegressionSetup):
         super(Setup).__init__()
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
+        self.sigma_prior = sigma_prior
         
         self.plot = True
 
@@ -108,12 +110,32 @@ class Setup(AbstractRegressionSetup):
 
     def logprior(self, theta):
         return  self._logprior(theta)
-    
+   
+    def projection(self,theta,n_samples,ratio_ood):
+        #compute size of both samples
+        n_id=int((1.-ratio_ood)*n_samples)
+        n_ood=int(ratio_ood*n_samples)
+
+        #batch sample from train
+        index=torch.randperm(self._X_train.shape[0])
+        X_id=self._X_train[index][0:n_id]
+
+
+        X_ood=torch.Tensor(n_ood,input_dim)
+        for i in range(input_dim):
+            X_ood[:,i].uniform_(-2,2)
+        # here is using a normal instead   
+        #ood_samples=torch.Tensor(n_ood,input_dim).normal_(0.,3.).to(self.device)
+        X=torch.cat([X_id, X_ood.to(self.device)])
+        theta_proj=self._model(X, theta).squeeze(2)
+        return theta_proj
+    """
     def projection(self,theta,k):
         X=torch.Tensor(k,input_dim).uniform_(-2.,2.).to(self.device)
         theta_proj=self._normalized_prediction(X, theta, self.device).squeeze(2)
         #theta_proj=self._normalized_prediction(self._X_train, theta, self.device).squeeze(2)
         return theta_proj
+    """
     
     def prediction(self,X,theta):
         y_pred=self._normalized_prediction(X, theta, self.device).squeeze(2)

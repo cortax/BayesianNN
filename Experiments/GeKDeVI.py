@@ -5,7 +5,7 @@ import timeit
 
 from tempfile import TemporaryDirectory
 
-from Inference.GeNNeVI import GeNNeVI
+from Inference.GeKDeVI import GeKDeVI
 
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 
@@ -18,7 +18,7 @@ import tempfile
 # python -m Experiments.GeNNeVI --setup=foong --max_iter=20000 --learning_rate=0.05 --lat_dim= --layerwidth=
 
 def GeNVI_run(objective_fn, lat_dim, param_count,
-                   kNNE, n_samples_NNE, n_samples_LP,
+                   n_samples_KDE, n_samples_LP,
                    max_iter, learning_rate, min_lr, patience, lr_decay,
                    device=None):
     
@@ -28,8 +28,8 @@ def GeNVI_run(objective_fn, lat_dim, param_count,
     
     
     with TemporaryDirectory() as temp_dir:
-        model=GeNNeVI(objective_fn=logposterior,
-                     kNNE=kNNE, n_samples_NNE=n_samples_NNE, n_samples_LP=n_samples_LP,
+        model=GeKDeVI(objective_fn=logposterior,
+                     n_samples_KDE=n_samples_KDE, n_samples_LP=n_samples_LP,
                      max_iter=max_iter, learning_rate=learning_rate, min_lr=min_lr, patience=patience, lr_decay=lr_decay,
                      device=device, temp_dir=temp_dir, save_best=True)
         the_epoch, the_elbo=model.run(GeN)
@@ -42,17 +42,16 @@ def GeNVI_run(objective_fn, lat_dim, param_count,
 
 def log_GeNVI_experiment(setup, the_epoch, the_elbo, scores, time,
                          lat_dim, param_count,
-                         kNNE, n_samples_NNE, n_samples_LP,
+                         n_samples_KDE, n_samples_LP,
                          max_iter, learning_rate, min_lr, patience, lr_decay, device):
 
     mlflow.set_tag('sigma_prior', setup.sigma_prior)
     mlflow.set_tag('device', device)
     mlflow.set_tag('param_dim', setup.param_count)
-    mlflow.set_tag('NNE', kNNE)
     mlflow.set_tag('lat_dim', lat_dim)
 
 
-    mlflow.log_param('n_samples_NNE', n_samples_NNE)
+    mlflow.log_param('n_samples_KDE', n_samples_KDE)
     mlflow.log_param('n_samples_LP', n_samples_LP)
 
     mlflow.log_param('learning_rate', learning_rate)
@@ -78,7 +77,7 @@ parser.add_argument("--lat_dim", type=int, default=5,
                     help="number of latent dimensions of each hypernet")
 parser.add_argument("--kNNE", type=int, default=1,
                     help="k≥1 for k-Nearest Neighbor Estimate")
-parser.add_argument("--n_samples_NNE", type=int, default=1000,
+parser.add_argument("--n_samples_KDE", type=int, default=1000,
                     help="number of samples for NNE estimator")
 parser.add_argument("--n_samples_LP", type=int, default=100,
                     help="number of samples for MC estimation of expected logposterior")
@@ -102,37 +101,36 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    setup_ = get_setup(args.setup)
-    setup=setup_.Setup(args.device) 
-    
+    setup = get_setup(args.setup, args.device)
+
     logposterior=setup.logposterior
     param_count=setup.param_count
 
     
     GeN, the_epoch, the_elbo, scores, time=GeNVI_run(logposterior, 
                                                    lat_dim=args.lat_dim, param_count=setup.param_count,
-                                                   kNNE=args.kNNE, n_samples_NNE=args.n_samples_NNE,
+                                                   n_samples_KDE=args.n_samples_KDE,
                                                    n_samples_LP=args.n_samples_LP,
                                                    max_iter=args.max_iter, learning_rate=args.learning_rate, min_lr=args.min_lr,
                                                    patience=args.patience, lr_decay=args.lr_decay, device=args.device)
     
     #ML flow logging:#
     
-    xpname = setup.experiment_name + '/GeNNeVI'
+    xpname = setup.experiment_name + '/GeKDeVI'
     mlflow.set_experiment(xpname)
 
     with mlflow.start_run():
         log_GeNVI_experiment(setup, the_epoch, the_elbo, scores, time,
                              args.lat_dim, setup.param_count,
-                             args.kNNE, args.n_samples_NNE, args.n_samples_LP,
+                             args.n_samples_KDE, args.n_samples_LP,
                              args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
                              args.device)
 
         log_device = 'cpu'
-        theta = GeN(10000).detach().to(log_device)
+        theta = GeN(1000).detach().to(log_device)
         log_exp_metrics(setup.evaluate_metrics, theta, time, log_device)
 
         save_model(GeN)
 
         if setup.plot:
-            draw_experiment(setup, theta, log_device)
+            draw_experiment(setup.makePlot, theta, log_device)

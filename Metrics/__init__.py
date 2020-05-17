@@ -1,45 +1,44 @@
 import torch
+from Tools import NormalLogLikelihood
 
 
-def RSE(prediction_fn,theta,X,y,device):
+def RMSE(X,y,y_pred,std_y_train,device):
     """
     Root Mean Squared Error and Root Std Squared Error
     Args:
-        prediction_fn: takes (X,theta) and returns y_pred, size N x 1
-        theta: Tensor, size M x P
+       
         X: Tensor, N x dim
         y: Tensor, N x 1
+        y_pred: Tensor, N x 1
 
     Returns:
         (Mean.sqrt(), Std.sqrt()) for Mean and Std on data (X,y) of the Squared Error
-        of the predictor given by x -> y_pred.mean()
+        of the predictor given y_pred
 
     """
-
-    y_pred =prediction_fn(X, theta,device).mean(0)
     SE=(y_pred-y)**2
-    RMSE=torch.mean(SE).sqrt()
-    RStdSE=torch.std(SE).sqrt()
+    RMSE=torch.mean(SE).sqrt()*std_y_train
+    RStdSE=torch.std(SE).sqrt()*std_y_train
     return (RMSE,RStdSE)
 
-def nLPP(loglikelihood_fn, theta, X, y, std_y_train, device):
+def LPP(y_pred, y_test, sigma, device):
     """
     NLPD from Quinonero-Candela and al.
     NLL from others
     nLPP for negative Log Posterior PREDICTIVE
 
     Args:
-        loglikelihood_fn: takes (theta, X, y) to Tensor of size M x N
-        theta: M x DIM
-        X: N x d
-        y: N x 1
+        y_pred: M x N x 1
+        y_test: N x 1
+        sigma: float
+        
 
     Returns:
         (Mean, Std) for Log Posterior Predictive of ensemble Theta on data (X,y)
     """
-    L = loglikelihood_fn(theta, X, y,device)
-    M = torch.tensor(theta.shape[0]).type_as(theta)
-    LPP = torch.logsumexp(L, 0) - torch.log(M)
-    MLPP=torch.mean(LPP)-std_y_train.log()
+    NLL=NormalLogLikelihood(y_pred,y_test,sigma)
+    M = torch.tensor(y_pred.shape[0],device=device).float()
+    LPP = NLL.logsumexp(dim=0) - torch.log(M)
+    MLPP=torch.mean(LPP)
     SLPP=torch.std(LPP)
     return (MLPP, SLPP)

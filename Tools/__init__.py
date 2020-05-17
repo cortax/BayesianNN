@@ -160,12 +160,12 @@ def KDE(x, x_kde,device):
     N=torch.as_tensor(float(n_comp*n_kde), device=device)
     return (ln.logsumexp(0).logsumexp(0)-torch.log(N)).unsqueeze(-1)
 
-def EntropyKDE(x,device):
+def EntropyKDE(x,y,device):
     """
     x (Tensor): Inputs, NbSamples X NbDimensions
     Returns:
      float: Entropy estimate based on KDE density estimation.
     """
-    K=KDE(x,x.unsqueeze(0),device)
+    K=KDE(x,y.unsqueeze(0),device)
     return -K.mean()
      
