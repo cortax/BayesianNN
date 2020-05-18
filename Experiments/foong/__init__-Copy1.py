@@ -124,7 +124,7 @@ class Setup(AbstractRegressionSetup):
     def logprior(self, theta):
         return  self._logprior(theta)
     
-    def projection(self,theta0,theta1, n_samples,ratio_ood):
+    def projection(self,theta,n_samples,ratio_ood):
         #compute size of both samples
         #n_samples=self.n_train_samples
         n_id=int((1.-ratio_ood)*n_samples)
@@ -133,18 +133,16 @@ class Setup(AbstractRegressionSetup):
         #batch sample from train
         index=torch.randperm(self._X_train.shape[0])
         X_id=self._X_train[index][0:n_id]
-                
+        
+        
         X_ood=torch.Tensor(n_ood,input_dim)
         for i in range(input_dim):
             X_ood[:,i].uniform_(-2,2)
         # here is using a normal instead   
         #ood_samples=torch.Tensor(n_ood,input_dim).normal_(0.,3.).to(self.device)
         X=torch.cat([X_id, X_ood.to(self.device)])
-        
-        #compute projection on both paramters with model
-        theta0_proj=self._model(X, theta0).squeeze(2)
-        theta1_proj=self._model(X, theta1).squeeze(2)
-        return theta0_proj, theta1_proj
+        theta_proj=self._model(X, theta).squeeze(2)
+        return theta_proj
     
     
     def prediction(self,X,theta):

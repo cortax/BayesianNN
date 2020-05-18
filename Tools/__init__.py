@@ -122,6 +122,49 @@ def KL(theta0,theta1,k=1,device='cpu', p=2):
         Mnn=(torch.log(a1)-torch.log(a0)).mean()
         return dim0*Mnn + N1.log()-(N0-1).log()
 
+def batchKL(theta0,theta1,k=1,device='cpu', p=2):
+        """
+        Parameters:
+            theta0 (Tensor): Samples, B x P X NbDimensions   
+            theta1 (Tensor): Samples, B x R X NbDimensions   
+            k (Int): positive ordinal number 
+
+        Returns:
+            (Float) k-Nearest Neighbour Estimation of the KL from theta0 to theta1  
+
+        Kullback-Leibler Divergence Estimation of Continuous Distributions Fernando Pérez-Cruz
+        """
+        
+        b0=theta0.shape[0]
+        b1=theta1.shape[0]
+        assert b0 == b1
+        n0=theta0.shape[1]
+        n1=theta1.shape[1]
+        dim0=theta0.shape[2]
+        dim1=theta1.shape[2]
+        assert dim0 == dim1
+        
+        #TODO check for new batch version of of cdist in Pytorch (issue with backward on cuda)
+         
+        D0=torch.stack([torch.cdist(theta0[i],theta0[i], p=p) for i in range(theta0.shape[0])])
+        D1=torch.stack([torch.cdist(theta0[i],theta1[i], p=p)  for i in range(theta0.shape[0])])
+        
+        #D0=torch.cdist(theta0,theta0, p=p)
+        #D1=torch.cdist(theta0,theta1, p=p)
+        
+        a0 = torch.topk(D0, k=k+1, dim=2, largest=False, sorted=True)[0][:,:,k]#.clamp(torch.finfo().eps,float('inf')).to(device)
+        a1 = torch.topk(D1, k=k, dim=2, largest=False, sorted=True)[0][:,:,k-1]#.clamp(torch.finfo().eps,float('inf')).to(device)
+        
+        assert a0.shape == a1.shape
+        
+        d=torch.as_tensor(float(dim0),device=device)
+        N0=torch.as_tensor(float(n0),device=device)
+        N1=torch.as_tensor(float(n1),device=device)
+        
+        Mnn=(torch.log(a1)-torch.log(a0)).mean(dim=1)       
+        KL=dim0*Mnn + N1.log()-(N0-1).log()
+        return KL.mean()
+    
 def JSD(x0,x1, k=1,device='cpu',p=2):
     x=torch.cat([x0,x1],dim=0)
     D0=KL(x0,x,k,device,p)

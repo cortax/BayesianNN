@@ -21,6 +21,10 @@ patience 100, 300
 
 learning rate 0.01, 0.005
 """
+g_lr=[0.005, 0.002, 0.001]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
+g_pat=[100, 250, 500]#[300, 500]#[100, 300, 600]
+lr_decay=0.5
+
 ## command line example
 # python -m Experiments.GeNVI-pred --setup=boston --max_iter=10000 --learning_rate=0.05
 
@@ -43,15 +47,20 @@ def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
         the_epoch, the_scores = optimizer.run(GeN)
 
     log_scores = [optimizer.score_elbo, optimizer.score_KL, optimizer.score_LL, optimizer.score_lr]
-    return GeN, the_epoch, the_scores, log_scores
+    ELBO=optimizer.ELBO(GeN)
+    return GeN, the_epoch, the_scores, log_scores, ELBO.item()
 
 
-def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, the_epoch, the_scores, log_scores, p,
+
+def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p,
                          lat_dim, 
                          kNNE, n_samples_KL, n_samples_LL, 
                          max_iter, learning_rate, min_lr, patience, lr_decay,
                          device, save_best):
 
+    
+    mlflow.set_tag('lr grid', str(g_lr))
+    mlflow.set_tag('patience grid', str(g_pat))
     
     mlflow.set_tag('sigma_noise', setup.sigma_noise)    
 
@@ -64,12 +73,14 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, the_epoch, the_scores,
     mlflow.set_tag('save_best', save_best)
 
     mlflow.log_param('lat_dim', lat_dim)
-
+    
     mlflow.log_param('L_p norm', p)
+
     mlflow.log_param('n_samples_FU', n_samples_FU)
     mlflow.log_param('ratio_ood', ratio_ood)
     mlflow.log_param('n_samples_KL', n_samples_KL)
     mlflow.log_param('n_samples_LL', n_samples_LL)
+    
 
     mlflow.log_param('learning_rate', learning_rate)
     mlflow.log_param('patience', patience)
@@ -77,11 +88,10 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, the_epoch, the_scores,
     mlflow.log_param('max_iter', max_iter)
     mlflow.log_param('min_lr', min_lr)
 
-    mlflow.log_metric('The epoch', the_epoch)
+def log_GeNVI_run(ELBO, logs_scores):    
 
-    mlflow.log_metric("The elbo", float(the_scores[0]))
-    mlflow.log_metric("The KL", float(the_scores[1]))
-    mlflow.log_metric("The LL", float(the_scores[2]))
+    mlflow.log_metric("The elbo", float(ELBO))
+
 
     for t in range(len(log_scores[0])):
         mlflow.log_metric("elbo", float(log_scores[0][t]), step=100*t)
@@ -99,9 +109,9 @@ parser.add_argument("--lat_dim", type=int, default=5,
                     help="number of latent dimensions of each hypernet")
 parser.add_argument("--NNE", type=int, default=10,
                     help="k≥1 Nearest Neighbor Estimate")
-parser.add_argument("--ratio_ood", type=float, default=.1,
+parser.add_argument("--ratio_ood", type=float, default=1.,
                     help="ratio in [0,1] of ood inputs w.r.t data inputs for MC sampling of predictive distance")
-parser.add_argument("--n_samples_FU", type=int, default=25,
+parser.add_argument("--n_samples_FU", type=int, default=10,
                     help="number of samples for functions estimation")
 parser.add_argument("--p_norm", type=int, default=2,
                     help="L_p norm to use for functions")
@@ -109,16 +119,10 @@ parser.add_argument("--n_samples_KL", type=int, default=1000,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
-parser.add_argument("--max_iter", type=int, default=10000,
+parser.add_argument("--max_iter", type=int, default=15000,
                     help="maximum number of learning iterations")
-parser.add_argument("--learning_rate", type=float, default=0.002,
-                    help="initial learning rate of the optimizer")
-parser.add_argument("--min_lr", type=float, default=1e-6,
+parser.add_argument("--min_lr", type=float, default=1e-7,
                     help="minimum learning rate triggering the end of the optimization")
-parser.add_argument("--patience", type=int, default=300,
-                    help="scheduler patience")
-parser.add_argument("--lr_decay", type=float, default=.5,
-                    help="scheduler multiplicative factor decreasing learning rate when patience reached")
 parser.add_argument("--device", type=str, default=None,
                     help="force device to be used")
 parser.add_argument('--save_best', dest='save_best', action='store_true',help="to return model with best ELBO during training, else return last model")
@@ -129,6 +133,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
+    
     setup_ = get_setup(args.setup)
     setup=setup_.Setup(args.device) 
     
@@ -139,38 +144,64 @@ if __name__ == "__main__":
 
     #compute size of ood sample
     
-    start = timeit.default_timer()
+    
 
     def prior(n):
         return setup.sigma_prior*torch.randn(size=(n,param_count), device=args.device)
 
 
-    GeN, the_epoch, the_scores, log_scores = learning(loglikelihood, prior, 
-                                                      projection, args.n_samples_FU, args.ratio_ood, args.p_norm,
-                                                      args.lat_dim, setup.param_count,
-                                                      args.NNE, args.n_samples_KL, args.n_samples_LL,
-                                                      args.max_iter, args.learning_rate, args.min_lr, args.patience,
-                                                      args.lr_decay, args.device, args.save_best)
-
+    ##grid search for convergence parameters
     
-    stop = timeit.default_timer()
-    execution_time = stop - start
-
-    xpname = setup.experiment_name + '/FuNNeVI'
+    best_elbo=torch.tensor(float('inf'))
+    best_lr=None
+    best_patience=None
+    for lr in g_lr:
+        for patience in g_pat:
+            _, _, _, _, ELBO = learning(loglikelihood, prior, projection, 
+                                        args.n_samples_FU, args.ratio_ood, args.p_norm,
+                                        args.lat_dim, setup.param_count,
+                                        args.NNE, args.n_samples_KL, args.n_samples_LL,
+                                        args.max_iter, lr, args.min_lr, patience,
+                                        lr_decay, args.device, args.save_best)
+            print('ELBO: '+str(ELBO))
+            if ELBO < best_elbo:
+                best_elbo=ELBO
+                best_lr=lr
+                best_patience=patience
+    
+    
+    xpname = setup.experiment_name + '/FuNNeVI-gs'
     mlflow.set_experiment(xpname)
-
+    
     with mlflow.start_run():
-        log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, the_epoch, the_scores, log_scores, args.p_norm,
+        log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, args.p_norm,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
-                             args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
+                             args.max_iter, best_lr, best_lr, best_patience, lr_decay,
                              args.device, args.save_best)
+        
+        for i in range(10):
+            with mlflow.start_run(run_name=str(i),nested=True):
+                start = timeit.default_timer()
+    
+                GeN, the_epoch, the_scores, log_scores, ELBO = learning(loglikelihood, prior, projection, 
+                                                                        args.n_samples_FU, args.ratio_ood, args.p_norm,
+                                                                        args.lat_dim, setup.param_count,
+                                                                        args.NNE, args.n_samples_KL, args.n_samples_LL,
+                                                                        args.max_iter, best_lr, args.min_lr, best_patience,
+                                                                        lr_decay, args.device, args.save_best)
 
-        log_device = 'cpu'
-        theta = GeN(10000).detach().to(log_device)
-        log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
 
-        save_model(GeN)
+                stop = timeit.default_timer()
+                execution_time = stop - start
 
-        if setup.plot:
-            draw_experiment(setup, theta[0:1000], log_device)
+                log_GeNVI_run(ELBO, log_scores)
+
+                log_device = 'cpu'
+                theta = GeN(10000).detach().to(log_device)
+                log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
+
+                save_model(GeN)
+
+                if setup.plot:
+                    draw_experiment(setup, theta[0:1000], log_device)

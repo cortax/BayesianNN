@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 import math
+from tqdm import tqdm, trange
+
 
 
 class MeanFieldVariationalDistribution(nn.Module):
@@ -80,7 +82,7 @@ class MeanFieldVariationalDistribution(nn.Module):
 
 
 class MeanFieldVariationInference():
-    def __init__(self, objective_fn, max_iter, n_ELBO_samples, learning_rate, min_lr, patience, lr_decay, device, verbose,temp_dir):
+    def __init__(self, objective_fn, max_iter, n_ELBO_samples, learning_rate, min_lr, patience, lr_decay, device, temp_dir):
         self.objective_fn = objective_fn
         self.max_iter = max_iter
         self.n_ELBO_samples = n_ELBO_samples
@@ -89,7 +91,6 @@ class MeanFieldVariationInference():
         self.patience = patience
         self.lr_decay = lr_decay
         self.device = device
-        self.verbose = verbose
 
         self.tempdir_name = temp_dir
 
@@ -125,36 +126,35 @@ class MeanFieldVariationInference():
         self.score_logposterior = []
         self.score_lr = []
 
-        for t in range(self.max_iter):
-            optimizer.zero_grad()
+        with trange(self.max_iter) as tr:
+            for t in tr:
+                optimizer.zero_grad()
 
-            theta = q.sample(self.n_ELBO_samples)
-            LQ = q.log_prob(theta).squeeze().mean()
-            LP = self.objective_fn(theta).mean()
-            loss = LQ - LP
+                theta = q.sample(self.n_ELBO_samples)
+                LQ = q.log_prob(theta).squeeze().mean()
+                LP = self.objective_fn(theta).mean()
+                loss = LQ - LP
 
-            loss.backward()
+                loss.backward()
 
-            lr = optimizer.param_groups[0]['lr']
+                lr = optimizer.param_groups[0]['lr']
 
-            if self.verbose:
-                stats = 'Epoch [{}/{}], Loss: {}, Entropy {}, Learning Rate: {}'.format(t+1, self.max_iter, loss, -LQ, lr)
-                print(stats)
+                tr.set_postfix(ELBO=loss.item(), ED=-LQ.item(), lr=lr)
 
-            #score.append(loss.detach().clone().cpu().numpy())
-            scheduler.step(loss.detach().clone().cpu().numpy())
-            optimizer.step()
+                #score.append(loss.detach().clone().cpu().numpy())
+                scheduler.step(loss.detach().clone().cpu().numpy())
+                optimizer.step()
 
-            self._save_best_model(q,t, loss.detach().clone(), -LQ.detach().clone(), LP.detach().clone())
+                self._save_best_model(q,t, loss.detach().clone(), -LQ.detach().clone(), LP.detach().clone())
 
-            if t%100== 0:
-                self.score_elbo.append(loss.detach().clone().cpu())
-                self.score_entropy.append(-LQ.detach().clone().cpu())
-                self.score_logposterior.append(LP.detach().clone().cpu())
-                self.score_lr.append(lr)
+                if t%100== 0:
+                    self.score_elbo.append(loss.detach().clone().cpu())
+                    self.score_entropy.append(-LQ.detach().clone().cpu())
+                    self.score_logposterior.append(LP.detach().clone().cpu())
+                    self.score_lr.append(lr)
 
-            if lr < self.min_lr:
-                break
+                if lr < self.min_lr:
+                    break
 
         #best_theta, best_score = self._get_best_model()
         best_epoch, scores=self._get_best_model(q)

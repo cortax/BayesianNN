@@ -80,14 +80,15 @@ def save_params_ens(theta):
 seed=1
 
 class AbstractRegressionSetup():
-    def __init__(self, seed=seed, sigma_prior=.5):
+    def __init__(self,):
         self.experiment_name=''
         self.plot = False
         self.param_count=None
         self.device=None
         self.sigma_noise=None
         self.n_train_samples=None
-        self.sigma_prior=sigma_prior
+        self.sigma_prior=None
+        self.seed=None
 
     #@abstractmethod
 
@@ -154,7 +155,7 @@ class AbstractRegressionSetup():
         return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
     
     def _split_holdout_data(self):
-        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.10, random_state=seed) #.20
+        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.10, random_state=self.seed) #.20
         self._X_train, self._y_train = X_tv, y_tv
         #self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
         

@@ -27,7 +27,11 @@ class GeNNeVI():
 
         self.tempdir_name = temp_dir
 
-        
+    def ELBO(self,GeN):
+        ED = NNE(GeN(self.n_samples_NNE),k=self.kNNE, device=self.device)
+        LP = self.objective_fn(GeN(self.n_samples_LP)).mean()
+        L = -ED - LP
+        return L
 
     def _save_best_model(self, GeN, epoch, score,ED,LP):
         if score < self._best_score:

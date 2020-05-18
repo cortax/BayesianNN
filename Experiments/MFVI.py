@@ -34,7 +34,9 @@ def log_MFVI_experiment(setup, the_epoch, the_scores, log_scores,
                          max_iter, learning_rate, min_lr, patience, lr_decay,
                          device):
 
-
+    mlflow.set_tag('lr grid', str(g_lr))
+    mlflow.set_tag('patience grid', str(g_pat))
+    
     mlflow.set_tag('device', device)
     mlflow.set_tag('sigma noise', setup.sigma_noise)
     mlflow.set_tag('dimensions', setup.param_count)
@@ -81,14 +83,15 @@ def MFVI(setup, max_iter, n_ELBO_samples, learning_rate, init_std, min_lr, patie
                             max_iter, learning_rate, min_lr, patience, lr_decay,
                             device)
         log_device='cpu'
-        theta = q.sample(1000).detach().to(log_device)
+        theta = q.sample(10000).detach().to(log_device)
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,log_device)
 
 
         save_model(q)
 
         if setup.plot:
-            draw_experiment(setup.makePlot, theta, log_device)
+            draw_experiment(setup, theta[0:1000], log_device)
+
 
 
 if __name__ == "__main__":
@@ -127,8 +130,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    setup =get_setup(args.setup,args.device)
-
+    setup_ = get_setup(args.setup)
+    setup=setup_.Setup(args.device) 
+    
     if args.ensemble_size > 1:
         raise NotImplementedError('ensemble MFVI not implemented')
         #eMFVI(setup, args.ensemble_size, args.max_iter, args.learning_rate, args.init_std, args.min_lr, args.patience, args.lr_decay, args.device, args.verbose)
