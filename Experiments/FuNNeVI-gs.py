@@ -20,10 +20,13 @@ lat_dim 5, 20
 patience 100, 300
 
 learning rate 0.01, 0.005
+
 """
-g_lr=[0.005, 0.002, 0.001]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
-g_pat=[100, 250, 500]#[300, 500]#[100, 300, 600]
+g_lr=[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
+g_pat=[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
 lr_decay=0.5
+
+
 
 ## command line example
 # python -m Experiments.GeNVI-pred --setup=boston --max_iter=10000 --learning_rate=0.05
@@ -101,17 +104,16 @@ def log_GeNVI_run(ELBO, logs_scores):
 
 
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--setup", type=str, default=None,
                     help="data setup on which run the method")
 parser.add_argument("--lat_dim", type=int, default=5,
                     help="number of latent dimensions of each hypernet")
-parser.add_argument("--NNE", type=int, default=10,
+parser.add_argument("--NNE", type=int, default=1,
                     help="k≥1 Nearest Neighbor Estimate")
 parser.add_argument("--ratio_ood", type=float, default=1.,
                     help="ratio in [0,1] of ood inputs w.r.t data inputs for MC sampling of predictive distance")
-parser.add_argument("--n_samples_FU", type=int, default=10,
+parser.add_argument("--n_samples_FU", type=int, default=20,
                     help="number of samples for functions estimation")
 parser.add_argument("--p_norm", type=int, default=2,
                     help="L_p norm to use for functions")
@@ -119,10 +121,12 @@ parser.add_argument("--n_samples_KL", type=int, default=1000,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
-parser.add_argument("--max_iter", type=int, default=15000,
+parser.add_argument("--max_iter", type=int, default=20000,
                     help="maximum number of learning iterations")
-parser.add_argument("--min_lr", type=float, default=1e-7,
+parser.add_argument("--min_lr", type=float, default=1e-9,
                     help="minimum learning rate triggering the end of the optimization")
+parser.add_argument("--lr_decay", type=float, default=.5,
+                    help="scheduler multiplicative factor decreasing learning rate when patience reached")
 parser.add_argument("--device", type=str, default=None,
                     help="force device to be used")
 parser.add_argument('--save_best', dest='save_best', action='store_true',help="to return model with best ELBO during training, else return last model")

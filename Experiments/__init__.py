@@ -89,6 +89,7 @@ class AbstractRegressionSetup():
         self.n_train_samples=None
         self.sigma_prior=None
         self.seed=None
+        self.input_dim=None
 
     #@abstractmethod
 
@@ -177,6 +178,34 @@ class AbstractRegressionSetup():
         self._y_test = torch.tensor(self._y_test, device=self.device).float()
         self.n_train_samples=self._X_train.shape[0]
 
+    def loglikelihood(self, theta):
+        ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
+        return ll
+
+    
+    def projection(self,theta0,theta1, n_samples,ratio_ood):
+        #compute size of both samples
+        #n_samples=self.n_train_samples
+        n_id=int((1.-ratio_ood)*n_samples)
+        n_ood=int(ratio_ood*n_samples)
+        
+        #batch sample from train
+        index=torch.randperm(self._X_train.shape[0])
+        X_id=self._X_train[index][0:n_id]
+        
+        m,_=self._X_train.min(dim=0)
+        M,_=self._X_train.max(dim=0)
+
+        X_ood=torch.Tensor(n_ood,self.input_dim)
+        for i in range(self.input_dim):
+            X_ood[:,i].uniform_(m[i]-1,M[i]+1)
+        
+        X=torch.cat([X_id, X_ood.to(self.device)])
+        
+        #compute projection on both paramters with model
+        theta0_proj=self._model(X, theta0).squeeze(2)
+        theta1_proj=self._model(X, theta1).squeeze(2)
+        return theta0_proj, theta1_proj
 
         
     

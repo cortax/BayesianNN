@@ -27,12 +27,11 @@ class FuNNeVI():
         self.patience = patience
         self.lr_decay = lr_decay
         self.device = device
-
+    
         self.save_best=save_best
         self._best_score=float('inf')
         
         self.p=p
-
 
         self.tempdir_name = temp_dir
 
@@ -64,8 +63,8 @@ class FuNNeVI():
     
     def _KL(self,GeN):
         
-        theta=GeN(self.n_samples_KL)
-        theta_prior=self.prior(self.n_samples_KL)
+        theta=GeN(self.n_samples_KL) #variationnel
+        theta_prior=self.prior(self.n_samples_KL) #prior
 
         theta_proj, theta_prior_proj = self.projection(theta, theta_prior, self.n_samples_FU, self.ratio_ood)
 
@@ -90,18 +89,8 @@ class FuNNeVI():
         with trange(self.max_iter) as tr:
             for t in tr:
                 optimizer.zero_grad()
-                """
-                theta=GeN(self.n_samples_KL)
-                theta_prior=self.prior(self.n_samples_KL)
-
-                theta_proj, theta_prior_proj=self.projection(theta, theta_prior, self.n_samples_FU, self.ratio_ood)
-                K=KL(theta_proj, theta_prior_proj,k=self.kNNE,device=self.device)
-
-                LL = self.loglikelihood(GeN(self.n_samples_LL)).mean()
-                L = K - LL
-                """
-                #TODO explore hyperparameter lambda*K
-                K = self._KL(GeN)
+    
+                K = self._KL(GeN) #KL(Q_var,Prior)
                 LL = self.loglikelihood(GeN(self.n_samples_LL)).mean()
                 L=K-LL
                 L.backward()
@@ -109,6 +98,7 @@ class FuNNeVI():
                 lr = optimizer.param_groups[0]['lr']
 
                 scheduler.step(L.item())
+                #scheduler.step(K.item())
 
                 tr.set_postfix(ELBO=L.item(), LogLike=LL.item(), KL=K.item(), lr=lr)
 

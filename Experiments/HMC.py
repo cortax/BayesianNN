@@ -57,11 +57,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--setup", type=str, default=None,
                         help="data setup on which run the method")
-    parser.add_argument("--numiter", type=int, default=100000,
+    parser.add_argument("--numiter", type=int, default=120000,
                         help="number of iterations in the Markov chain")
     parser.add_argument("--burning", type=int, default=40000,
                         help="number of initial samples to skip in the Markov chain")
-    parser.add_argument("--thinning", type=int, default=6,
+    parser.add_argument("--thinning", type=int, default=8,
                         help="subsampling factor of the Markov chain")
     parser.add_argument("--step_size", type=float, default=0.002,
                         help="initial step_size for integrator")
@@ -105,8 +105,7 @@ if __name__ == "__main__":
     samples, scores = hamiltonian_monte_carlo_da(numiter, burning,thinning, potential, #
                                   initial_position=theta.squeeze().numpy(), 
                                   initial_step_size=initial_step_size,
-                                  path_len=path_len
-                                    )
+                                  path_len=path_len)
 
     
     stop = timeit.default_timer()
@@ -151,7 +150,7 @@ if __name__ == "__main__":
         mlflow.set_tag('sigma_noise', setup.sigma_noise) 
         
         log_exp_params(numiter, burning, thinning, initial_step_size)
-        
+                
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')        
     
         for score in scores:

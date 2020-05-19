@@ -59,7 +59,7 @@ class Setup(AbstractRegressionSetup):
         fig, ax = plt.subplots()
         fig.set_size_inches(10, 10)
         plt.xlim(-2, 2) 
-        plt.ylim(-4, 6)
+        plt.ylim(-10, 10)
         plt.grid(True, which='major', linewidth=0.5)
 #        plt.title('Validation set')
 
@@ -93,13 +93,10 @@ class Setup(AbstractRegressionSetup):
         plt.grid(True, which='major', linewidth=0.5)
 
         plt.xlim(-2,2)
-        plt.ylim(-4, 6)
+        plt.ylim(-10, 10)
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
 
-    def loglikelihood(self, theta):
-        ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
-        return ll
     
     def loss(self,theta, R):
         y_pred = self._normalized_prediction(self._X_train, theta, self.device)  # MxNx1 tensor

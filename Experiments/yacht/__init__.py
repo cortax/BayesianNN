@@ -13,13 +13,20 @@ input_dim = 6
 nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
-sigma_noise = 1.0 #yarin gal 1.4
+sigma_noise = 1.4 #yarin gal 1.4
 seed = 42
+sigma_prior=0.5
 
 class Setup(AbstractRegressionSetup): 
-    def __init__(self, device):
+    def __init__(self, device, seed=seed, sigma_prior=sigma_prior):
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
+        self.sigma_prior=sigma_prior
+        
+        self.seed=seed
+
+        self.input_dim=input_dim
+
 
         self.plot = False
 
@@ -30,10 +37,14 @@ class Setup(AbstractRegressionSetup):
         self._split_holdout_data()
         self._normalize_data()
         self._flip_data_to_torch()
+    
+
 
     def _preparare_data(self):
         self._X, _y = torch.load ('Experiments/yacht/data.pt')
         self._y = np.expand_dims(_y, axis=1)
+        
+
 
 
 
