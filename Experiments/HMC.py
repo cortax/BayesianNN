@@ -21,7 +21,8 @@ from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params
 """
 example command:
 
-python -m Experiments.HMC --setup=foong
+python -m Experiments.HMC --max_time= (en secondes) --setup=foong
+
 
 python -m Experiments.HMC --setup=foong_mixed
 
@@ -71,6 +72,8 @@ if __name__ == "__main__":
                         help="number of optimization iterations to initialize the state")
     parser.add_argument("--device", type=str, default='cpu',
                         help="force device to be used")
+    parser.add_argument("--max_time", type=float, default=float('inf'),
+                        help="maximum time allocated")
 
     args = parser.parse_args()
 
@@ -105,14 +108,13 @@ if __name__ == "__main__":
     samples, scores = hamiltonian_monte_carlo_da(numiter, burning,thinning, potential, #
                                   initial_position=theta.squeeze().numpy(), 
                                   initial_step_size=initial_step_size,
-                                  path_len=path_len)
+                                  path_len=path_len, start_time=start, max_time=args.max_time)
 
     
     stop = timeit.default_timer()
     execution_time = stop - start
     
     theta=torch.as_tensor(samples)
-    
     
     ##diagnostic with arviz
     

@@ -6,6 +6,7 @@ from tqdm import tqdm, trange
 
 from numpy.linalg import norm
 
+import timeit
 
 """
 adapted from
@@ -204,15 +205,8 @@ def hamiltonian_monte_carlo(
                 step_sizes.append(step_size)
                 log_prob.append(initial_potential)
 
-
-            
         
             tr.set_postfix(pot=initial_potential, rate=acceptance_count/(t+1), step=step_size, norm=norm(q_new))
-            
-            
-            
-            if np.isnan(q_new).sum():
-                print('Current state contains nan')
             
             q_last=q_new
     return samples, accept_rates, step_sizes, log_prob
@@ -230,6 +224,8 @@ def hamiltonian_monte_carlo_da(
     initial_step_size=0.1,
     integrator=leapfrog,
     max_energy_change=1000.0,
+    start_time=0.,
+    max_time=float('inf')
 ):
     """Run Hamiltonian Monte Carlo sampling.
     Parameters
@@ -334,11 +330,9 @@ def hamiltonian_monte_carlo_da(
     
             tr.set_postfix(pot=initial_potential, step_av=averaged_step, step=step_size, norm=norm(q_new))
             
-            
-            
-            if np.isnan(q_new).sum():
-                print('Current state contains nan')
+            if timeit.default_timer()- start_time> max_time:
                 break
+            
             q_last=q_new
     return samples, scores
 
