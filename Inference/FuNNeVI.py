@@ -82,10 +82,12 @@ class FuNNeVI():
         optimizer = torch.optim.Adam(GeN.parameters(), lr=self.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience, factor=self.lr_decay)
 
-        self.score_elbo = []
-        self.score_KL = []
-        self.score_LL = []
-        self.score_lr = []
+        self.scores={'ELBO': [] ,
+                     'KL':[],
+                      'LL':[],
+                     'lr':[]    
+        }
+        
         with trange(self.max_iter) as tr:
             for t in tr:
                 optimizer.zero_grad()
@@ -103,10 +105,10 @@ class FuNNeVI():
                 tr.set_postfix(ELBO=L.item(), LogLike=LL.item(), KL=K.item(), lr=lr)
 
                 if t % 100 ==0:
-                    self.score_elbo.append(L.detach().clone().cpu())
-                    self.score_KL.append(K.detach().clone().cpu())
-                    self.score_LL.append(LL.detach().clone().cpu())
-                    self.score_lr.append(lr)
+                    self.scores['ELBO'].append(L.item())
+                    self.scores['KL'].append(K.item())
+                    self.scores['LL'].append(LL.item())
+                    self.scores['lr'].append(lr)
 
                 if self.save_best:
                     self._save_best_model(GeN, t,L.item(), K.item(), LL.item())
@@ -121,5 +123,5 @@ class FuNNeVI():
                 optimizer.step()
 
             
-        best_epoch, scores =self._get_best_model(GeN)
-        return best_epoch, scores
+        best_epoch, best_scores =self._get_best_model(GeN)
+        return best_epoch, best_scores

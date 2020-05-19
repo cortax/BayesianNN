@@ -16,7 +16,7 @@ nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
 sigma_noise = 1.5
-seed = 1
+seed = 42
 sigma_prior=.5
 
 class Setup(AbstractRegressionSetup): 

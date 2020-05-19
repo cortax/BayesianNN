@@ -22,8 +22,8 @@ patience 100, 300
 learning rate 0.01, 0.005
 
 """
-g_lr=[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
-g_pat=[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
+g_lr=[0.001]#[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
+g_pat=[10]#[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
 lr_decay=0.5
 
 
@@ -49,9 +49,8 @@ def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
 
         the_epoch, the_scores = optimizer.run(GeN)
 
-    log_scores = [optimizer.score_elbo, optimizer.score_KL, optimizer.score_LL, optimizer.score_lr]
     ELBO=optimizer.ELBO(GeN)
-    return GeN, the_epoch, the_scores, log_scores, ELBO.item()
+    return GeN, the_epoch, the_scores, optimizer.scores, ELBO.item()
 
 
 
@@ -91,18 +90,18 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p,
     mlflow.log_param('max_iter', max_iter)
     mlflow.log_param('min_lr', min_lr)
 
-def log_GeNVI_run(ELBO, logs_scores):    
+def log_GeNVI_run(ELBO, scores):    
 
     mlflow.log_metric("The elbo", float(ELBO))
 
 
-    for t in range(len(log_scores[0])):
-        mlflow.log_metric("elbo", float(log_scores[0][t]), step=100*t)
-        mlflow.log_metric("KL", float(log_scores[1][t]), step=100*t)
-        mlflow.log_metric("Exp. loglikelihood", float(log_scores[2][t]), step=100*t)
-        mlflow.log_metric("learning_rate", float(log_scores[3][t]), step=100*t)
 
-
+    for t in range(len(scores['ELBO'])):
+        mlflow.log_metric("elbo", float(scores['ELBO'][t]), step=100*t)
+        mlflow.log_metric("KL", float(scores['KL'][t]), step=100*t)
+        mlflow.log_metric("LL", float(scores['LL'][t]), step=100*t)        
+        mlflow.log_metric("learning_rate", float(scores['lr'][t]), step=100*t)
+        
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--setup", type=str, default=None,

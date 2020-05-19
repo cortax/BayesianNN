@@ -4,7 +4,6 @@ from torch import nn
 
 from Experiments import AbstractRegressionSetup
 
-
 from Models import get_mlp
 
 experiment_name='Concrete'
@@ -13,14 +12,22 @@ input_dim = 8
 nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
-sigma_noise = 1.0 #yarin gal 4.5
+sigma_noise = 4.5 #yarin gal 4.5
 seed = 42
+sigma_prior=0.5
+
 
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device):
         self.experiment_name = experiment_name
+        
         self.sigma_noise = sigma_noise
+        self.sigma_prior=sigma_prior
+        self.seed=seed
+        
+        self.input_dim=input_dim
 
+        
         self.plot = False
 
         self.device = device

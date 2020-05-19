@@ -4,7 +4,6 @@ from torch import nn
 
 from Experiments import AbstractRegressionSetup
 
-
 from Models import get_mlp
 
 experiment_name='Yacht'
@@ -20,9 +19,9 @@ sigma_prior=0.5
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device, seed=seed, sigma_prior=sigma_prior):
         self.experiment_name = experiment_name
+        
         self.sigma_noise = sigma_noise
         self.sigma_prior=sigma_prior
-        
         self.seed=seed
 
         self.input_dim=input_dim

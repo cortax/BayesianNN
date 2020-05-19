@@ -18,7 +18,7 @@ nblayers = 1
 activation = nn.Tanh()#
 layerwidth = 50
 sigma_noise=0.1
-seed = 32
+seed = 42
 sigma_prior=.5
 
 class Setup(AbstractRegressionSetup):  
@@ -59,7 +59,7 @@ class Setup(AbstractRegressionSetup):
         fig, ax = plt.subplots()
         fig.set_size_inches(10, 10)
         plt.xlim(-2, 2) 
-        plt.ylim(-10, 10)
+        plt.ylim(-5, 5)
         plt.grid(True, which='major', linewidth=0.5)
 #        plt.title('Validation set')
 
@@ -93,7 +93,7 @@ class Setup(AbstractRegressionSetup):
         plt.grid(True, which='major', linewidth=0.5)
 
         plt.xlim(-2,2)
-        plt.ylim(-10, 10)
+        plt.ylim(-5, 5)
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
 
