@@ -149,8 +149,8 @@ if __name__ == "__main__":
     with mlflow.start_run():
         
         
-        torch.save(theta, setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt' )
-        mlflow.log_artifact(setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt')
+        torch.save(theta,'HMC_models/' + setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt' )
+        mlflow.log_artifact('HMC_models/' + setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt')
 
 
         mlflow.set_tag('sigma_prior', setup.sigma_prior) 
@@ -177,6 +177,3 @@ if __name__ == "__main__":
         
 #        if setup.plot:
 #            draw_experiment(setup, theta, 'cpu')
-        #
-        save_params_ens(theta)    
-
