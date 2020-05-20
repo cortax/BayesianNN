@@ -104,11 +104,8 @@ def KL(theta0,theta1,k=1,device='cpu', p=2):
         dim1=theta1.shape[1]
         assert dim0 == dim1
         
-   
-        
         D0=torch.cdist(theta0,theta0, p=p)
         D1=torch.cdist(theta0,theta1,p=p)
-        
 
         a0 = torch.topk(D0, k=k+1, dim=1, largest=False, sorted=True)[0][:,k]#.clamp(torch.finfo().eps,float('inf')).to(device)
         a1 = torch.topk(D1, k=k, dim=1, largest=False, sorted=True)[0][:,k-1]#.clamp(torch.finfo().eps,float('inf')).to(device)

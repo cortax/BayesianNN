@@ -149,12 +149,7 @@ class Setup(AbstractRegressionSetup):
         #theta_proj=self._normalized_prediction(self._X_train, theta, self.device).squeeze(2)
         return y_pred
     
-    
-    def train_data(self):
-        return self._X_train, self._y_train
-    
-    def test_data(self):
-        return self._X_test, self._y_test
+
         
     def _flip_data_to_torch(self): 
         self._X_train = self._X_train.to(self.device).float()

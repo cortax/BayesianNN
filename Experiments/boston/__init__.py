@@ -15,7 +15,7 @@ input_dim = 13
 nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
-sigma_noise = 1.5
+sigma_noise = 2.5 #yarin_gal
 seed = 42
 sigma_prior=.5
 

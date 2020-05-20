@@ -46,7 +46,7 @@ class FuNNeVI():
             }, self.tempdir_name+'/best.pt')
             self._best_score=score
 
-    def ELBO(self,GeN,m_MCL=100,n_LL=1000):
+    def ELBO(self,GeN,m_MCL=10,n_LL=1000):
         #compute ELBO of GeN accurately
         
         theta=GeN(self.n_samples_KL)

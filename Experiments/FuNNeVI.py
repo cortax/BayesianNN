@@ -162,6 +162,8 @@ if __name__ == "__main__":
     mlflow.set_experiment(xpname)
 
     with mlflow.start_run():
+        save_model(GeN)
+
         log_GeNVI_experiment(ELBO, setup, args.n_samples_FU, args.ratio_ood, log_scores, args.p_norm,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
@@ -169,10 +171,10 @@ if __name__ == "__main__":
                              args.device, args.save_best)
 
         log_device = 'cpu'
-        theta = GeN(10000).detach().to(log_device)
+        theta = GeN(1000).detach().to(log_device)
         log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
 
-        save_model(GeN)
 
         if setup.plot:
             draw_experiment(setup, theta[0:1000], log_device)
+    

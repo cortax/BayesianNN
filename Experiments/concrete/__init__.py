@@ -13,7 +13,7 @@ nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
 sigma_noise = 4.5 #yarin gal 4.5
-seed = 42
+seed = 1#42
 sigma_prior=0.5
 
 
@@ -41,6 +41,7 @@ class Setup(AbstractRegressionSetup):
     def _preparare_data(self):
         self._X, _y = torch.load ('Experiments/concrete/data.pt')
         self._y = np.expand_dims(_y, axis=1)
+        
 
 
 

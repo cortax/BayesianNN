@@ -2,7 +2,7 @@ import torch
 from Tools import NormalLogLikelihood
 
 
-def RMSE(X,y,y_pred,std_y_train,device):
+def RMSE(y,y_pred,std_y_train,device):
     """
     Root Mean Squared Error and Root Std Squared Error
     Args:

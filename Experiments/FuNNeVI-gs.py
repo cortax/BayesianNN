@@ -22,8 +22,8 @@ patience 100, 300
 learning rate 0.01, 0.005
 
 """
-g_lr=[0.001]#[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
-g_pat=[10]#[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
+g_lr=[0.002,0.001,0.0005]#[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
+g_pat=[300,600]#[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
 lr_decay=0.5
 
 
@@ -120,7 +120,7 @@ parser.add_argument("--n_samples_KL", type=int, default=1000,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
-parser.add_argument("--max_iter", type=int, default=20000,
+parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
 parser.add_argument("--min_lr", type=float, default=1e-9,
                     help="minimum learning rate triggering the end of the optimization")
@@ -183,7 +183,7 @@ if __name__ == "__main__":
                              args.max_iter, best_lr, best_lr, best_patience, lr_decay,
                              args.device, args.save_best)
         
-        for i in range(10):
+        for i in range(2):
             with mlflow.start_run(run_name=str(i),nested=True):
                 start = timeit.default_timer()
     

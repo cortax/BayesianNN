@@ -42,6 +42,7 @@ class Setup(AbstractRegressionSetup):
     def _preparare_data(self):
         self._X, _y = torch.load ('Experiments/yacht/data.pt')
         self._y = np.expand_dims(_y, axis=1)
+        print(self._X, self._y)
         
 
 

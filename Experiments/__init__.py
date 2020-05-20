@@ -115,10 +115,10 @@ class AbstractRegressionSetup():
             std_y_train=torch.tensor(self._scaler_y.scale_, device=device).float()
         
         y_pred_mean = y_pred.mean(dim=0)
-        RMSE_test = RMSE(self._X_test, self._y_test.to(device), y_pred_mean, std_y_train, device)
+        RMSE_test = RMSE(self._y_test.to(device), y_pred_mean, std_y_train, device)
         
         y_pred_train_mean=self._model(self._X_train.to(device), theta).mean(dim=0)
-        RMSE_train = RMSE(self._X_train, self._y_train.to(device), y_pred_train_mean, std_y_train, device)
+        RMSE_train = RMSE(self._y_train.to(device), y_pred_train_mean, std_y_train, device)
         return LPP_test, RMSE_test, RMSE_train
 
     def _logprior(self, theta):
@@ -178,8 +178,15 @@ class AbstractRegressionSetup():
         self._y_test = torch.tensor(self._y_test, device=self.device).float()
         self.n_train_samples=self._X_train.shape[0]
 
-    def loglikelihood(self, theta):
+    def loglikelihood(self, theta,):
         ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
+        return ll
+
+    def b_loglikelihood(self, theta, batch_size=100):
+        index=torch.randperm(self._X_train.shape[0])
+        X_train=self._X_train[index][0:batch_size]
+        y_train=self._y_train[index][0:batch_size]
+        ll=torch.sum(self._loglikelihood(theta, X_train, y_train, self.device),dim=1)
         return ll
 
     
@@ -207,6 +214,12 @@ class AbstractRegressionSetup():
         theta1_proj=self._model(X, theta1).squeeze(2)
         return theta0_proj, theta1_proj
 
+        
+    def train_data(self):
+        return self._X_train, self._y_train
+    
+    def test_data(self):
+        return self._X_test, self._y_test
         
     
     # @abstractmethod
