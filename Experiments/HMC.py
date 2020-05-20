@@ -166,8 +166,8 @@ if __name__ == "__main__":
 
                                       
             
-        if setup.plot:
-            draw_experiment(setup, theta, 'cpu')
+#        if setup.plot:
+#            draw_experiment(setup, theta, 'cpu')
         #
         save_params_ens(theta)
     
