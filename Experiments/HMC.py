@@ -148,13 +148,17 @@ if __name__ == "__main__":
     #mlflow logging
     with mlflow.start_run():
         
+        
+        torch.save(theta, setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt' )
+        mlflow.log_artifact(setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt')
+
+
         mlflow.set_tag('sigma_prior', setup.sigma_prior) 
         mlflow.set_tag('sigma_noise', setup.sigma_noise) 
         
         log_exp_params(numiter, burning, thinning, initial_step_size)
                 
-        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')        
-    
+            
         for score in scores:
             for t in range(len(scores[score])):
                 mlflow.log_metric(score, float(scores[score][t]), step=100*(t+1))
@@ -164,11 +168,12 @@ if __name__ == "__main__":
             mlflow.log_metric('ess_tail', float(ess_tail[t]), step=t)
             mlflow.log_metric('rhat 2-folded', float(folded_rhat[t]), step=t)
 
-                                      
+        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')        
+                              
             
         if setup.plot:
-            draw_experiment(setup, theta, 'cpu')
-        #
-        save_params_ens(theta)
+            draw_experiment(setup, theta[0:1000], 'cpu')
+        
+        
     
 
