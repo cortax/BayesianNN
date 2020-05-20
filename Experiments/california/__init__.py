@@ -16,13 +16,15 @@ nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
 sigma_noise = 1.0
+sigma_prior=.5
 seed = 42
 
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device):
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
-
+        self.sigma_prior= sigma_prior
+        self.seed = seed
         self.plot = False
 
         self.device = device
