@@ -171,16 +171,12 @@ if __name__ == "__main__":
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')        
                               
             
-<<<<<<< HEAD
         if setup.plot:
             draw_experiment(setup, theta[0:1000], 'cpu')
         
         
-=======
 #        if setup.plot:
 #            draw_experiment(setup, theta, 'cpu')
         #
-        save_params_ens(theta)
->>>>>>> ce61975dd685352d980a36ebe1d35e3ecbf43b11
-    
+        save_params_ens(theta)    
 
