@@ -26,7 +26,7 @@ learning rate 0.01, 0.005
 ## command line example
 # python -m Experiments.GeNVI-pred --setup=boston --max_iter=10000 --learning_rate=0.05
 
-def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
+def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                    lat_dim, param_count, 
                    kNNE, n_samples_KL, n_samples_LL,  
                    max_iter, learning_rate, min_lr, patience, lr_decay, 
@@ -37,7 +37,7 @@ def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
     #GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, device)
 
     with TemporaryDirectory() as temp_dir:
-        optimizer = FuNNeVI(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
+        optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                               kNNE, n_samples_KL, n_samples_LL, 
                               max_iter, learning_rate, min_lr, patience, lr_decay,
                               device, temp_dir, save_best)
@@ -50,14 +50,15 @@ def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
     return GeN, optimizer.scores, ELBO.item()
 
 
-def log_GeNVI_experiment(ELBO, setup,  n_samples_FU, ratio_ood, scores, p,
+def log_GeNVI_experiment(ELBO, setup,  n_samples_FU, ratio_ood, scores, p, batch,
                          lat_dim, 
                          kNNE, n_samples_KL, n_samples_LL, 
                          max_iter, learning_rate, min_lr, patience, lr_decay,
                          device, save_best):
 
 
-    
+    mlflow.set_tag('batch_size', batch)
+
     mlflow.set_tag('sigma_noise', setup.sigma_noise)    
 
     mlflow.set_tag('sigma_prior', setup.sigma_prior)    
@@ -111,6 +112,8 @@ parser.add_argument("--n_samples_KL", type=int, default=1000,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
+parser.add_argument("--batch", type=int, default=None,
+                    help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=20000,
                     help="maximum number of learning iterations")
 parser.add_argument("--learning_rate", type=float, default=0.001,
@@ -138,6 +141,10 @@ if __name__ == "__main__":
     projection=setup.projection
     size_sample=setup.n_train_samples
     param_count=setup.param_count
+    
+    batch=args.batch
+    if batch is None:
+        batch=size_sample
 
     #compute size of ood sample
     
@@ -147,7 +154,7 @@ if __name__ == "__main__":
         return setup.sigma_prior*torch.randn(size=(n,param_count), device=args.device)
 
 
-    GeN, log_scores, ELBO = learning(loglikelihood, prior, 
+    GeN, log_scores, ELBO = learning(loglikelihood, batch, size_sample, prior, 
                                                       projection, args.n_samples_FU, args.ratio_ood, args.p_norm,
                                                       args.lat_dim, setup.param_count,
                                                       args.NNE, args.n_samples_KL, args.n_samples_LL,
@@ -164,13 +171,14 @@ if __name__ == "__main__":
     with mlflow.start_run():
         save_model(GeN)
 
-        log_GeNVI_experiment(ELBO, setup, args.n_samples_FU, args.ratio_ood, log_scores, args.p_norm,
+        log_GeNVI_experiment(ELBO, setup, args.n_samples_FU, args.ratio_ood, log_scores, args.p_norm, batch,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
                              args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
                              args.device, args.save_best)
 
         log_device = 'cpu'
+        
         theta = GeN(1000).detach().to(log_device)
         log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
 

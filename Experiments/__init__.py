@@ -100,7 +100,7 @@ class AbstractRegressionSetup():
         if self.plot:
             raise NotImplementedError('subclasses with plot=True must override makePlot()')
 
-    def evaluate_metrics(self, theta, device):
+    def evaluate_metrics(self, theta, device='cpu'):
         theta = theta.to(device)
      #   nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train.to(device),device)
      #   nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation.to(device),device)
@@ -178,11 +178,11 @@ class AbstractRegressionSetup():
         self._y_test = torch.tensor(self._y_test, device=self.device).float()
         self.n_train_samples=self._X_train.shape[0]
 
-    def loglikelihood(self, theta,):
-        ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
-        return ll
 
-    def b_loglikelihood(self, theta, batch_size=100):
+
+    def loglikelihood(self, theta, batch_size=None):
+        if batch_size is None:
+            batch_size=self.n_train_samples
         index=torch.randperm(self._X_train.shape[0])
         X_train=self._X_train[index][0:batch_size]
         y_train=self._y_train[index][0:batch_size]
@@ -190,7 +190,7 @@ class AbstractRegressionSetup():
         return ll
 
     
-    def projection(self,theta0,theta1, n_samples,ratio_ood):
+    def projection(self,theta0,theta1, n_samples, ratio_ood):
         #compute size of both samples
         #n_samples=self.n_train_samples
         n_id=int((1.-ratio_ood)*n_samples)

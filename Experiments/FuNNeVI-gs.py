@@ -22,8 +22,8 @@ patience 100, 300
 learning rate 0.01, 0.005
 
 """
-g_lr=[0.002,0.001,0.0005]#[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
-g_pat=[300,600]#[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
+g_lr=[0.005,0.002,0.001,0.0005]#[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
+g_pat=[400, 600]#[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
 lr_decay=0.5
 
 
@@ -31,7 +31,7 @@ lr_decay=0.5
 ## command line example
 # python -m Experiments.GeNVI-pred --setup=boston --max_iter=10000 --learning_rate=0.05
 
-def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
+def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                    lat_dim, param_count, 
                    kNNE, n_samples_KL, n_samples_LL,  
                    max_iter, learning_rate, min_lr, patience, lr_decay, 
@@ -42,7 +42,7 @@ def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
     #GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, device)
 
     with TemporaryDirectory() as temp_dir:
-        optimizer = FuNNeVI(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
+        optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                               kNNE, n_samples_KL, n_samples_LL, 
                               max_iter, learning_rate, min_lr, patience, lr_decay,
                               device, temp_dir, save_best)
@@ -54,11 +54,13 @@ def learning(loglikelihood, prior, projection, n_samples_FU, ratio_ood, p,
 
 
 
-def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p,
+def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
                          lat_dim, 
                          kNNE, n_samples_KL, n_samples_LL, 
                          max_iter, learning_rate, min_lr, patience, lr_decay,
                          device, save_best):
+    
+    mlflow.set_tag('batch_size', batch)
 
     
     mlflow.set_tag('lr grid', str(g_lr))
@@ -108,6 +110,8 @@ parser.add_argument("--setup", type=str, default=None,
                     help="data setup on which run the method")
 parser.add_argument("--lat_dim", type=int, default=5,
                     help="number of latent dimensions of each hypernet")
+parser.add_argument("--nb_models", type=int, default=2,
+                    help="number of models to learn")
 parser.add_argument("--NNE", type=int, default=1,
                     help="k≥1 Nearest Neighbor Estimate")
 parser.add_argument("--ratio_ood", type=float, default=1.,
@@ -120,9 +124,11 @@ parser.add_argument("--n_samples_KL", type=int, default=1000,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
+parser.add_argument("--batch", type=int, default=None,
+                    help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
-parser.add_argument("--min_lr", type=float, default=1e-9,
+parser.add_argument("--min_lr", type=float, default=1e-8,
                     help="minimum learning rate triggering the end of the optimization")
 parser.add_argument("--lr_decay", type=float, default=.5,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")
@@ -145,7 +151,10 @@ if __name__ == "__main__":
     size_sample=setup.n_train_samples
     param_count=setup.param_count
 
-    #compute size of ood sample
+    
+    batch=args.batch
+    if batch is None:
+        batch=size_sample
     
     
 
@@ -160,7 +169,7 @@ if __name__ == "__main__":
     best_patience=None
     for lr in g_lr:
         for patience in g_pat:
-            _, _, _, _, ELBO = learning(loglikelihood, prior, projection, 
+            _, _, _, _, ELBO = learning(loglikelihood, batch, setup.n_train_samples, prior, projection, 
                                         args.n_samples_FU, args.ratio_ood, args.p_norm,
                                         args.lat_dim, setup.param_count,
                                         args.NNE, args.n_samples_KL, args.n_samples_LL,
@@ -177,17 +186,19 @@ if __name__ == "__main__":
     mlflow.set_experiment(xpname)
     
     with mlflow.start_run():
-        log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, args.p_norm,
+        log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, args.p_norm, batch,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
                              args.max_iter, best_lr, best_lr, best_patience, lr_decay,
                              args.device, args.save_best)
         
-        for i in range(2):
+        GeN_models_dict=[]
+        for i in range(args.nb_models):
             with mlflow.start_run(run_name=str(i),nested=True):
                 start = timeit.default_timer()
     
-                GeN, the_epoch, the_scores, log_scores, ELBO = learning(loglikelihood, prior, projection, 
+                GeN, the_epoch, the_scores, log_scores, ELBO = learning(loglikelihood, batch, setup.n_train_samples,
+                                                                        prior, projection, 
                                                                         args.n_samples_FU, args.ratio_ood, args.p_norm,
                                                                         args.lat_dim, setup.param_count,
                                                                         args.NNE, args.n_samples_KL, args.n_samples_LL,
@@ -201,10 +212,15 @@ if __name__ == "__main__":
                 log_GeNVI_run(ELBO, log_scores)
 
                 log_device = 'cpu'
-                theta = GeN(10000).detach().to(log_device)
+                theta = GeN(1000).detach().to(log_device)
                 log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
 
                 save_model(GeN)
+                GeN_models_dict.append((i,GeN.state_dict().copy()))
 
                 if setup.plot:
                     draw_experiment(setup, theta[0:1000], log_device)
+      
+        tempdir = tempfile.TemporaryDirectory()
+        torch.save({str(i): models for i,models in GeN_models_dict}, tempdir.name + '/models.pt')
+        mlflow.log_artifact(tempdir.name + '/models.pt')
