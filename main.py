@@ -9,4 +9,4 @@ if __name__ == "__main__":
         time = str(sys.argv[2])
         dataset = str(lines[index])
 
-        os.system('python -m Experiments.HMC --numiter=50 --burning=0 --thinning=1 --setup='+ dataset + ' --max_time='+time)
+        os.system('python -m Experiments.HMC --setup='+ dataset + ' --max_time='+time)
