@@ -35,7 +35,7 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
                    lat_dim, param_count, 
                    kNNE, n_samples_KL, n_samples_LL,  
                    max_iter, learning_rate, min_lr, patience, lr_decay, 
-                   device, save_best):
+                   device):
 
     GeN = BigGenerator(lat_dim, param_count,device).to(device)
     #GeN=SLPGenerator(lat_dim, param_count,device).to(device)
@@ -45,12 +45,11 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
         optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                               kNNE, n_samples_KL, n_samples_LL, 
                               max_iter, learning_rate, min_lr, patience, lr_decay,
-                              device, temp_dir, save_best)
+                              device, temp_dir)
 
-        the_epoch, the_scores = optimizer.run(GeN)
+        ELBO = optimizer.run(GeN)
 
-    ELBO=optimizer.ELBO(GeN)
-    return GeN, the_epoch, the_scores, optimizer.scores, ELBO.item()
+    return GeN, optimizer.scores, ELBO.item()
 
 
 
@@ -58,7 +57,7 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
                          lat_dim, 
                          kNNE, n_samples_KL, n_samples_LL, 
                          max_iter, learning_rate, min_lr, patience, lr_decay,
-                         device, save_best):
+                         device):
     
     mlflow.set_tag('batch_size', batch)
 
@@ -74,7 +73,6 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
     mlflow.set_tag('NNE', kNNE)
    
     mlflow.set_tag('device', device)
-    mlflow.set_tag('save_best', save_best)
 
     mlflow.log_param('lat_dim', lat_dim)
     
@@ -128,14 +126,13 @@ parser.add_argument("--batch", type=int, default=None,
                     help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
-parser.add_argument("--min_lr", type=float, default=1e-8,
+parser.add_argument("--min_lr", type=float, default=1e-7,
                     help="minimum learning rate triggering the end of the optimization")
 parser.add_argument("--lr_decay", type=float, default=.5,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")
 parser.add_argument("--device", type=str, default=None,
                     help="force device to be used")
-parser.add_argument('--save_best', dest='save_best', action='store_true',help="to return model with best ELBO during training, else return last model")
-parser.set_defaults(save_best=False)
+
                     
 if __name__ == "__main__":
 
@@ -167,43 +164,51 @@ if __name__ == "__main__":
     best_elbo=torch.tensor(float('inf'))
     best_lr=None
     best_patience=None
+    ELBOs=[]
+
     for lr in g_lr:
         for patience in g_pat:
-            _, _, _, _, ELBO = learning(loglikelihood, batch, setup.n_train_samples, prior, projection, 
+            _, _, ELBO = learning(loglikelihood, batch, setup.n_train_samples, prior, projection, 
                                         args.n_samples_FU, args.ratio_ood, args.p_norm,
                                         args.lat_dim, setup.param_count,
                                         args.NNE, args.n_samples_KL, args.n_samples_LL,
                                         args.max_iter, lr, args.min_lr, patience,
-                                        lr_decay, args.device, args.save_best)
+                                        lr_decay, args.device)
             print('ELBO: '+str(ELBO))
+            ELBOs.append((lr,patience,ELBO))
+
             if ELBO < best_elbo:
                 best_elbo=ELBO
                 best_lr=lr
                 best_patience=patience
     
+        
     
     xpname = setup.experiment_name + '/FuNNeVI-gs'
     mlflow.set_experiment(xpname)
     
     with mlflow.start_run():
+        for lr,pat,ELBO in ELBOs:
+            mlflow.log_metric(str(lr)+' / '+str(pat), ELBO)
+
         log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, args.p_norm, batch,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
-                             args.max_iter, best_lr, best_lr, best_patience, lr_decay,
-                             args.device, args.save_best)
+                             args.max_iter, best_lr, args.min_lr, best_patience, lr_decay,
+                             args.device)
         
         GeN_models_dict=[]
         for i in range(args.nb_models):
             with mlflow.start_run(run_name=str(i),nested=True):
                 start = timeit.default_timer()
     
-                GeN, the_epoch, the_scores, log_scores, ELBO = learning(loglikelihood, batch, setup.n_train_samples,
+                GeN, log_scores, ELBO = learning(loglikelihood, batch, setup.n_train_samples,
                                                                         prior, projection, 
                                                                         args.n_samples_FU, args.ratio_ood, args.p_norm,
                                                                         args.lat_dim, setup.param_count,
                                                                         args.NNE, args.n_samples_KL, args.n_samples_LL,
                                                                         args.max_iter, best_lr, args.min_lr, best_patience,
-                                                                        lr_decay, args.device, args.save_best)
+                                                                        lr_decay, args.device)
 
 
                 stop = timeit.default_timer()

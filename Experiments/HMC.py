@@ -15,6 +15,7 @@ import timeit
 
 import arviz as az
 
+#
 
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_params_ens
 
@@ -114,45 +115,47 @@ if __name__ == "__main__":
     stop = timeit.default_timer()
     execution_time = stop - start
     
+   
     theta=torch.as_tensor(samples)
-    
-    ##diagnostic with arviz
-    
-    data=az.convert_to_inference_data(theta.unsqueeze(0).numpy())
-    
-    ess_b=az.ess(data, method='bulk')
-    ess_bulk=ess_b.to_dict()['data_vars']['x']['data']
 
-    ess_t=az.ess(data, method='tail')
-    ess_tail=ess_t.to_dict()['data_vars']['x']['data']
-    
-    
-    trace=theta
-    draws=trace.shape[0]    
-    if draws % 2 ==1:
-        trace=trace[0:-1]
-
-    half_draws=int(trace.shape[0]/2)
-
-    trace_0=trace[0:half_draws]
-    trace_1=trace[half_draws:]
-    folded_trace=np.stack([trace_0,trace_1])
-    folded_data=az.convert_to_inference_data(folded_trace)
-    
-    folded_rhat_=az.rhat(folded_data)
-    folded_rhat=folded_rhat_.to_dict()['data_vars']['x']['data']
-                                      
     xpname = setup.experiment_name + '/HMC'
     mlflow.set_experiment(xpname)
-
     #mlflow logging
     with mlflow.start_run():
-        
-        
+
+
+       
+
         torch.save(theta,'HMC_models/' + setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt' )
-        mlflow.log_artifact('HMC_models/' + setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt')
+
+        ##diagnostic with arviz
+
+        data=az.convert_to_inference_data(theta.unsqueeze(0).numpy())
+
+        ess_b=az.ess(data, method='bulk')
+        ess_bulk=ess_b.to_dict()['data_vars']['x']['data']
+
+        ess_t=az.ess(data, method='tail')
+        ess_tail=ess_t.to_dict()['data_vars']['x']['data']
 
 
+        trace=theta
+        draws=trace.shape[0]    
+        if draws % 2 ==1:
+            trace=trace[0:-1]
+
+        half_draws=int(trace.shape[0]/2)
+
+        trace_0=trace[0:half_draws]
+        trace_1=trace[half_draws:]
+        folded_trace=np.stack([trace_0,trace_1])
+        folded_data=az.convert_to_inference_data(folded_trace)
+
+        folded_rhat_=az.rhat(folded_data)
+        folded_rhat=folded_rhat_.to_dict()['data_vars']['x']['data']
+
+        
+        
         mlflow.set_tag('sigma_prior', setup.sigma_prior) 
         mlflow.set_tag('sigma_noise', setup.sigma_noise) 
         
@@ -168,8 +171,9 @@ if __name__ == "__main__":
             mlflow.log_metric('ess_tail', float(ess_tail[t]), step=t)
             mlflow.log_metric('rhat 2-folded', float(folded_rhat[t]), step=t)
 
-        log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')        
-                                      
+        mlflow.log_artifact('HMC_models/' + setup.experiment_name+'_'+mlflow.active_run().info.run_id+'.pt')
         
-#        if setup.plot:
-#            draw_experiment(setup, theta, 'cpu')
+        log_exp_metrics(setup.evaluate_metrics, theta[0:1000], execution_time, 'cpu')        
+                              
+            
+ 
