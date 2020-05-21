@@ -169,11 +169,7 @@ if __name__ == "__main__":
             mlflow.log_metric('rhat 2-folded', float(folded_rhat[t]), step=t)
 
         log_exp_metrics(setup.evaluate_metrics,theta,execution_time,'cpu')        
-                              
-            
-        if setup.plot:
-            draw_experiment(setup, theta[0:1000], 'cpu')
-        
+                                      
         
 #        if setup.plot:
 #            draw_experiment(setup, theta, 'cpu')

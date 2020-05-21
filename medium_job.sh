@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=17:00:00
+#SBATCH --time=20:00:00
 #SBATCH --mem-per-cpu=128G
 #SBATCH --account=rrg-corbeilj-ac
 #SBATCH --array=5-6
