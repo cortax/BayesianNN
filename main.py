@@ -7,6 +7,12 @@ if __name__ == "__main__":
 
         index = int(sys.argv[1])
         time = str(sys.argv[2])
-        dataset = str(lines[index])
-
-        os.system('python -m Experiments.HMC --setup='+ dataset + ' --max_time='+time)
+        line = lines[index+1].split(',')
+        dataset = str(line[0])
+        num_iter = str(line[1])
+        burning = str(line[2])
+        thinning = str(line[3])
+        print(str(line[1]))
+        print(str(line[2]))
+        print(str(line[3]))
+        os.system('python -m Experiments.HMC --setup='+ dataset + ' --num_iter=' + num_iter + ' --burning=' + burning + ' --thinning=' + thinning + ' --max_time='+ time)
