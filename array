@@ -1,8 +1,8 @@
 dataset/num_iter/burning/thinning
-foong, 190000, 40000, 15
-boston, 140000, 40000, 10
-concrete, 140000, 40000, 10
-wine, 240000, 40000, 20
-yacht, 140000, 40000, 10
-kin8nm, 10000, 20000, 1
-powerplant, 10000, 20000, 1
+foong,190000,40000,15
+boston,140000,40000,10
+concrete,140000,40000,10
+wine,240000,40000,20
+yacht,140000,40000,10
+kin8nm,10000,20000,1
+powerplant,10000,20000,1
