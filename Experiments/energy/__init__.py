@@ -13,12 +13,12 @@ nblayers = 1
 activation = nn.ReLU()
 layerwidth = 50
 sigma_noise = 1.4 #yarin gal 1.4
-seed = 1#42
+seed = 42
 sigma_prior=0.5
 
 
 class Setup(AbstractRegressionSetup): 
-    def __init__(self, device):
+    def __init__(self, device, seed=seed):
         self.experiment_name = experiment_name
         
         self.sigma_noise = sigma_noise

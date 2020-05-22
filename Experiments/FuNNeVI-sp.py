@@ -4,6 +4,7 @@ import argparse
 import mlflow
 import timeit
 
+import numpy as np
 
 from tempfile import TemporaryDirectory
 
@@ -22,11 +23,12 @@ patience 100, 300
 learning rate 0.01, 0.005
 
 """
-g_lr=[0.01, 0.005,0.002]#[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
-g_pat=[400, 600]#[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
+g_lr=[0.01]#[0.01, 0.005,0.002]#[0.005, 0.002, 0.0005]#.002, 0.001, 0.0005]#[0.001, 0.0005]#[0.01, 0.005, 0.002, 0.001]
+g_pat=[600]#[100, 300, 600]#[100, 300, 600]#[300, 500]#[100, 300, 600]
 lr_decay=0.5
 
-
+best_lr=0.005
+best_patience=600
 
 ## command line example
 # python -m Experiments.GeNVI-pred --setup=boston --max_iter=10000 --learning_rate=0.05
@@ -114,7 +116,7 @@ parser.add_argument("--NNE", type=int, default=1,
                     help="k≥1 Nearest Neighbor Estimate")
 parser.add_argument("--ratio_ood", type=float, default=1.,
                     help="ratio in [0,1] of ood inputs w.r.t data inputs for MC sampling of predictive distance")
-parser.add_argument("--n_samples_FU", type=int, default=20,
+parser.add_argument("--n_samples_FU", type=int, default=50,
                     help="number of samples for functions estimation")
 parser.add_argument("--p_norm", type=int, default=2,
                     help="L_p norm to use for functions")
@@ -122,7 +124,7 @@ parser.add_argument("--n_samples_KL", type=int, default=1000,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
-parser.add_argument("--batch", type=int, default=None,
+parser.add_argument("--batch", type=int, default=100,
                     help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
@@ -139,69 +141,47 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    
-    setup_ = get_setup(args.setup)
-    setup=setup_.Setup(args.device) 
-    
-    loglikelihood=setup.loglikelihood
-    projection=setup.projection
-    size_sample=setup.n_train_samples
-    param_count=setup.param_count
-
-    
     batch=args.batch
     if batch is None:
         batch=size_sample
     
-    
+    setup_ = get_setup(args.setup)
+    setup=setup_.Setup(args.device) 
 
+    
     def prior(n):
-        return setup.sigma_prior*torch.randn(size=(n,param_count), device=args.device)
-
-
-    ##grid search for convergence parameters
+            return setup.sigma_prior*torch.randn(size=(n,param_count), device=args.device)
     
-    best_elbo=torch.tensor(float('inf'))
-    best_lr=None
-    best_patience=None
-    ELBOs=[]
-
-    for lr in g_lr:
-        for patience in g_pat:
-            _, _, ELBO = learning(loglikelihood, batch, setup.n_train_samples, prior, projection, 
-                                        args.n_samples_FU, args.ratio_ood, args.p_norm,
-                                        args.lat_dim, setup.param_count,
-                                        args.NNE, args.n_samples_KL, args.n_samples_LL,
-                                        args.max_iter, lr, args.min_lr, patience,
-                                        lr_decay, args.device)
-            print('ELBO: '+str(ELBO))
-            ELBOs.append((lr,patience,ELBO))
-
-            if ELBO < best_elbo:
-                best_elbo=ELBO
-                best_lr=lr
-                best_patience=patience
-    
-        
-    
-    xpname = setup.experiment_name + '/FuNNeVI-gs'
+    xpname = setup.experiment_name + '/FuNNeVI-sp'
     mlflow.set_experiment(xpname)
     
     with mlflow.start_run():
-        for lr,pat,ELBO in ELBOs:
-            mlflow.log_metric(str(lr)+' / '+str(pat), ELBO)
 
         log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, args.p_norm, batch,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
                              args.max_iter, best_lr, args.min_lr, best_patience, lr_decay,
                              args.device)
-        
+
+
+        RMSEs=[]
+        LPPs=[]
+
         GeN_models_dict=[]
-        for i in range(args.nb_models):
+        
+        for i in range(10):
+            seed=42+i
+
+            setup=setup_.Setup(args.device,seed) 
+
+            loglikelihood=setup.loglikelihood
+            projection=setup.projection
+            size_sample=setup.n_train_samples
+            param_count=setup.param_count
+
             with mlflow.start_run(run_name=str(i),nested=True):
                 start = timeit.default_timer()
-    
+
                 GeN, log_scores, ELBO = learning(loglikelihood, batch, setup.n_train_samples,
                                                                         prior, projection, 
                                                                         args.n_samples_FU, args.ratio_ood, args.p_norm,
@@ -218,14 +198,21 @@ if __name__ == "__main__":
 
                 log_device = 'cpu'
                 theta = GeN(1000).detach().to(log_device)
-                log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
+                LPP_test, RMSE_test, _ =log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
+                RMSEs.append(RMSE_test[0])
+                LPPs.append(LPP_test[0])
 
                 save_model(GeN)
                 GeN_models_dict.append((i,GeN.state_dict().copy()))
 
-                if setup.plot:
-                    draw_experiment(setup, theta[0:1000], log_device)
-      
+
+
+        mlflow.log_metric('RMSE',np.mean(RMSEs))
+        mlflow.log_metric('RMSE-std',np.std(RMSEs))
+        mlflow.log_metric('LPP',np.mean(LPPs))
+        mlflow.log_metric('LPP-std',np.std(LPPs))
+
+
         tempdir = tempfile.TemporaryDirectory()
         torch.save({str(i): models for i,models in GeN_models_dict}, tempdir.name + '/models.pt')
         mlflow.log_artifact(tempdir.name + '/models.pt')

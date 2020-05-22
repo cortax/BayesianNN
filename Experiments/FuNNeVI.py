@@ -30,7 +30,7 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
                    lat_dim, param_count, 
                    kNNE, n_samples_KL, n_samples_LL,  
                    max_iter, learning_rate, min_lr, patience, lr_decay, 
-                   device, save_best):
+                   device):
 
     GeN = BigGenerator(lat_dim, param_count,device).to(device)
     #GeN=SLPGenerator(lat_dim, param_count,device).to(device)
@@ -40,7 +40,7 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
         optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                               kNNE, n_samples_KL, n_samples_LL, 
                               max_iter, learning_rate, min_lr, patience, lr_decay,
-                              device, temp_dir, save_best)
+                              device, temp_dir)
 
         the_epoch, the_scores = optimizer.run(GeN)
         
@@ -54,7 +54,7 @@ def log_GeNVI_experiment(ELBO, setup,  n_samples_FU, ratio_ood, scores, p, batch
                          lat_dim, 
                          kNNE, n_samples_KL, n_samples_LL, 
                          max_iter, learning_rate, min_lr, patience, lr_decay,
-                         device, save_best):
+                         device):
 
 
     mlflow.set_tag('batch_size', batch)
@@ -67,7 +67,6 @@ def log_GeNVI_experiment(ELBO, setup,  n_samples_FU, ratio_ood, scores, p, batch
     mlflow.set_tag('NNE', kNNE)
    
     mlflow.set_tag('device', device)
-    mlflow.set_tag('save_best', save_best)
 
     mlflow.log_param('lat_dim', lat_dim)
 
@@ -126,8 +125,7 @@ parser.add_argument("--lr_decay", type=float, default=.5,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")
 parser.add_argument("--device", type=str, default=None,
                     help="force device to be used")
-parser.add_argument('--save_best', dest='save_best', action='store_true',help="to return model with best ELBO during training, else return last model")
-parser.set_defaults(save_best=False)
+
                     
 if __name__ == "__main__":
 
@@ -159,7 +157,7 @@ if __name__ == "__main__":
                                                       args.lat_dim, setup.param_count,
                                                       args.NNE, args.n_samples_KL, args.n_samples_LL,
                                                       args.max_iter, args.learning_rate, args.min_lr, args.patience,
-                                                      args.lr_decay, args.device, args.save_best)
+                                                      args.lr_decay, args.device)
 
     
     stop = timeit.default_timer()
@@ -175,7 +173,7 @@ if __name__ == "__main__":
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
                              args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
-                             args.device, args.save_best)
+                             args.device)
 
         log_device = 'cpu'
         
