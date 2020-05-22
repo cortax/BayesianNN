@@ -12,5 +12,5 @@ if __name__ == "__main__":
         num_iter = str(line[1])
         burning = str(line[2])
         thinning = str(line[3])
-
-        os.system('python -m Experiments.HMC --setup='+ dataset + ' --numiter=' + num_iter + ' --burning=' + burning + ' --thinning=' + thinning + ' --max_time='+ time)
+        path_len = str(line[4])
+        os.system('python -m Experiments.HMC --setup='+ dataset + ' --numiter=' + num_iter + ' --burning=' + burning + ' --thinning=' + thinning + ' --path_len=' + path_len + ' --max_time='+ time)
