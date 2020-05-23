@@ -12,7 +12,7 @@ class FuNNeVI():
     def __init__(self, loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                  kNNE, n_samples_KL, n_samples_LL,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
-                 device,  temp_dir, save_best=True):
+                 device,  temp_dir):
         self.loglikelihood=loglikelihood
         self.batch=batch
         self.size_data=size_data
@@ -30,23 +30,11 @@ class FuNNeVI():
         self.lr_decay = lr_decay
         self.device = device
     
-        self.save_best=save_best
-        self._best_score=float('inf')
         
         self.p=p
 
         self.tempdir_name = temp_dir
 
-    def _save_best_model(self, GeN, epoch, score,ED,LP):
-        if score < self._best_score:
-            torch.save({
-                'epoch': epoch,
-                'state_dict': GeN.state_dict(),
-                'ELBO': score,
-                'ED':ED,
-                'LP':LP
-            }, self.tempdir_name+'/best.pt')
-            self._best_score=score
 
     def ELBO(self,GeN,m_MCL=100,n_LL=200):
         #compute ELBO of GeN accurately
@@ -75,11 +63,7 @@ class FuNNeVI():
         return (self.batch/self.size_data)*K
 
         
-             
-    def _get_best_model(self, GeN):
-        best= torch.load(self.tempdir_name+'/best.pt')
-        GeN.load_state_dict(best['state_dict'])
-        return best['epoch'], [best['ELBO'], best['ED'], best['LP']]
+
 
     def run(self, GeN, show_fn=None):
         optimizer = torch.optim.Adam(GeN.parameters(), lr=self.learning_rate)
@@ -107,24 +91,17 @@ class FuNNeVI():
 
                 tr.set_postfix(ELBO=L.item(), LogLike=LL.item(), KL=K.item(), lr=lr)
 
+                                
                 if t % 100 ==0:
                     self.scores['ELBO'].append(L.item())
                     self.scores['KL'].append(K.item())
                     self.scores['LL'].append(LL.item())
                     self.scores['lr'].append(lr)
 
-                if self.save_best:
-                    self._save_best_model(GeN, t,L.item(), K.item(), LL.item())
-
+      
                 if lr < self.min_lr:
-                    self._save_best_model(GeN, t, L.item(), K.item(), LL.item())
-                    break
-
-                if t+1==self.max_iter:
-                    self._save_best_model(GeN, t, L.item(), K.item(), LL.item())
+                      break
 
                 optimizer.step()
 
-            
-        best_epoch, best_scores =self._get_best_model(GeN)
-        return best_epoch, best_scores
+            return self.ELBO(GeN)

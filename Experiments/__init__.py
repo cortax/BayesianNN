@@ -1,4 +1,4 @@
-from Metrics import RMSE, LPP
+from Metrics import RMSE, LPP, PICP, MPIW
 
 import tempfile
 import mlflow
@@ -37,23 +37,20 @@ def get_setup(setup):
 def log_exp_metrics(evaluate_metrics, theta_ens, execution_time, device):
     mlflow.set_tag('execution_time ', '{0:.2f}'.format(execution_time)+'s')
 
-    LPP_test, RMSE_test, RMSE_train = evaluate_metrics(theta_ens, device)
-#   mlflow.log_metric("MnLPP_train", float(nLPP_train[0].item()))
-#    mlflow.log_metric("MnLPP_validation", float(nLPP_validation[0].cpu().numpy()))
-    mlflow.log_metric("LPP_test", float(LPP_test[0].cpu().numpy()))
+    LPP_test, RMSE_test, RMSE_train, PICP_test, MPIW_test = evaluate_metrics(theta_ens, device)
 
-#    mlflow.log_metric("SnLPP_train", float(nLPP_train[1].cpu().numpy()))
-#    mlflow.log_metric("SnLPP_validation", float(nLPP_validation[1].cpu().numpy()))
-    mlflow.log_metric("LPP_test_std", float(LPP_test[1].cpu().numpy()))
+    mlflow.log_metric("LPP_test", LPP_test[0].item())
 
-#    mlflow.log_metric("MSE_train", float(RSE_train[0].cpu().numpy()))
-#    mlflow.log_metric("MSE_validation", float(RSE_validation[0].cpu().numpy()))
-    mlflow.log_metric("RMSE_test", float(RMSE_test[0].cpu().numpy()))
-    mlflow.log_metric("RMSE_train", float(RMSE_train[0].cpu().numpy()))
+    mlflow.log_metric("LPP_test_std", LPP_test[1].item())
 
-#    mlflow.log_metric("SSE_train", float(RSE_train[1].cpu().numpy()))
-#    mlflow.log_metric("SSE_validation", float(RSE_validation[1].cpu().numpy()))
-    mlflow.log_metric("RSSE_test_std", float(RMSE_test[1].cpu().numpy()))
+    mlflow.log_metric("RMSE_test", RMSE_test[0].item())
+    mlflow.log_metric("RMSE_train", RMSE_train[0].item())
+
+    mlflow.log_metric("RSSE_test_std", RMSE_test[1].item())
+    
+    mlflow.log_metric("PICP_test", PICP_test.item())
+    mlflow.log_metric("MPIW_test", MPIW_test.item())
+
     return LPP_test, RMSE_test, RMSE_train
 
 def draw_experiment(setup, theta,device):
@@ -78,7 +75,6 @@ def save_params_ens(theta):
     torch.save(theta, tempdir.name + '/theta.pt')
     mlflow.log_artifact(tempdir.name + '/theta.pt')
 
-seed=1
 
 class AbstractRegressionSetup():
     def __init__(self,):
@@ -103,24 +99,24 @@ class AbstractRegressionSetup():
 
     def evaluate_metrics(self, theta, device='cpu'):
         theta = theta.to(device)
-     #   nLPP_train = nLPP(self._loglikelihood, theta, self._X_train, self._y_train.to(device),device)
-     #   nLPP_validation = nLPP(self._loglikelihood, theta, self._X_validation, self._y_validation.to(device),device)
-
+        
         y_pred=self._model(self._X_test.to(device), theta)
         LPP_test = LPP(y_pred, self._y_test.to(device), self.sigma_noise, device)
 
-     #   RSE_train = RSE(self._normalized_prediction, theta, self._X_train, self._y_train.to(device),device)
-     #   RSE_validation = RSE(self._normalized_prediction, theta, self._X_validation, self._y_validation.to(device),device)
         std_y_train = torch.tensor(1.)
         if hasattr(self, '_scaler_y'):
             std_y_train=torch.tensor(self._scaler_y.scale_, device=device).float()
         
         y_pred_mean = y_pred.mean(dim=0)
-        RMSE_test = RMSE(self._y_test.to(device), y_pred_mean, std_y_train, device)
+        RMSE_test = RMSE(y_pred_mean, self._y_test.to(device), std_y_train, device)
         
         y_pred_train_mean=self._model(self._X_train.to(device), theta).mean(dim=0)
         RMSE_train = RMSE(self._y_train.to(device), y_pred_train_mean, std_y_train, device)
-        return LPP_test, RMSE_test, RMSE_train
+        
+        PICP_test=PICP(y_pred, self._y_test.to(device), device)
+
+        MPIW_test= MPIW(y_pred, std_y_train, device)
+        return LPP_test, RMSE_test, RMSE_train, PICP_test, MPIW_test
 
     def _logprior(self, theta):
         return logmvn01pdf(theta, self.device, v=self.sigma_prior)

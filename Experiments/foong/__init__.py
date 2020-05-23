@@ -82,7 +82,7 @@ class Setup(AbstractRegressionSetup):
         N_high=N-N_low
         X=torch.arange(-2,2,0.02).to(device)
 
-        pred, _=self._normalized_prediction(X,theta,device).sort(dim=0)
+        pred, _=self._model(X,theta).sort(dim=0)
         y_mean=pred.mean(dim=0).squeeze().cpu()
         y_low=pred[N_low,:].squeeze().cpu()
         y_high=pred[N_high,:].squeeze().cpu()
