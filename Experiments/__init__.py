@@ -11,6 +11,7 @@ from Tools import logmvn01pdf, NormalLogLikelihood
 from sklearn.model_selection import train_test_split
 from Preprocessing import fitStandardScalerNormalization, normalize
 
+test_ratio=0.1
 
 def switch_setup(setup):
     return {
@@ -87,6 +88,7 @@ class AbstractRegressionSetup():
         self.sigma_prior=None
         self.seed=None
         self.input_dim=None
+        self.test_ratio=test_ratio
 
     #@abstractmethod
 
@@ -153,7 +155,7 @@ class AbstractRegressionSetup():
         return self._logprior(theta) + torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
     
     def _split_holdout_data(self):
-        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=0.10, random_state=self.seed) #.20
+        X_tv, self._X_test, y_tv, self._y_test = train_test_split(self._X, self._y, test_size=test_ratio, random_state=self.seed) #.20
         self._X_train, self._y_train = X_tv, y_tv
         #self._X_train, self._X_validation, self._y_train, self._y_validation = train_test_split(X_tv, y_tv, test_size=0.25, random_state=seed)
         

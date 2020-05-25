@@ -5,7 +5,6 @@ import mlflow
 import timeit
 
 
-from tempfile import TemporaryDirectory
 
 from Inference.FuNNeVI import FuNNeVI
 from Models import BigGenerator, SLPGenerator
@@ -33,13 +32,12 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
     #GeN=SLPGenerator(lat_dim, param_count,device).to(device)
     #GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, device)
 
-    with TemporaryDirectory() as temp_dir:
-        optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
-                              kNNE, n_samples_KL, n_samples_LL, 
-                              max_iter, learning_rate, min_lr, patience, lr_decay,
-                              device, temp_dir)
+    optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
+                          kNNE, n_samples_KL, n_samples_LL, 
+                          max_iter, learning_rate, min_lr, patience, lr_decay,
+                          device)
 
-        ELBO = optimizer.run(GeN)
+    ELBO = optimizer.run(GeN)
 
     return GeN, optimizer.scores, ELBO.item()
 

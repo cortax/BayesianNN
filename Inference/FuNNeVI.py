@@ -7,12 +7,14 @@ from tqdm import trange
 
 from Tools import KL, batchKL
 
+#regularizer for the KL
+rho=1.
 
 class FuNNeVI():
     def __init__(self, loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                  kNNE, n_samples_KL, n_samples_LL,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
-                 device,  temp_dir):
+                 device, show=None):
         self.loglikelihood=loglikelihood
         self.batch=batch
         self.size_data=size_data
@@ -29,11 +31,12 @@ class FuNNeVI():
         self.patience = patience
         self.lr_decay = lr_decay
         self.device = device
+        
+        self.show=show
     
         
         self.p=p
 
-        self.tempdir_name = temp_dir
 
 
     def ELBO(self,GeN,m_MCL=100,n_LL=200):
@@ -60,7 +63,7 @@ class FuNNeVI():
         theta_proj, theta_prior_proj = self.projection(theta, theta_prior, self.n_samples_FU, self.ratio_ood)
 
         K=KL(theta_proj, theta_prior_proj,k=self.kNNE,device=self.device,p=self.p)
-        return (self.batch/self.size_data)*K
+        return (self.batch/self.size_data)*rho*K
 
         
 
@@ -97,6 +100,8 @@ class FuNNeVI():
                     self.scores['KL'].append(K.item())
                     self.scores['LL'].append(LL.item())
                     self.scores['lr'].append(lr)
+                    if self.show is not None:
+                        self.show(GeN)
 
       
                 if lr < self.min_lr:

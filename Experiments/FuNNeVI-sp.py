@@ -43,13 +43,12 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
     #GeN=SLPGenerator(lat_dim, param_count,device).to(device)
     #GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, device)
 
-    with TemporaryDirectory() as temp_dir:
-        optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
-                              kNNE, n_samples_KL, n_samples_LL, 
-                              max_iter, learning_rate, min_lr, patience, lr_decay,
-                              device, temp_dir)
+    optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
+                          kNNE, n_samples_KL, n_samples_LL, 
+                          max_iter, learning_rate, min_lr, patience, lr_decay,
+                          device)
 
-        ELBO = optimizer.run(GeN)
+    ELBO = optimizer.run(GeN)
 
     return GeN, optimizer.scores, ELBO.item()
 
@@ -61,11 +60,8 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
                          max_iter, learning_rate, min_lr, patience, lr_decay,
                          device):
     
+    mlflow.set_tag('test ratio', setup.test_ratio)
     mlflow.set_tag('batch_size', batch)
-
-    
-    mlflow.set_tag('lr grid', str(g_lr))
-    mlflow.set_tag('patience grid', str(g_pat))
     
     mlflow.set_tag('sigma_noise', setup.sigma_noise)    
 
@@ -110,8 +106,6 @@ parser.add_argument("--setup", type=str, default=None,
                     help="data setup on which run the method")
 parser.add_argument("--lat_dim", type=int, default=5,
                     help="number of latent dimensions of each hypernet")
-parser.add_argument("--nb_models", type=int, default=2,
-                    help="number of models to learn")
 parser.add_argument("--NNE", type=int, default=1,
                     help="k≥1 Nearest Neighbor Estimate")
 parser.add_argument("--ratio_ood", type=float, default=1.,
@@ -166,7 +160,7 @@ if __name__ == "__main__":
 
         RMSEs=[]
         LPPs=[]
-
+        TIMEs=[]
         GeN_models_dict=[]
         
         for i in range(10):
@@ -201,12 +195,13 @@ if __name__ == "__main__":
                 LPP_test, RMSE_test, _ =log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
                 RMSEs.append(RMSE_test[0])
                 LPPs.append(LPP_test[0])
+                TIMEs.append(execution_time)
 
                 save_model(GeN)
                 GeN_models_dict.append((i,GeN.state_dict().copy()))
 
 
-
+        mlflow.log_metric('average time',np.mean(TIMEs))
         mlflow.log_metric('RMSE',np.mean(RMSEs))
         mlflow.log_metric('RMSE-std',np.std(RMSEs))
         mlflow.log_metric('LPP',np.mean(LPPs))

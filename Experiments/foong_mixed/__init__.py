@@ -58,7 +58,7 @@ class Setup(AbstractRegressionSetup):
         fig, ax = plt.subplots()
         fig.set_size_inches(10, 10)
         plt.xlim(-2, 2) 
-        plt.ylim(-4, 6)
+        plt.ylim(-5, 5)
         plt.grid(True, which='major', linewidth=0.5)
 #        plt.title('Validation set')
 
@@ -74,29 +74,28 @@ class Setup(AbstractRegressionSetup):
          #   plt.fill_between(x_lin.detach().cpu().numpy().squeeze(), y_pred.squeeze(0).detach().cpu().numpy().squeeze()-3*self.sigma_noise, y_pred.squeeze(0).detach().cpu().numpy().squeeze()+3*self.sigma_noise, alpha=0.5, color='lightblue')
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
-    
+
     def makePlotCI(self, theta, device):
         N=theta.shape[0]
-        N_low=int(0.025*N)
+        N_low=int(0.022*N)
         N_high=N-N_low
         X=torch.arange(-2,2,0.02).to(device)
 
-        pred, _=self._normalized_prediction(X,theta).sort(dim=0)
-        y_mean=pred.mean(dim=0).cpu()
-        y_low=pred[N_low,:].cpu()
-        y_high=pred[N_high,:].cpu()
+        pred, _=self._model(X,theta).sort(dim=0)
+        y_mean=pred.mean(dim=0).squeeze().cpu()
+        y_low=pred[N_low,:].squeeze().cpu()
+        y_high=pred[N_high,:].squeeze().cpu()
 
         fig, ax=plt.subplots()
         ax.fill_between(X.cpu(), y_low, y_high, facecolor='springgreen', alpha=0.1)
         plt.plot(X.cpu(),y_mean, color='springgreen')
+        plt.grid(True, which='major', linewidth=0.5)
+
         plt.xlim(-2,2)
-        plt.ylim(-4, 4)
+        plt.ylim(-5, 5)
         plt.scatter(self._X_train.cpu(), self._y_train.cpu(), marker='.',color='black',zorder=4)
         return fig
 
-    def loglikelihood(self, theta):
-        ll=torch.sum(self._loglikelihood(theta, self._X_train, self._y_train, self.device),dim=1)
-        return ll
     
     def loss(self,theta, R):
         y_pred = self._normalized_prediction(self._X_train, theta, self.device)  # MxNx1 tensor
@@ -111,31 +110,27 @@ class Setup(AbstractRegressionSetup):
     def logprior(self, theta):
         return  self._logprior(theta)
    
-    def projection(self,theta,n_samples,ratio_ood):
+    def projection(self,theta0,theta1, n_samples,ratio_ood):
         #compute size of both samples
+        #n_samples=self.n_train_samples
         n_id=int((1.-ratio_ood)*n_samples)
         n_ood=int(ratio_ood*n_samples)
-
+        
         #batch sample from train
         index=torch.randperm(self._X_train.shape[0])
         X_id=self._X_train[index][0:n_id]
-
-
+                
         X_ood=torch.Tensor(n_ood,input_dim)
         for i in range(input_dim):
             X_ood[:,i].uniform_(-2,2)
         # here is using a normal instead   
         #ood_samples=torch.Tensor(n_ood,input_dim).normal_(0.,3.).to(self.device)
         X=torch.cat([X_id, X_ood.to(self.device)])
-        theta_proj=self._model(X, theta).squeeze(2)
-        return theta_proj
-    """
-    def projection(self,theta,k):
-        X=torch.Tensor(k,input_dim).uniform_(-2.,2.).to(self.device)
-        theta_proj=self._normalized_prediction(X, theta, self.device).squeeze(2)
-        #theta_proj=self._normalized_prediction(self._X_train, theta, self.device).squeeze(2)
-        return theta_proj
-    """
+        
+        #compute projection on both paramters with model
+        theta0_proj=self._model(X, theta0).squeeze(2)
+        theta1_proj=self._model(X, theta1).squeeze(2)
+        return theta0_proj, theta1_proj
     
     def prediction(self,X,theta):
         y_pred=self._normalized_prediction(X, theta, self.device).squeeze(2)
