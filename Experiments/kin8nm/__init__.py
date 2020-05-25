@@ -19,6 +19,8 @@ sigma_prior=0.5
 
 class Setup(AbstractRegressionSetup): 
     def __init__(self, device, seed=seed):
+        super(Setup, self).__init__()
+
         self.experiment_name = experiment_name
         self.sigma_noise = sigma_noise
         self.sigma_prior=sigma_prior
