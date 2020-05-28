@@ -1,5 +1,8 @@
 import torch
 import math
+import torch.nn.functional as F
+import numpy as np
+import scipy.stats as st
 
 
 def log_norm(x, mu, std):
@@ -240,4 +243,24 @@ def sw(S0,S1, device, L=1000):
     S1_1d=proj1d(S1,u)
     W=[st.wasserstein_distance(S0_1d[i,:].cpu(), S1_1d[i,:].cpu()) for i in range(L)]
     return np.mean(W), np.std(W)/L
-     
+
+def FunSW(t,s,projection,device, n=50, n_samples_inputs=50, L=100):
+    assert t.shape == s.shape
+    W=torch.Tensor(n)
+    for i in range(n):
+        t_, s_= projection(t, s, n_samples_inputs)
+        # I added 1/sqrt(n_samples_input) the scaling factor we discussed :-)
+        W[i]=1/torch.tensor(float(n_samples_input)).sqrt()*sw(s_, t_,device, L=L)[0] 
+    return W.mean(), W.std()
+
+def FunKL(t,s,projection,device,k=1,n=100, m=50):
+    assert t.shape == s.shape
+    K=torch.Tensor(n)
+    for i in range(n):
+        t_, s_= projection(t, s, m)
+        K[i]=KL(t_, s_, k=k,device=device)
+    return K.mean(), K.std()
+
+def SFunKL(t,s,projection, device, k=1,n=100, m=50):
+    K=FunKL(t,s,projection, device)+FunKL(s,t, projection, device)
+    return K
