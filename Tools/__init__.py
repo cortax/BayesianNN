@@ -208,4 +208,36 @@ def EntropyKDE(x,y,device):
     """
     K=KDE(x,y.unsqueeze(0),device)
     return -K.mean()
+
+
+def sphere(L,dim):
+    theta=torch.randn(size=(L,dim))
+    directions=F.normalize(theta, p=2, dim=1)
+    return  directions
+
+def proj1d(S,u):
+    """
+    inputs:
+        S: Tensor M x D
+        u: Tensor K x D
+        
+    returns:
+        dot: Tensor Kx M
+    
+    """
+    assert S.shape[1] == u.shape[1]
+    dim=S.shape[1]
+    S_=S.view(S.shape[0],dim,1)
+    u_=u.view(u.shape[0],1,1,dim)
+    dot=torch.matmul(u_, S_).squeeze()
+    return dot
+
+def sw(S0,S1, device, L=1000):
+    assert S0.shape[1] == S1.shape[1]
+    dim=S0.shape[1]
+    u=sphere(L,dim).to(device)
+    S0_1d=proj1d(S0,u)
+    S1_1d=proj1d(S1,u)
+    W=[st.wasserstein_distance(S0_1d[i,:].cpu(), S1_1d[i,:].cpu()) for i in range(L)]
+    return np.mean(W), np.std(W)/L
      
