@@ -14,8 +14,8 @@ import tempfile
 
 
 lr=0.005
-patience=600
-lr_decay=0.5
+patience=100
+lr_decay=0.7
 
 
 
@@ -105,7 +105,7 @@ parser.add_argument("--n_samples_FU", type=int, default=50,
                     help="number of samples for functions estimation")
 parser.add_argument("--p_norm", type=int, default=2,
                     help="L_p norm to use for functions")
-parser.add_argument("--n_samples_KL", type=int, default=1000,
+parser.add_argument("--n_samples_KL", type=int, default=100,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
@@ -113,7 +113,7 @@ parser.add_argument("--batch", type=int, default=None,
                     help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
-parser.add_argument("--min_lr", type=float, default=1e-7,
+parser.add_argument("--min_lr", type=float, default=1e-5,
                     help="minimum learning rate triggering the end of the optimization")
 parser.add_argument("--lr_decay", type=float, default=.5,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")
@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
     
     
-    xpname = setup.experiment_name + '/FuNNeVI-mr'
+    xpname = setup.experiment_name + '/FuNNeVI-mres'
     mlflow.set_experiment(xpname)
     
     with mlflow.start_run():
