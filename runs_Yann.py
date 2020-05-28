@@ -48,3 +48,18 @@ if __name__ == "__main__":
         pool.map(run_dataset, ["-m Experiments.FuNNeVI-mres --n_samples_FU=20 --nb_models="+str(n)+" --setup="+dataset+"  --device='cuda:0'"])  
 
         print(dataset+': done :-)')
+        
+           #sort of early stopping for FuNNeVI
+    pool = Pool(processes=1) 
+
+    for dataset in ['boston', 'yacht', 'concrete','energy', 'wine','powerplant']:
+        print(dataset)
+        pool.map(run_dataset, ["-m Experiments.FuNNeVI-spes --setup="+dataset+"  --device='cuda:0'"])  
+        print(dataset+': done :-)')
+    
+    print('kin8nm')
+    pool.map(run_dataset, ["-m Experiments.FuNNeVI-spes --setup=kin8nm --NNE=1  --device='cuda:0'"])
+
+    print('kin8nm: done :-)')
+    
+   
