@@ -104,7 +104,7 @@ parser.add_argument("--batch", type=int, default=100,
                     help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
-parser.add_argument("--min_lr", type=float, default=1e-7,
+parser.add_argument("--min_lr", type=float, default=6e-4,
                     help="minimum learning rate triggering the end of the optimization")
 parser.add_argument("--lr_decay", type=float, default=.5,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")

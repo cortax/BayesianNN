@@ -48,8 +48,10 @@ class GeNNeVI():
 
 
     def run(self, GeN, show_fn=None):
+        one_epoch=int(self.size_data/self.batch)
+
         optimizer = torch.optim.Adam(GeN.parameters(), lr=self.learning_rate)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=self.patience,
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=one_epoch*self.patience,
                                                                factor=self.lr_decay)
         self.scores={'ELBO': [] ,
                      'KL':[],

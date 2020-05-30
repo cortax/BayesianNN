@@ -204,7 +204,7 @@ class AbstractRegressionSetup():
 
         X_ood=torch.Tensor(n_ood,self.input_dim)
         for i in range(self.input_dim):
-            X_ood[:,i].uniform_(m[i]-1,M[i]+1)
+            X_ood[:,i].uniform_(m[i]-0.1,M[i]+.1)
         
         X=torch.cat([X_id, X_ood.to(self.device)])
         

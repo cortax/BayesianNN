@@ -14,9 +14,8 @@ import tempfile
 
 
 lr=0.005
-patience=100
 lr_decay=0.7
-
+min_lr=0.001
 
 
 ## command line example
@@ -105,7 +104,7 @@ parser.add_argument("--n_samples_FU", type=int, default=50,
                     help="number of samples for functions estimation")
 parser.add_argument("--p_norm", type=int, default=2,
                     help="L_p norm to use for functions")
-parser.add_argument("--n_samples_KL", type=int, default=100,
+parser.add_argument("--n_samples_KL", type=int, default=1000,
                     help="number of samples for NNE estimation of the KL")
 parser.add_argument("--n_samples_LL", type=int, default=100,
                     help="number of samples for estimation of expected loglikelihood")
@@ -113,7 +112,9 @@ parser.add_argument("--batch", type=int, default=None,
                     help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
-parser.add_argument("--min_lr", type=float, default=1e-5,
+parser.add_argument("--patience", type=int, default=100,
+                    help="scheduler patience")
+parser.add_argument("--min_lr", type=float, default=min_lr,
                     help="minimum learning rate triggering the end of the optimization")
 parser.add_argument("--lr_decay", type=float, default=.5,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")
@@ -156,7 +157,7 @@ if __name__ == "__main__":
         log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, args.p_norm, batch,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
-                             args.max_iter, lr, args.min_lr, patience, lr_decay,
+                             args.max_iter, lr, args.min_lr, args.patience, lr_decay,
                              args.device)
         
         GeN_models_dict=[]
@@ -169,7 +170,7 @@ if __name__ == "__main__":
                                                                         args.n_samples_FU, args.ratio_ood, args.p_norm,
                                                                         args.lat_dim, setup.param_count,
                                                                         args.NNE, args.n_samples_KL, args.n_samples_LL,
-                                                                        args.max_iter, lr, args.min_lr, patience,
+                                                                        args.max_iter, lr, args.min_lr, args.patience,
                                                                         lr_decay, args.device)
 
 
