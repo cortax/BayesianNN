@@ -121,6 +121,7 @@ def KL(theta0,theta1,k=1,device='cpu', p=2):
         
         Mnn=(torch.log(a1)-torch.log(a0)).mean()
         return dim0*Mnn + N1.log()-(N0-1).log()
+    
 
 def batchKL(theta0,theta1,k=1,device='cpu', p=2):
         """
@@ -242,16 +243,16 @@ def sw(S0,S1, device, L=1000):
     S0_1d=proj1d(S0,u)
     S1_1d=proj1d(S1,u)
     W=[st.wasserstein_distance(S0_1d[i,:].cpu(), S1_1d[i,:].cpu()) for i in range(L)]
-    return np.mean(W), np.std(W)/L
+    return np.mean(W)#, np.std(W)/L
 
-def FunSW(t,s,projection,device, n=50, n_samples_inputs=50, L=100):
+def FunSW(t,s, projection, device, n=50, n_samples_inputs=50, L=100):
     assert t.shape == s.shape
     W=torch.Tensor(n)
     for i in range(n):
         t_, s_= projection(t, s, n_samples_inputs)
         # I added 1/sqrt(n_samples_input) the scaling factor we discussed :-)
-        W[i]=1/torch.tensor(float(n_samples_input)).sqrt()*sw(s_, t_,device, L=L)[0] 
-    return W.mean(), W.std()
+        W[i]=1/torch.tensor(float(n_samples_inputs)).sqrt()*sw(s_.to(device), t_.to(device),device, L=L)
+    return W.mean()#, W.std()
 
 def FunKL(t,s,projection,device,k=1,n=100, m=50):
     assert t.shape == s.shape
@@ -259,7 +260,7 @@ def FunKL(t,s,projection,device,k=1,n=100, m=50):
     for i in range(n):
         t_, s_= projection(t, s, m)
         K[i]=KL(t_, s_, k=k,device=device)
-    return K.mean(), K.std()
+    return K.mean()#, K.std()
 
 def SFunKL(t,s,projection, device, k=1,n=100, m=50):
     K=FunKL(t,s,projection, device)+FunKL(s,t, projection, device)

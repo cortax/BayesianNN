@@ -15,10 +15,7 @@ from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 import tempfile
 
 
-lr_decay=0.5
 
-best_lr=0.005
-best_patience=600
 
 
 def learning(loglikelihood, batch, size_data, prior,
@@ -104,16 +101,18 @@ parser.add_argument("--batch", type=int, default=100,
                     help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
-parser.add_argument("--min_lr", type=float, default=6e-4,
+parser.add_argument("--learning_rate", type=float, default=0.005,
+                    help="initial learning rate of the optimizer")
+parser.add_argument("--patience", type=int, default=400,
+                    help="scheduler patience")
+parser.add_argument("--min_lr", type=float, default=0.001,
                     help="minimum learning rate triggering the end of the optimization")
-parser.add_argument("--lr_decay", type=float, default=.5,
+parser.add_argument("--lr_decay", type=float, default=.7,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")
 parser.add_argument("--device", type=str, default=None,
                     help="force device to be used")
 
-                    
-if __name__ == "__main__":
-
+def main():
     args = parser.parse_args()
     print(args)
 
@@ -128,7 +127,7 @@ if __name__ == "__main__":
     def prior(n):
             return setup.sigma_prior*torch.randn(size=(n,param_count), device=args.device)
     
-    xpname = setup.experiment_name + '/GeNNeVI-mr'
+    xpname = setup.experiment_name + '/GeNNeVI-mres'
     mlflow.set_experiment(xpname)
     
     with mlflow.start_run():
@@ -136,7 +135,7 @@ if __name__ == "__main__":
         log_GeNVI_experiment(setup, batch,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
-                             args.max_iter, best_lr, args.min_lr, best_patience, lr_decay,
+                             args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
                              args.device)
 
 
@@ -161,8 +160,8 @@ if __name__ == "__main__":
                 GeN, log_scores, ELBO = learning(loglikelihood, batch, setup.n_train_samples, prior, 
                                                  args.lat_dim, setup.param_count,
                                                  args.NNE, args.n_samples_KL, args.n_samples_LL,
-                                                 args.max_iter, best_lr, args.min_lr, best_patience,
-                                                 lr_decay, args.device)
+                                                 args.max_iter, args.learning_rate, args.min_lr, args.patience,
+                                                 args.lr_decay, args.device)
 
 
                 stop = timeit.default_timer()
@@ -194,3 +193,11 @@ if __name__ == "__main__":
         tempdir = tempfile.TemporaryDirectory()
         torch.save({str(i): models for i,models in GeN_models_dict}, tempdir.name + '/models.pt')
         mlflow.log_artifact(tempdir.name + '/models.pt')
+
+    return models
+
+                    
+if __name__ == "__main__":
+    main()
+
+    

@@ -13,10 +13,6 @@ from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 import tempfile
 
 
-lr=0.005
-lr_decay=0.7
-min_lr=0.001
-
 
 ## command line example
 # python -m Experiments.GeNVI-pred --setup=boston --max_iter=10000 --learning_rate=0.05
@@ -112,18 +108,19 @@ parser.add_argument("--batch", type=int, default=None,
                     help="size of batches for likelihood evaluation")
 parser.add_argument("--max_iter", type=int, default=25000,
                     help="maximum number of learning iterations")
-parser.add_argument("--patience", type=int, default=100,
+parser.add_argument("--learning_rate", type=float, default=0.005,
+                    help="initial learning rate of the optimizer")
+parser.add_argument("--patience", type=int, default=400,
                     help="scheduler patience")
-parser.add_argument("--min_lr", type=float, default=min_lr,
+parser.add_argument("--min_lr", type=float, default=0.001,
                     help="minimum learning rate triggering the end of the optimization")
-parser.add_argument("--lr_decay", type=float, default=.5,
+parser.add_argument("--lr_decay", type=float, default=.7,
                     help="scheduler multiplicative factor decreasing learning rate when patience reached")
 parser.add_argument("--device", type=str, default=None,
                     help="force device to be used")
 
-                    
-if __name__ == "__main__":
 
+def main():
     args = parser.parse_args()
     print(args)
 
@@ -157,7 +154,7 @@ if __name__ == "__main__":
         log_GeNVI_experiment(setup, args.n_samples_FU, args.ratio_ood, args.p_norm, batch,
                              args.lat_dim, 
                              args.NNE, args.n_samples_KL, args.n_samples_LL,
-                             args.max_iter, lr, args.min_lr, args.patience, lr_decay,
+                             args.max_iter, args.learning_rate, args.min_lr, args.patience, args.lr_decay,
                              args.device)
         
         GeN_models_dict=[]
@@ -170,25 +167,31 @@ if __name__ == "__main__":
                                                                         args.n_samples_FU, args.ratio_ood, args.p_norm,
                                                                         args.lat_dim, setup.param_count,
                                                                         args.NNE, args.n_samples_KL, args.n_samples_LL,
-                                                                        args.max_iter, lr, args.min_lr, args.patience,
-                                                                        lr_decay, args.device)
+                                                                        args.max_iter, args.learning_rate, args.min_lr, args.patience,
+                                                                        args.lr_decay, args.device)
 
 
                 stop = timeit.default_timer()
                 execution_time = stop - start
 
                 log_GeNVI_run(ELBO, log_scores)
-
+                """
                 log_device = 'cpu'
                 theta = GeN(1000).detach().to(log_device)
                 log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
 
                 save_model(GeN)
                 GeN_models_dict.append((i,GeN.state_dict().copy()))
-
+                """
                 if setup.plot:
                     draw_experiment(setup, theta[0:1000], log_device)
       
         tempdir = tempfile.TemporaryDirectory()
-        torch.save({str(i): models for i,models in GeN_models_dict}, tempdir.name + '/models.pt')
+        models={str(i): models for i,models in GeN_models_dict}
+        torch.save(models, tempdir.name + '/models.pt')
         mlflow.log_artifact(tempdir.name + '/models.pt')
+    
+    return models
+        
+if __name__ == "__main__":
+    main()
