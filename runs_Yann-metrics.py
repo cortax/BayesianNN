@@ -45,9 +45,9 @@ def run(dataset, method):
     
     metrics_dict={dataset:{(method,'RMSE'):(np.mean(RMSEs).round(decimals=3),np.std(RMSEs).round(decimals=3)),
                            (method,'LPP'): (np.mean(LPPs).round(decimals=3),np.std(LPPs).round(decimals=3)),
-                           (method,'PICP'): {dataset: np.mean(PICPs).round(decimals=3), 
-                           (method,'MPIW'): {dataset: np.mean(MPIWs).round(decimals=3)
-                            }
+                           (method,'PICP'):  np.mean(PICPs).round(decimals=3), 
+                           (method,'MPIW'):  np.mean(MPIWs).round(decimals=3)
+                           }
                    }
                  
     
