@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     for m in methods:
         for d in datasets:
-            metrics=run(d, method) 
+            metrics=run(d, m) 
             print(d+': done :-)')
             results.update(metrics)
 
