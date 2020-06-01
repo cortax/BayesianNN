@@ -96,7 +96,7 @@ def log_GeNVI_run(ELBO, scores):
         
 
 
-def run(dataset, n_samples_FU, batch):
+def run(dataset, n_samples_FU):
     
     setup_ = get_setup(dataset)
     setup=setup_.Setup( device) 
