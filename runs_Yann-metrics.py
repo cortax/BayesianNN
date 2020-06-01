@@ -58,10 +58,10 @@ if __name__ == "__main__":
     
     results={}
 
-    
-    for d in datasets:
-        metrics=run(d, method) 
-        print(d+': done :-)')
-        results.update(metrics)
+    for m in methods:
+        for d in datasets:
+            metrics=run(d, method) 
+            print(d+': done :-)')
+            results.update(metrics)
 
     torch.save(results, 'Results/MR_metrics.pt')
