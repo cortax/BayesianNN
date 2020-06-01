@@ -107,7 +107,7 @@ class AbstractRegressionSetup():
 
         std_y_train = torch.tensor(1.)
         if hasattr(self, '_scaler_y'):
-            std_y_train=torch.tensor(self._scaler_y.scale_, device=device).float()
+            std_y_train=torch.tensor(self._scaler_y.scale_, device=device).squeeze().float()
         
         y_pred_mean = y_pred.mean(dim=0)
         RMSE_test = RMSE(y_pred_mean, self._y_test.to(device), std_y_train, device)

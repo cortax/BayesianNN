@@ -4,10 +4,12 @@ import argparse
 import mlflow
 import timeit
 
+import numpy as np
 
+from tempfile import TemporaryDirectory
 
-from Inference.FuNNeVI import FuNNeVI
-from Models import BigGenerator, SLPGenerator
+from Inference.GeNNeVI import GeNNeVI
+from Models import BigGenerator
 from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 
 import tempfile
@@ -17,16 +19,16 @@ nb_models=3
 NNE=1
 ratio_ood=1.
 p_norm=2
-n_samples_KL=1000
+n_samples_KL=500
 n_samples_LL=100
-max_iter=25000
+max_iter=20000
 learning_rate=0.005
 patience=400
 min_lr= 0.001
 lr_decay=.7
 device='cuda:0'
 
-def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
+def learning(loglikelihood, batch, size_data, prior,
                    lat_dim, param_count, 
                    kNNE, n_samples_KL, n_samples_LL,  
                    max_iter, learning_rate, min_lr, patience, lr_decay, 
@@ -36,7 +38,7 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
     #GeN=SLPGenerator(lat_dim, param_count,device).to(device)
     #GeN = GeNetEns(ensemble_size, lat_dim, layerwidth, param_count, activation, init_w, init_b, device)
 
-    optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
+    optimizer = GeNNeVI(loglikelihood, batch, size_data, prior,
                           kNNE, n_samples_KL, n_samples_LL, 
                           max_iter, learning_rate, min_lr, patience, lr_decay,
                           device)
@@ -47,7 +49,9 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
 
 
 
-def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
+
+
+def log_GeNVI_experiment(setup,  batch,
                          lat_dim, 
                          kNNE, n_samples_KL, n_samples_LL, 
                          max_iter, learning_rate, min_lr, patience, lr_decay,
@@ -55,7 +59,8 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
     
     mlflow.set_tag('batch_size', batch)
 
-        
+
+    
     mlflow.set_tag('sigma_noise', setup.sigma_noise)    
 
     mlflow.set_tag('sigma_prior', setup.sigma_prior)    
@@ -67,10 +72,7 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
 
     mlflow.log_param('lat_dim', lat_dim)
     
-    mlflow.log_param('L_p norm', p)
 
-    mlflow.log_param('n_samples_FU', n_samples_FU)
-    mlflow.log_param('ratio_ood', ratio_ood)
     mlflow.log_param('n_samples_KL', n_samples_KL)
     mlflow.log_param('n_samples_LL', n_samples_LL)
     
@@ -80,7 +82,7 @@ def log_GeNVI_experiment(setup,  n_samples_FU, ratio_ood, p, batch,
     mlflow.log_param('lr_decay', lr_decay)
     mlflow.log_param('max_iter', max_iter)
     mlflow.log_param('min_lr', min_lr)
-
+    
 def log_GeNVI_run(ELBO, scores):    
 
     mlflow.log_metric("The elbo", float(ELBO))
@@ -95,7 +97,7 @@ def log_GeNVI_run(ELBO, scores):
         
 
 
-def run(setup, n_samples_FU, batch, patience=patience):
+def run(setup, batch):
     
     setup_ = get_setup( setup)
     setup=setup_.Setup( device) 
@@ -117,142 +119,106 @@ def run(setup, n_samples_FU, batch, patience=patience):
 
 
     
-    
-    xpname = setup.experiment_name + '/FuNNeVI-mres'
+    xpname = setup.experiment_name + '/GeNNeVI-mr'
     mlflow.set_experiment(xpname)
     
     with mlflow.start_run():
 
-        log_GeNVI_experiment(setup,  n_samples_FU,  ratio_ood,  p_norm, batch,
+        log_GeNVI_experiment(setup, batch,
                               lat_dim, 
                               NNE,  n_samples_KL,  n_samples_LL,
                               max_iter,  learning_rate,  min_lr,  patience,  lr_decay,
                               device)
-        
+
+
+        RMSEs=[]
+        LPPs=[]
+        TIMEs=[]
+
         GeN_models_dict=[]
+        
         for i in range( nb_models):
+
+            setup=setup_.Setup( device) 
+
+            loglikelihood=setup.loglikelihood
+            projection=setup.projection
+            size_sample=setup.n_train_samples
+            param_count=setup.param_count
+
             with mlflow.start_run(run_name=str(i),nested=True):
                 start = timeit.default_timer()
-    
-                GeN, log_scores, ELBO = learning(loglikelihood, batch, setup.n_train_samples,
-                                                                        prior, projection, 
-                                                                         n_samples_FU,  ratio_ood,  p_norm,
-                                                                         lat_dim, setup.param_count,
-                                                                         NNE,  n_samples_KL,  n_samples_LL,
-                                                                         max_iter,  learning_rate,  min_lr,  patience,
-                                                                         lr_decay,  device)
+
+                GeN, log_scores, ELBO = learning(loglikelihood, batch, setup.n_train_samples, prior, 
+                                                  lat_dim, setup.param_count,
+                                                  NNE,  n_samples_KL,  n_samples_LL,
+                                                  max_iter,  learning_rate,  min_lr,  patience,
+                                                  lr_decay,  device)
 
 
                 stop = timeit.default_timer()
                 execution_time = stop - start
 
                 log_GeNVI_run(ELBO, log_scores)
-                """
+
                 log_device = 'cpu'
                 theta = GeN(1000).detach().to(log_device)
-                log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
-                """
+                LPP_test, RMSE_test, _ =log_exp_metrics(setup.evaluate_metrics, theta, execution_time, log_device)
+                RMSEs.append(RMSE_test[0])
+                LPPs.append(LPP_test[0])
+                TIMEs.append(execution_time)
                 save_model(GeN)
                 GeN_models_dict.append((i,GeN.state_dict().copy()))
                 
                 if setup.plot:
-                    log_device = 'cpu'
-                    theta = GeN(1000).detach().to(log_device)
                     draw_experiment(setup, theta[0:1000], log_device)
-      
+
+
+        mlflow.log_metric('average time',np.mean(TIMEs))
+
+        mlflow.log_metric('RMSE',np.mean(RMSEs))
+        mlflow.log_metric('RMSE-std',np.std(RMSEs))
+        mlflow.log_metric('LPP',np.mean(LPPs))
+        mlflow.log_metric('LPP-std',np.std(LPPs))
+
+
         tempdir = tempfile.TemporaryDirectory()
         models={str(i): model for i,model in GeN_models_dict}
         torch.save(models, tempdir.name + '/models.pt')
         mlflow.log_artifact(tempdir.name + '/models.pt')
-    
+
     return models
+
 
 
 if __name__ == "__main__":
     
-    FuNmodels={}
+    GeNmodels={}
 
-    """
+
     dataset='powerplant'
     print(dataset)
-    models=run(dataset, n_samples_FU=150, batch=500) 
+    models=run(dataset, batch=500) 
     print(dataset+': done :-)')
     
-    FuNmodels.update({dataset:models})
+    GeNmodels.update({dataset:models})
     
     for dataset in ['boston', 'yacht', 'concrete','energy', 'wine']:
         print(dataset)
-        models=run(dataset, n_samples_FU=150, batch=100) 
+        models=run(dataset, batch=None) 
         print(dataset+': done :-)')
-        FuNmodels.update({dataset:models})
-
-    """
-
-    n_samples_FU=30
-    patience=1000
-    
-    dataset='foong'
-    print(dataset)
-    models=run(dataset, n_samples_FU=n_samples_FU, batch=20,patience=patience) 
-    print(dataset+': done :-)')
-    FuNmodels.update({dataset:models})
-
-    
-    dataset='foong_mixed'
-    print(dataset)
-    models=run(dataset, n_samples_FU=n_samples_FU, batch=24,patience=patience) 
-    print(dataset+': done :-)')
-    FuNmodels.update({dataset:models})
+        GeNmodels.update({dataset:models})
 
 
- 
-    dataset='foong_sparse'
-    
-    print(dataset)
-    models=run(dataset, n_samples_FU=n_samples_FU, batch=4,patience=patience)
-    print(dataset+': done :-)')
-    FuNmodels.update({dataset:models})
 
-    torch.save(FuNmodels, 'Results/FuNmodelsFoong.pt')
-
-    """  
-    print('kin8nm')
-    pool.map(run_dataset, ["-m Experiments.FuNNeVI-mr --batch=100 --nb_models="+str(n)+" --setup=kin8nm --NNE=10  --device='cuda:0'"])
-    pool.map(run_dataset, ["-m Experiments.GeNNeVI-mr --batch=100 --nb_models="+str(n)+" --setup=kin8nm --device='cuda:0'"])      
-    print('kin8nm: done :-)')
-   
-  
-          #sort of early stopping for FuNNeVI
-    pool = Pool(processes=1) 
-
-    for dataset in ['boston', 'yacht', 'concrete','energy', 'wine','powerplant']:
-        print(dataset)
-        pool.map(run_dataset, ["-m Experiments.FuNNeVI-mres --batch=100  --nb_models="+str(n)+" --setup="+dataset+"  --device='cuda:0'"])  
-        print(dataset+': done :-)')
-    
-    print('kin8nm')
-    pool.map(run_dataset, ["-m Experiments.FuNNeVI-mres --batch=100  --nb_models="+str(n)+" --setup=kin8nm --NNE=10  --device='cuda:0'"])
-
-    print('kin8nm: done :-)')
-    
-   
     for dataset in ['foong','foong_mixed', 'foong_sparse']:
         print(dataset)
-        pool.map(run_dataset, ["-m Experiments.FuNNeVI-mres --n_samples_FU=20 --nb_models="+str(n)+" --setup="+dataset+"  --device='cuda:0'"])  
-
+        models=run(dataset, batch=None) 
         print(dataset+': done :-)')
-        
-           #sort of early stopping for FuNNeVI
-    pool = Pool(processes=1) 
+        GeNmodels.update({dataset:models})
 
-    for dataset in ['boston', 'yacht', 'concrete','energy', 'wine','powerplant']:
-        print(dataset)
-        pool.map(run_dataset, ["-m Experiments.FuNNeVI-spes --setup="+dataset+"  --device='cuda:0'"])  
-        print(dataset+': done :-)')
-    
-    print('kin8nm')
-    pool.map(run_dataset, ["-m Experiments.FuNNeVI-spes --setup=kin8nm --NNE=1  --device='cuda:0'"])
 
-    print('kin8nm: done :-)')
-    
-    """
+
+    torch.save(GeNmodels, 'Results/GeNmodels.pt')
+
+  
