@@ -14,15 +14,15 @@ from Experiments import draw_experiment, get_setup, save_model
 import tempfile
 
 lat_dim=5
-nb_models=3
+nb_splits=10
 NNE=1
 ratio_ood=1.
 p_norm=2
 n_samples_KL=1000
 n_samples_LL=100
-max_iter=25000
+max_iter=30000
 learning_rate=0.005
-patience=400
+patience=1000
 min_lr= 0.001
 lr_decay=.7
 device='cuda:0'
@@ -137,7 +137,7 @@ def run(dataset, n_samples_FU, batch):
         
         GeN_models_dict=[]
         
-        for i in range(10):
+        for i in range(nb_splits):
             seed=42+i
 
             setup=setup_.Setup(device,seed) 
@@ -193,7 +193,8 @@ def run(dataset, n_samples_FU, batch):
     metrics_dict={dataset:{'RMSE':(np.mean(RMSEs).round(decimals=3),np.std(RMSEs).round(decimals=3)),
                            'LPP': (np.mean(LPPs).round(decimals=3), np.std(LPPs).round(decimals=3)),
                            'PICP': (np.mean(PICPs).round(decimals=3), np.std(PICPs).round(decimals=3)),
-                           'MPIW': (np.mean(MPIWs).round(decimals=3), np.std(MPIWs).round(decimals=3))
+                           'MPIW': (np.mean(MPIWs).round(decimals=3), np.std(MPIWs).round(decimals=3)),
+                           'TIME': np.mean(TIMEs).round(decimals=0)
                           }
                  }
     
@@ -210,9 +211,12 @@ if __name__ == "__main__":
     print(dataset)
     metrics, models =run(dataset, n_samples_FU=150, batch=500) 
     print(dataset+': done :-)')
-    
+     
     results.update(metrics)
     Models.update({dataset:models})
+    
+    torch.save(results, 'Results/Fun_splits.pt')
+    torch.save(Models, 'Results/Fun_splits_Models.pt')
     
     for dataset in ['boston', 'yacht', 'concrete','energy', 'wine']:
         print(dataset)
@@ -221,7 +225,6 @@ if __name__ == "__main__":
         results.update(metrics)
         Models.update({dataset:models})
 
-
-    torch.save(results, 'Results/Fun_splits.pt')
-    torch.save(Models, 'Results/Fun_splits_Models.pt')
+        torch.save(results, 'Results/Fun_splits.pt')
+        torch.save(Models, 'Results/Fun_splits_Models.pt')
  
