@@ -107,7 +107,7 @@ def run(dataset, n_samples_FU, batch):
     param_count=setup.param_count
     
     if batch is None:
-        batch=size_sample
+        batch=int(size_sample/6)
     
     
 
@@ -207,9 +207,9 @@ if __name__ == "__main__":
     results={}
     Models={}
     
-    dataset='powerplant'
+    dataset='powerplant' 
     print(dataset)
-    metrics, models =run(dataset, n_samples_FU=150, batch=500) 
+    metrics, models =run(dataset, n_samples_FU=150) 
     print(dataset+': done :-)')
      
     results.update(metrics)
@@ -218,13 +218,54 @@ if __name__ == "__main__":
     torch.save(results, 'Results/Fun_splits.pt')
     torch.save(Models, 'Results/Fun_splits_Models.pt')
     
-    for dataset in ['boston', 'yacht', 'concrete','energy', 'wine']:
-        print(dataset)
-        metrics, models =run(dataset, n_samples_FU=150, batch=100) 
-        print(dataset+': done :-)')
-        results.update(metrics)
-        Models.update({dataset:models})
+    
+    dataset='boston'
+    print(dataset)
+    metrics, models =run(dataset, n_samples_FU=150) 
+    print(dataset+': done :-)')
+    results.update(metrics)
+    Models.update({dataset:models})
 
-        torch.save(results, 'Results/Fun_splits.pt')
-        torch.save(Models, 'Results/Fun_splits_Models.pt')
+    torch.save(results, 'Results/Fun_splits.pt')
+    torch.save(Models, 'Results/Fun_splits_Models.pt')
+    
+    dataset='yacht'
+    print(dataset)
+    metrics, models =run(dataset, n_samples_FU=150) 
+    print(dataset+': done :-)')
+    results.update(metrics)
+    Models.update({dataset:models})
+
+    torch.save(results, 'Results/Fun_splits.pt')
+    torch.save(Models, 'Results/Fun_splits_Models.pt')
+    
+    dataset= 'concrete' #1030
+    print(dataset)
+    metrics, models =run(dataset, n_samples_FU=150) 
+    print(dataset+': done :-)')
+    results.update(metrics)
+    Models.update({dataset:models})
+
+    torch.save(results, 'Results/Fun_splits.pt')
+    torch.save(Models, 'Results/Fun_splits_Models.pt')
+ 
+    dataset='energy'
+    print(dataset)
+    metrics, models =run(dataset, n_samples_FU=150) 
+    print(dataset+': done :-)')
+    results.update(metrics)
+    Models.update({dataset:models})
+
+    torch.save(results, 'Results/Fun_splits.pt')
+    torch.save(Models, 'Results/Fun_splits_Models.pt')
+ 
+    dataset= 'wine' #1599
+    print(dataset)
+    metrics, models =run(dataset, n_samples_FU=150) 
+    print(dataset+': done :-)')
+    results.update(metrics)
+    Models.update({dataset:models})
+
+    torch.save(results, 'Results/Fun_splits.pt')
+    torch.save(Models, 'Results/Fun_splits_Models.pt')
  
