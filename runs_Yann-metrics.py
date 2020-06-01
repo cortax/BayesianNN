@@ -60,8 +60,8 @@ if __name__ == "__main__":
 
     
     for d in datasets:
-        metrics=run(d) 
+        metrics=run(d, method) 
         print(d+': done :-)')
         results.update(metrics)
 
-    torch.save(results, 'Results/HMC_metrics.pt')
+    torch.save(results, 'Results/MR_metrics.pt')
