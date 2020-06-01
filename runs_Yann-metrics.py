@@ -34,7 +34,7 @@ def run(dataset, method):
     
     for i,m in models[dataset][method].items():
         G.load_state_dict(m)
-        theta=G(10000).detach()
+        theta=G(1000).detach()
 
         LPP_test, RMSE_test, _, PICP_test, MPIW_test = setup.evaluate_metrics(theta,log_device)
         
