@@ -43,10 +43,10 @@ def run(dataset, method):
         PICPs.append(PICP_test.item())
         MPIWs.append(MPIW_test.item())
     
-    metrics_dict={dataset:{(method,'RMSE'):(np.mean(RMSEs).round(decimals=3),np.std(RMSEs).round(decimals=3)),
-                           (method,'LPP'): (np.mean(LPPs).round(decimals=3),np.std(LPPs).round(decimals=3)),
-                           (method,'PICP'):  np.mean(PICPs).round(decimals=3), 
-                           (method,'MPIW'):  np.mean(MPIWs).round(decimals=3)
+    metrics_dict={(method,dataset):{'RMSE':(np.mean(RMSEs).round(decimals=3),np.std(RMSEs).round(decimals=3)),
+                           'LPP': (np.mean(LPPs).round(decimals=3),np.std(LPPs).round(decimals=3)),
+                           'PICP':  np.mean(PICPs).round(decimals=3), 
+                           'MPIW':  np.mean(MPIWs).round(decimals=3)
                            }
                    }
                  
