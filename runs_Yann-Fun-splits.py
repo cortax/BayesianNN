@@ -106,8 +106,9 @@ def run(dataset, n_samples_FU):
     size_sample=setup.n_train_samples
     param_count=setup.param_count
     
-    if batch is None:
-        batch=int(size_sample/6)
+    
+    
+    batch=int(size_sample/6)
     
     
 
