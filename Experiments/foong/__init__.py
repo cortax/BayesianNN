@@ -28,7 +28,8 @@ class Setup(AbstractRegressionSetup):
         self.sigma_noise = sigma_noise
         self.sigma_prior=sigma_prior
         self.plot = True
-
+        
+        self.input_dim=input_dim
         self.device = device
         self.param_count, self._model = get_mlp(input_dim, layerwidth, nblayers, activation)
         self._preparare_data()

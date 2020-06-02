@@ -5,11 +5,12 @@ from tqdm import tqdm, trange
 
 from Tools import KL
 
+
 class GeNNeVI():
     def __init__(self, objective_fn, batch, size_data, prior,
                  kNNE, n_samples_KL, n_samples_LL,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
-                 device,  save_best=True):
+                 device,  save_best=True, rho=1.):
         self.objective_fn = objective_fn
         self.batch=batch
         self.size_data=size_data
@@ -24,6 +25,9 @@ class GeNNeVI():
         self.patience = patience
         self.lr_decay = lr_decay
         self.device = device
+        
+        self.rho=rho
+
 
         self._best_score=float('inf')
     
@@ -44,7 +48,7 @@ class GeNNeVI():
         theta_prior=self.prior(self.n_samples_KL) #prior
 
         K=KL(theta, theta_prior, k=self.kNNE, device=self.device,p=2)
-        return (self.batch/self.size_data)*K
+        return K
 
 
     def run(self, GeN, show_fn=None):
@@ -67,7 +71,7 @@ class GeNNeVI():
 
                 K = self._KL(GeN) #KL(Q_var,Prior)
                 LL = self.objective_fn(GeN(self.n_samples_LL), self.batch).mean()
-                L = K - LL
+                L =self.rho* K - LL
                 L.backward()
 
                 lr = optimizer.param_groups[0]['lr']

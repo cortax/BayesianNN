@@ -14,7 +14,7 @@ class FuNNeVI():
     def __init__(self, loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                  kNNE, n_samples_KL, n_samples_LL,
                  max_iter, learning_rate, min_lr, patience, lr_decay,
-                 device, show=None):
+                 device, show=None, rho=1.):
         self.loglikelihood=loglikelihood
         self.batch=batch
         self.size_data=size_data
@@ -32,6 +32,7 @@ class FuNNeVI():
         self.lr_decay = lr_decay
         self.device = device
         
+        self.rho=rho
         self.show=show
     
         
@@ -89,7 +90,7 @@ class FuNNeVI():
     
                 K = self._KL(GeN) #KL(Q_var,Prior)
                 LL = self.loglikelihood(GeN(self.n_samples_LL), self.batch).mean()
-                L=(self.batch/self.size_data)*rho*K-LL
+                L=self.rho*K-LL
                 L.backward()
 
                 lr = optimizer.param_groups[0]['lr']
