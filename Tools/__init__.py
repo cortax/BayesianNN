@@ -254,7 +254,7 @@ def FunSW(t,s, projection, device, n=50, n_samples_inputs=50, L=100):
         W[i]=1/torch.tensor(float(n_samples_inputs)).sqrt()*sw(s_.to(device), t_.to(device),device, L=L)
     return W.mean()#, W.std()
 
-def FunKL(t,s,projection,device,k=1,n=100, m=50):
+def FunKL(t,s,projection,device,k=1,n=100, m=100):
     assert t.shape == s.shape
     K=torch.Tensor(n)
     for i in range(n):

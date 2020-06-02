@@ -192,8 +192,9 @@ class AbstractRegressionSetup():
     def projection(self,theta0,theta1, n_samples, ratio_ood):
         #compute size of both samples
         #n_samples=self.n_train_samples
-        n_id=int((1.-ratio_ood)*n_samples)
         n_ood=int(ratio_ood*n_samples)
+        n_id=n_samples-n_ood
+        
         
         #batch sample from train
         index=torch.randperm(self._X_train.shape[0])
