@@ -185,10 +185,10 @@ def run(setup, n_samples_FU):
     return models
 
 
-models=torch.load('Results/FuNmodelsPatience6pm.pt')#torch.load('Results/The_models.pt')
-lat_dim=5
-datasets=[d for d,i in models.items()]
-methods=['FuNNeVI']#['GeNNeVI', 'FuNNeVI']
+
+
+
+
 
 def run_metrics(dataset, method):
     
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     
     
     FuNmodels={}
-    n_samples_FU=200
+    n_samples_FU=150
     
     for dataset in ['powerplant','boston', 'yacht', 'concrete','energy', 'wine']:
         print(dataset)
