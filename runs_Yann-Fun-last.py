@@ -114,17 +114,18 @@ def run(setup, n_samples_FU):
     ratio_ood=0.05
 
     if dataset== 'concrete':
-        ratio_ood=0.25
+        ratio_ood= 0.4 #0.25
     
     if dataset == 'boston':
-        ratio_ood=0.1
+        ratio_ood=0.2#0.1
     if dataset == 'yacht':
-        ratio_ood=0.2
+        ratio_ood=0.1#0.2
     
-    
+    if dataset == 'energy':
+        ratio_ood=0.1
     
     if dataset== 'wine':
-        ratio_ood=0.00
+        ratio_ood=0.
     
 
         
