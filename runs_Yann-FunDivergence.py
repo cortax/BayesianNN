@@ -5,6 +5,7 @@ import mlflow
 import timeit
 
 import numpy as np
+import itertools
 
 from Models import BigGenerator
 
@@ -19,7 +20,7 @@ lat_dim=5
 def _FunKL(s,t,projection,device):
     k=1
     FKL=FunKL(s,t,projection=projection,device=device,k=k)
-    while torch.isnan(FKL):
+    while torch.isinf(FKL):
         k+=1
         FKL=FunKL(s,t,projection=projection,device=device,k=k)
     return FKL
@@ -87,6 +88,9 @@ def run(dataset, method, metrics):
     print(KLs)
     metrics.update({(method,dataset):{metric:(np.mean(KLs).round(decimals=3), np.std(KLs).round(decimals=3))}})
     
+    models_pairs=list(itertools.combinations(models[dataset].items(),2))
+
+    
     metric='KL(-,-)'
     KLs=[]
     for (i,m),(j,n) in models_pairs:
@@ -129,4 +133,4 @@ if __name__ == "__main__":
             metrics=run(d, m, metrics) 
             print(d+': done :-)')
 
-    torch.save(results, 'Results/DivergenceGeN.pt')
+            torch.save(metrics, 'Results/Divergence'+method+'.pt')

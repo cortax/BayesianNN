@@ -259,8 +259,7 @@ if __name__ == "__main__":
             metrics=run_metrics(d, m) 
             print(d+': done :-)')
             results.update(metrics)
-
-    torch.save(results, 'Results/MR_FuNmetrics_last.pt')
+            torch.save(results, 'Results/MR_FuNmetrics_last.pt')
 
 
 
