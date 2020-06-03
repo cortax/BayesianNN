@@ -208,9 +208,7 @@ def run_metrics(dataset, method):
     
     for i,m in models[dataset].items():
         G.load_state_dict(m)
-        n=10000
-        if dataset == 'powerplant':
-            n=2000
+        n=2000
         theta=G(n).detach().cpu()
 
         LPP_test, RMSE_test, _, PICP_test, MPIW_test = setup.evaluate_metrics(theta,log_device)
