@@ -13,15 +13,15 @@ from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 import tempfile
 
 lat_dim=5
-nb_models=3
+nb_models=1
 NNE=1
 ratio_ood=1.
 p_norm=2
-n_samples_KL=1000
+n_samples_KL=500
 n_samples_LL=100
-max_iter=20000
+max_iter=30000
 learning_rate=0.005
-patience=400
+patience=1000
 min_lr= 0.001
 lr_decay=.7
 device='cuda:0'
@@ -95,7 +95,7 @@ def log_GeNVI_run(ELBO, scores):
         
 
 
-def run(setup, n_samples_FU, batch):
+def run(setup, n_samples_FU,batch=None):
     
     setup_ = get_setup( setup)
     setup=setup_.Setup( device) 
@@ -104,13 +104,10 @@ def run(setup, n_samples_FU, batch):
     projection=setup.projection
     size_sample=setup.n_train_samples
     param_count=setup.param_count
-
     
     batch= batch
     if batch is None:
-        batch=size_sample
-    
-    
+        batch=int(size_sample/6)
 
     def prior(n):
         return setup.sigma_prior*torch.randn(size=(n,param_count), device= device)
@@ -171,39 +168,29 @@ def run(setup, n_samples_FU, batch):
 if __name__ == "__main__":
     
     FuNmodels={}
-
-
+    n_samples_FU=200
+    
     dataset='powerplant'
     print(dataset)
-    models=run(dataset, n_samples_FU=150, batch=500) 
+    models=run(dataset, n_samples_FU=n_samples_FU, batch=500) 
     print(dataset+': done :-)')
-    
-    FuNmodels.update({dataset:models})
     
     for dataset in ['boston', 'yacht', 'concrete','energy', 'wine']:
         print(dataset)
-        models=run(dataset, n_samples_FU=150, batch=100) 
+        models=run(dataset, n_samples_FU=n_samples_FU) 
         print(dataset+': done :-)')
         FuNmodels.update({dataset:models})
+        torch.save(FuNmodels, 'Results/FuNmodels_minibatch.pt')
 
-
-
-    for dataset in ['foong','foong_mixed']:
+    """
+    for dataset in ['foong','foong_mixed', 'foong_sparse']:
         print(dataset)
-        models=run(dataset, n_samples_FU=50, batch=30) 
+        models=run(dataset,n_samples_FU=30) 
         print(dataset+': done :-)')
         FuNmodels.update({dataset:models})
 
+    """
 
- 
-    dataset='foong_sparse'
-    
-    print(dataset)
-    models=run(dataset, n_samples_FU=50, batch=5)
-    print(dataset+': done :-)')
-    FuNmodels.update({dataset:models})
-
-    torch.save(FuNmodels, 'Results/FuNmodels.pt')
 
     """  
     print('kin8nm')

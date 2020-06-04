@@ -17,13 +17,11 @@ import tempfile
 lat_dim=5
 nb_models=3
 NNE=1
-ratio_ood=1.
-p_norm=2
 n_samples_KL=500
 n_samples_LL=100
-max_iter=20000
+max_iter=30000
 learning_rate=0.005
-patience=400
+patience=1000
 min_lr= 0.001
 lr_decay=.7
 device='cuda:0'
@@ -110,7 +108,7 @@ def run(setup, batch):
     
     batch= batch
     if batch is None:
-        batch=size_sample
+        batch=int(size_sample/6)
     
     
 
@@ -205,7 +203,7 @@ if __name__ == "__main__":
     
     for dataset in ['boston', 'yacht', 'concrete','energy', 'wine']:
         print(dataset)
-        models=run(dataset, batch=None) 
+        models=run(dataset) 
         print(dataset+': done :-)')
         GeNmodels.update({dataset:models})
 
@@ -213,12 +211,12 @@ if __name__ == "__main__":
 
     for dataset in ['foong','foong_mixed', 'foong_sparse']:
         print(dataset)
-        models=run(dataset, batch=None) 
+        models=run(dataset) 
         print(dataset+': done :-)')
         GeNmodels.update({dataset:models})
 
 
 
-    torch.save(GeNmodels, 'Results/GeNmodels.pt')
+    torch.save(GeNmodels, 'Results/GeNmodels_minibatch.pt')
 
   
