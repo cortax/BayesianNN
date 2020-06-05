@@ -13,7 +13,7 @@ from Experiments import log_exp_metrics, draw_experiment, get_setup, save_model
 import tempfile
 
 lat_dim=5
-nb_models=1
+nb_models=3
 NNE=1
 ratio_ood=1.
 p_norm=2
@@ -30,7 +30,7 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
                    lat_dim, param_count, 
                    kNNE, n_samples_KL, n_samples_LL,  
                    max_iter, learning_rate, min_lr, patience, lr_decay, 
-                   device):
+                   device, rho):
 
     GeN = BigGenerator(lat_dim, param_count,device).to(device)
     #GeN=SLPGenerator(lat_dim, param_count,device).to(device)
@@ -39,7 +39,7 @@ def learning(loglikelihood, batch, size_data, prior, projection, n_samples_FU, r
     optimizer = FuNNeVI(loglikelihood, batch, size_data, prior, projection, n_samples_FU, ratio_ood, p,
                           kNNE, n_samples_KL, n_samples_LL, 
                           max_iter, learning_rate, min_lr, patience, lr_decay,
-                          device)
+                          device, rho=rho)
 
     ELBO = optimizer.run(GeN)
 
@@ -109,6 +109,8 @@ def run(setup, n_samples_FU,batch=None):
     if batch is None:
         batch=int(size_sample/6)
 
+    rho=batch/size_sample
+    
     def prior(n):
         return setup.sigma_prior*torch.randn(size=(n,param_count), device= device)
 
@@ -137,8 +139,7 @@ def run(setup, n_samples_FU,batch=None):
                                                                          lat_dim, setup.param_count,
                                                                          NNE,  n_samples_KL,  n_samples_LL,
                                                                          max_iter,  learning_rate,  min_lr,  patience,
-                                                                         lr_decay,  device)
-
+                                                                         lr_decay,  device, rho=rho)
 
                 stop = timeit.default_timer()
                 execution_time = stop - start
@@ -180,7 +181,7 @@ if __name__ == "__main__":
         models=run(dataset, n_samples_FU=n_samples_FU) 
         print(dataset+': done :-)')
         FuNmodels.update({dataset:models})
-        torch.save(FuNmodels, 'Results/FuNmodels_minibatch.pt')
+    torch.save(FuNmodels, 'Results/FuNmodels_minibatch.pt')
 
     """
     for dataset in ['foong','foong_mixed', 'foong_sparse']:
@@ -192,44 +193,4 @@ if __name__ == "__main__":
     """
 
 
-    """  
-    print('kin8nm')
-    pool.map(run_dataset, ["-m Experiments.FuNNeVI-mr --batch=100 --nb_models="+str(n)+" --setup=kin8nm --NNE=10  --device='cuda:0'"])
-    pool.map(run_dataset, ["-m Experiments.GeNNeVI-mr --batch=100 --nb_models="+str(n)+" --setup=kin8nm --device='cuda:0'"])      
-    print('kin8nm: done :-)')
-   
-  
-          #sort of early stopping for FuNNeVI
-    pool = Pool(processes=1) 
-
-    for dataset in ['boston', 'yacht', 'concrete','energy', 'wine','powerplant']:
-        print(dataset)
-        pool.map(run_dataset, ["-m Experiments.FuNNeVI-mres --batch=100  --nb_models="+str(n)+" --setup="+dataset+"  --device='cuda:0'"])  
-        print(dataset+': done :-)')
-    
-    print('kin8nm')
-    pool.map(run_dataset, ["-m Experiments.FuNNeVI-mres --batch=100  --nb_models="+str(n)+" --setup=kin8nm --NNE=10  --device='cuda:0'"])
-
-    print('kin8nm: done :-)')
-    
-   
-    for dataset in ['foong','foong_mixed', 'foong_sparse']:
-        print(dataset)
-        pool.map(run_dataset, ["-m Experiments.FuNNeVI-mres --n_samples_FU=20 --nb_models="+str(n)+" --setup="+dataset+"  --device='cuda:0'"])  
-
-        print(dataset+': done :-)')
-        
-           #sort of early stopping for FuNNeVI
-    pool = Pool(processes=1) 
-
-    for dataset in ['boston', 'yacht', 'concrete','energy', 'wine','powerplant']:
-        print(dataset)
-        pool.map(run_dataset, ["-m Experiments.FuNNeVI-spes --setup="+dataset+"  --device='cuda:0'"])  
-        print(dataset+': done :-)')
-    
-    print('kin8nm')
-    pool.map(run_dataset, ["-m Experiments.FuNNeVI-spes --setup=kin8nm --NNE=1  --device='cuda:0'"])
-
-    print('kin8nm: done :-)')
-    
-    """
+ 
