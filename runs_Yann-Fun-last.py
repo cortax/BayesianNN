@@ -20,7 +20,7 @@ ratio_ood=.1
 p_norm=2
 n_samples_KL=500
 n_samples_LL=100
-max_iter=20000
+max_iter=30000
 learning_rate=0.005
 patience=1000
 min_lr= 0.001
@@ -109,25 +109,31 @@ def run(setup, n_samples_FU):
 
     batch=np.min([int(size_sample/6),500])
 
-    rho=batch/size_sample * input_dim
+    rho=batch/size_sample #* input_dim
     
-    ratio_ood=0.05
+    ratio_ood=0.8
 
+    if dataset== 'powerplant':
+        ratio_ood= 0.1 #0.35 #0.25
+    if dataset== 'wine':
+        ratio_ood=0.1
+    
+    """
     if dataset== 'concrete':
-        ratio_ood= 0.4 #0.25
+        ratio_ood= 0.25 #0.35 #0.25
     
     if dataset == 'boston':
-        ratio_ood=0.2#0.1
+        ratio_ood=0.1 #0.15 #0.2#0.1
     if dataset == 'yacht':
-        ratio_ood=0.1#0.2
+        ratio_ood=0.15#0.1#0.2
     
     if dataset == 'energy':
-        ratio_ood=0.1
+        ratio_ood=0.1 #0.15#0.1
     
     if dataset== 'wine':
         ratio_ood=0.
     
-
+    """
         
         
     def prior(n):
@@ -235,7 +241,7 @@ if __name__ == "__main__":
     
     
     FuNmodels={}
-    n_samples_FU=150
+    n_samples_FU=200
     
     for dataset in ['powerplant','boston', 'yacht', 'concrete','energy', 'wine']:
         print(dataset)
@@ -258,7 +264,7 @@ if __name__ == "__main__":
             metrics=run_metrics(d, m) 
             print(d+': done :-)')
             results.update(metrics)
-            torch.save(results, 'Results/MR_FuNmetrics_last.pt')
+            torch.save(results, 'Results/MR_FuNmetrics_last2.pt')
 
 
 
