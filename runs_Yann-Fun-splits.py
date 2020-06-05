@@ -18,7 +18,7 @@ nb_splits=10
 NNE=1
 ratio_ood=1.
 p_norm=2
-n_samples_KL=1000
+n_samples_KL=500
 n_samples_LL=100
 max_iter=30000
 learning_rate=0.005
@@ -96,7 +96,7 @@ def log_GeNVI_run(ELBO, scores):
         
 
 
-def run(dataset, n_samples_FU):
+def run(dataset, n_samples_FU, batch=None):
     
     setup_ = get_setup(dataset)
     setup=setup_.Setup( device) 
@@ -107,9 +107,10 @@ def run(dataset, n_samples_FU):
     param_count=setup.param_count
     
     
-    
-    batch=int(size_sample/6)
-    
+
+    if batch is None:
+        batch=int(size_sample/6)
+        
     
 
     def prior(n):
@@ -207,66 +208,30 @@ if __name__ == "__main__":
     
     results={}
     Models={}
+
+    n_samples_FU=200
+
     
-    dataset='powerplant' 
+    dataset='powerplant'
     print(dataset)
-    metrics, models =run(dataset, n_samples_FU=150) 
+    metrics, models=run(dataset, n_samples_FU=n_samples_FU, batch=500) 
     print(dataset+': done :-)')
-     
-    results.update(metrics)
-    Models.update({dataset:models})
     
-    torch.save(results, 'Results/Fun_splits.pt')
-    torch.save(Models, 'Results/Fun_splits_Models.pt')
-    
-    
-    dataset='boston'
-    print(dataset)
-    metrics, models =run(dataset, n_samples_FU=150) 
-    print(dataset+': done :-)')
     results.update(metrics)
     Models.update({dataset:models})
 
-    torch.save(results, 'Results/Fun_splits.pt')
-    torch.save(Models, 'Results/Fun_splits_Models.pt')
+    torch.save(results, 'Results/Fun_splits_last.pt')
+    torch.save(Models, 'Results/Fun_splits_Models_last.pt')
     
-    dataset='yacht'
-    print(dataset)
-    metrics, models =run(dataset, n_samples_FU=150) 
-    print(dataset+': done :-)')
-    results.update(metrics)
-    Models.update({dataset:models})
+    for dataset in ['boston', 'yacht', 'concrete','energy', 'wine']:
+        print(dataset)
+        metrics, models =run(dataset,n_samples_FU=n_samples_FU, batch=None) 
+        print(dataset+': done :-)')
+        results.update(metrics)
+        Models.update({dataset:models})
 
-    torch.save(results, 'Results/Fun_splits.pt')
-    torch.save(Models, 'Results/Fun_splits_Models.pt')
+        torch.save(results, 'Results/Fun_splits_last.pt')
+        torch.save(Models, 'Results/Fun_splits_Models_last.pt')
+
     
-    dataset= 'concrete' #1030
-    print(dataset)
-    metrics, models =run(dataset, n_samples_FU=150) 
-    print(dataset+': done :-)')
-    results.update(metrics)
-    Models.update({dataset:models})
-
-    torch.save(results, 'Results/Fun_splits.pt')
-    torch.save(Models, 'Results/Fun_splits_Models.pt')
- 
-    dataset='energy'
-    print(dataset)
-    metrics, models =run(dataset, n_samples_FU=150) 
-    print(dataset+': done :-)')
-    results.update(metrics)
-    Models.update({dataset:models})
-
-    torch.save(results, 'Results/Fun_splits.pt')
-    torch.save(Models, 'Results/Fun_splits_Models.pt')
- 
-    dataset= 'wine' #1599
-    print(dataset)
-    metrics, models =run(dataset, n_samples_FU=150) 
-    print(dataset+': done :-)')
-    results.update(metrics)
-    Models.update({dataset:models})
-
-    torch.save(results, 'Results/Fun_splits.pt')
-    torch.save(Models, 'Results/Fun_splits_Models.pt')
- 
+  
